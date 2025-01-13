@@ -18,54 +18,6 @@
 		{
 			"src": "^\\/_image\\/?$",
 			"dest": "_render"
-		},
-		{
-			"src": "^\\/authentication\\/sign-in\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/citasTable\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/consulta\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/dashboard\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/empleados\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/favicon\\.svg\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/login\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/logup\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/nueva-cita\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/pacientes\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/tratamiento\\/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^\\/$",
-			"dest": "_render"
 		}
 	]
 }
