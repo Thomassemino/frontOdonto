@@ -5,6 +5,10 @@ import LayoutProtected from "../app/LayoutProtected.astro";
 
 <LayoutProtected>
 <LayoutCommon>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
   <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 text-slate-800 dark:from-slate-900 dark:to-slate-800 dark:text-slate-100 lg:p-16">
     <div class="mx-auto max-w-4xl">
       <div class="mb-8">
@@ -56,6 +60,7 @@ import LayoutProtected from "../app/LayoutProtected.astro";
                   id="diaConsulta"
                   name="diaConsulta"
                   required
+                  placeholder="Seleccionar un día"
                   class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700"
                 />
               </div>
@@ -65,10 +70,11 @@ import LayoutProtected from "../app/LayoutProtected.astro";
                   Hora de Consulta
                 </label>
                 <input
-                  type="time"
+                  type="text"
                   id="horaConsulta"
                   name="horaConsulta"
                   required
+                  placeholder="Seleccionar una hora"
                   class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700"
                 />
               </div>
@@ -140,6 +146,23 @@ import LayoutProtected from "../app/LayoutProtected.astro";
   const volverBtn = document.getElementById('volverBtn');
   const cancelarBtn = document.getElementById('cancelarBtn');
 
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar Flatpickr para el selector de hora
+    flatpickr("#horaConsulta", {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      time_24hr: true,
+      locale: "es",
+      minuteIncrement: 30,
+      minTime: "09:00",
+      maxTime: "18:00",
+      defaultHour: 9,
+      defaultMinute: 0
+    });
+  });
+  
 	form?.addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
@@ -350,4 +373,29 @@ async function cargarPacientes() {
   setTimeout(() => notification.remove(), 3000);
 }
 </script>
+
+
+<style>
+  :global(.flatpickr-calendar.noCalendar) {
+    background: #1e293b;
+    border: 1px solid #475569;
+  }
+
+  :global(.dark .flatpickr-calendar) {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+  }
+
+  :global(.dark .flatpickr-time) {
+    background: #1e293b !important;
+  }
+
+  :global(.dark .flatpickr-time input) {
+    color: #e2e8f0 !important;
+  }
+
+  :global(.dark .flatpickr-time .numInputWrapper:hover) {
+    background: #334155 !important;
+  }  
+</style>
 
