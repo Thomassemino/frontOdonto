@@ -339,7 +339,7 @@ form.addEventListener('submit', async (e) => {
 
       console.log('Enviando datos de médico:', medicoData);
 
-      const medicoResponse = await fetch(`${BASE_URL}/api/medico/create`, {
+      const medicoResponse = await fetch(`${BASE_URL}/medico/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

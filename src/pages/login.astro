@@ -71,7 +71,7 @@ interface LoginResponse {
 const validateUser = async (email: string, password: string): Promise<LoginResponse> => {
   try {
     // 1. Primero hacemos el login
-    const loginResponse = await fetch('http://localhost:5000/api/login/login', {
+    const loginResponse = await fetch(`${BASE_URL}/login/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
