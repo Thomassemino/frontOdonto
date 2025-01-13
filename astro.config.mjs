@@ -2,20 +2,21 @@ import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import vercel from '@astrojs/vercel/serverless';
 
-// https://astro.build/config
 export default defineConfig({
-  output: 'server',
+  output: 'hybrid',  // Cambiado a hybrid
   adapter: vercel({
-    functionPerRoute: false,
-    maxDuration: 10
+    webAnalytics: {
+      enabled: true,
+    },
+    speedInsights: {
+      enabled: true,
+    },
+    imageService: true,
+    imagesConfig: {
+      sizes: [640, 750, 828, 1080, 1200, 1920],
+      domains: [],
+      formats: ['image/avif', 'image/webp'],
+    },
   }),
   integrations: [tailwind()],
-  vite: {
-    build: {
-      minify: false
-    },
-    ssr: {
-      noExternal: ['flowbite', 'flowbite-react']
-    }
-  }
 });
