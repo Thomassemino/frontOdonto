@@ -1,0 +1,7 @@
+# Forzar LF para todos los archivos de texto
+* text=auto eol=lf
+
+# Archivos específicos con LF
+*.ts text eol=lf
+*.astro text eol=lf
+*.json text eol=lf

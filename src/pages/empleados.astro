@@ -1,0 +1,161 @@
+---
+import LayoutCommon from "../app/LayoutCommon.astro";
+import LayoutProtected from "../app/LayoutProtected.astro";
+---
+
+<LayoutProtected>
+	<LayoutCommon>
+		<div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 text-slate-800 dark:from-slate-900 dark:to-slate-800 dark:text-slate-100 lg:p-16">
+			<div class="mx-auto max-w-6xl">
+				<div class="flex items-center gap-4 mb-6">
+					<button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+						← Volver al inicio
+					</button>
+					<h2 class="text-2xl font-bold">Empleados</h2>
+				</div>
+	
+				<!-- Filtros y Búsqueda -->
+				<div class="mb-6 max-w-lg"> <!-- Contenedor con ancho máximo -->
+					<div class="grid grid-cols-2 gap-4">
+						<div class="space-y-2">
+							<label for="searchInput" class="block text-sm font-medium">Buscar</label>
+							<input
+								type="text"
+								id="searchInput"
+								placeholder="Buscar por nombre o email..."
+								class="w-full rounded-lg border border-gray-300 p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+							/>
+						</div>
+						
+						<div class="space-y-2">
+							<label for="rolFilter" class="block text-sm font-medium">Filtrar por Rol</label>
+							<select
+								id="rolFilter"
+								class="w-full rounded-lg border border-gray-300 p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+							>
+								<option value="">Todos</option>
+								<option value="Odontólogo">Odontólogos</option>
+								<option value="Secretaria">Secretarias</option>
+							</select>
+						</div>
+					</div>
+				</div>
+	
+				<div class="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800">
+					<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+						<thead class="bg-gray-100 dark:bg-gray-700">
+							<tr>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Nombre</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Email</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Celular</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Rol</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Especialidad</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</LayoutCommon>
+	</LayoutProtected>
+
+<script>
+	const BASE_URL = 'https://consultorio-odontologico-backend-production-b1c8.up.railway.app/api';
+  let empleadosData = []; // Almacenar todos los empleados
+
+  function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${
+      type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
+  }
+
+  function filtrarEmpleados() {
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase();
+    const rolFilter = document.getElementById('rolFilter')?.value;
+
+    const empleadosFiltrados = empleadosData.filter(empleado => {
+      const cumpleBusqueda = !searchTerm || 
+        empleado.nombre.toLowerCase().includes(searchTerm) || 
+        empleado.email.toLowerCase().includes(searchTerm);
+      
+      const cumpleRol = !rolFilter || empleado.rol === rolFilter;
+
+      return cumpleBusqueda && cumpleRol;
+    });
+
+    renderizarTabla(empleadosFiltrados);
+  }
+
+  function renderizarTabla(empleados) {
+    const tbody = document.querySelector('tbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = empleados.map(empleado => `
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-150">
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${empleado.nombre || ''}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${empleado.email || ''}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${empleado.celular || ''}</td>
+        <td class="px-6 py-4 text-sm">
+          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+            empleado.rol === 'Odontólogo' 
+              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+              : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+          }">
+            ${empleado.rol}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${empleado.especialidad || '-'}</td>
+      </tr>
+    `).join('');
+  }
+
+  async function cargarEmpleados() {
+    try {
+      // Obtener médicos
+      const responseMedicos = await fetch(`${BASE_URL}/medico`);
+      const dataMedicos = await responseMedicos.json();
+      const medicos = dataMedicos.medicos.map(medico => ({
+        ...medico,
+        rol: 'Odontólogo'
+      }));
+
+      // Obtener secretarias
+			const responseSecretarias = await fetch(`${BASE_URL}/secretaria/getAll`);
+    const dataSecretarias = await responseSecretarias.json();
+    const secretarias = dataSecretarias.secretarias.map(secretaria => ({
+      ...secretaria,
+      rol: 'Secretaria',
+      especialidad: '-'
+    }));
+
+      // Combinar y ordenar por nombre
+      empleadosData = [...medicos, ...secretarias].sort((a, b) => 
+        a.nombre.localeCompare(b.nombre)
+      );
+
+      renderizarTabla(empleadosData);
+    } catch (error) {
+      console.error('Error:', error);
+      showNotification('Error al cargar los empleados', 'error');
+    }
+  }
+
+  // Event Listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    cargarEmpleados();
+    
+    document.getElementById('volverBtn')?.addEventListener('click', () => {
+      window.location.href = '/';
+    });
+
+    // Eventos para filtros
+    document.getElementById('searchInput')?.addEventListener('input', filtrarEmpleados);
+    document.getElementById('rolFilter')?.addEventListener('change', filtrarEmpleados);
+  });
+</script>

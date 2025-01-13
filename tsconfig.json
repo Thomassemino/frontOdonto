@@ -1,0 +1,12 @@
+{
+  "extends": "astro/tsconfigs/strictest",
+  "compilerOptions": {
+    "strictNullChecks": true
+  },
+	"include": [
+  "src/**/*.ts",
+  "src/**/*.tsx",
+  "src/**/*.astro",
+  "src/services/auth.ts"
+]
+}

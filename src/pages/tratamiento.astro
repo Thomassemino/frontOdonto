@@ -1,0 +1,448 @@
+---
+import LayoutCommon from "../app/LayoutCommon.astro";
+import LayoutProtected from "../app/LayoutProtected.astro";
+---
+
+<script>
+const BASE_URL = 'http://localhost:5000/api';
+
+const state = {
+  modals: {
+    edit: { isOpen: false, selectedTreatment: null },
+    create: { isOpen: false }
+  }
+};
+
+const validateTreatment = (treatment) => {
+  const errors = [];
+  if (!treatment.nombre.trim()) errors.push('El nombre es requerido');
+  if (!treatment.descripcion.trim()) errors.push('La descripción es requerida');
+  return errors;
+};
+
+const showNotification = (message, type = 'success') => {
+  const existingNotification = document.querySelector('.notification');
+  if (existingNotification) existingNotification.remove();
+
+  const notification = document.createElement('div');
+  notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${
+    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+  } transition-opacity duration-300`;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    setTimeout(() => notification.remove(), 3000);
+  }, 3000);
+};
+
+async function filtrarTratamientos() {
+  const searchTerm = document.getElementById('searchInput')?.value.toLowerCase().trim();
+  const tbody = document.querySelector('tbody');
+  
+  if (!tbody) return;
+
+  try {
+    const response = await fetch(`${BASE_URL}/tratamientos`);
+    const data = await response.json();
+    
+    const tratamientosFiltrados = !searchTerm 
+      ? data 
+      : data.filter(tratamiento => 
+          tratamiento.nombre.toLowerCase().includes(searchTerm) ||
+          tratamiento.descripcion.toLowerCase().includes(searchTerm)
+        );
+
+    tbody.innerHTML = tratamientosFiltrados.map(row => `
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-150"
+          data-id="${row._id}"
+          data-nombre="${row.nombre}"
+          data-descripcion="${row.descripcion}">
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.nombre}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.descripcion}</td>
+        <td class="px-6 py-4">
+          <div class="flex space-x-2">
+            <button class="edit-button p-2 text-blue-600 hover:text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="delete-button p-2 text-red-600 hover:text-red-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Error al filtrar tratamientos:', error);
+    showNotification('Error al filtrar los tratamientos', 'error');
+  }
+}
+
+async function actualizarTabla() {
+  const tbody = document.querySelector('tbody');
+  if (!tbody) return;
+
+  try {
+    const response = await fetch(`${BASE_URL}/tratamientos`);
+    if (!response.ok) throw new Error('Error al obtener tratamientos');
+
+    const data = await response.json();
+    console.log('Tratamientos:', data);
+
+    tbody.innerHTML = data.map(row => `
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-150"
+          data-id="${row._id}"
+          data-nombre="${row.nombre}"
+          data-descripcion="${row.descripcion}">
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.nombre}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.descripcion}</td>
+        <td class="px-6 py-4">
+          <div class="flex space-x-2">
+            <button class="edit-button p-2 text-blue-600 hover:text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="delete-button p-2 text-red-600 hover:text-red-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Error al obtener tratamientos:', error);
+    showNotification('Error al cargar los tratamientos', 'error');
+  }
+}
+
+async function handleCreate(formData) {
+  const treatment = {
+    nombre: formData.get('nombre')?.toString().trim(),
+    descripcion: formData.get('descripcion')?.toString().trim()
+  };
+
+  const errors = validateTreatment(treatment);
+  if (errors.length > 0) {
+    throw new Error(errors.join('\n'));
+  }
+
+  const response = await fetch(`${BASE_URL}/tratamientos/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Origin': 'http://localhost:4321'
+    },
+    body: JSON.stringify(treatment)
+  });
+
+  if (!response.ok) {
+    throw new Error('Error al crear el tratamiento');
+  }
+
+  showNotification('Tratamiento creado correctamente');
+  await actualizarTabla();
+  closeCreateModal();
+}
+
+async function handleEdit(formData) {
+  const id = state.modals.edit.selectedTreatment.id;
+  const treatment = {
+    nombre: formData.get('nombre')?.toString().trim(),
+    descripcion: formData.get('descripcion')?.toString().trim()
+  };
+
+  const errors = validateTreatment(treatment);
+  if (errors.length > 0) {
+    throw new Error(errors.join('\n'));
+  }
+
+  const response = await fetch(`${BASE_URL}/tratamientos/updateById/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Origin': 'http://localhost:4321'
+    },
+    body: JSON.stringify(treatment)
+  });
+
+  if (!response.ok) {
+    throw new Error('Error al actualizar el tratamiento');
+  }
+
+  showNotification('Tratamiento actualizado correctamente');
+  await actualizarTabla();
+  closeEditModal();
+}
+
+async function handleDelete(id, nombre) {
+  if (!confirm(`¿Está seguro que desea eliminar el tratamiento "${nombre}"?`)) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/tratamientos/deleteById/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Origin': 'http://localhost:4321'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al eliminar el tratamiento');
+    }
+
+    showNotification('Tratamiento eliminado correctamente');
+    await actualizarTabla();
+  } catch (error) {
+    showNotification(error.message, 'error');
+  }
+}
+
+// Modal handlers
+function openEditModal(treatment) {
+  state.modals.edit.selectedTreatment = { ...treatment };
+  state.modals.edit.isOpen = true;
+  
+  const modal = document.getElementById('editModal');
+  const form = document.getElementById('editForm');
+  
+  modal?.classList.remove('hidden');
+  if (form) {
+    form.elements.nombre.value = treatment.nombre;
+    form.elements.descripcion.value = treatment.descripcion;
+  }
+}
+
+function closeEditModal() {
+  state.modals.edit.isOpen = false;
+  state.modals.edit.selectedTreatment = null;
+  document.getElementById('editModal')?.classList.add('hidden');
+}
+
+function openCreateModal() {
+  document.getElementById('createModal')?.classList.remove('hidden');
+  state.modals.create.isOpen = true;
+}
+
+function closeCreateModal() {
+  document.getElementById('createModal')?.classList.add('hidden');
+  state.modals.create.isOpen = false;
+  document.getElementById('createForm')?.reset();
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+  actualizarTabla();
+
+  document.getElementById('createTreatmentButton')?.addEventListener('click', openCreateModal);
+
+	document.getElementById('volverBtn')?.addEventListener('click', () => {
+    window.location.href = '/';
+	});
+
+	document.getElementById('searchInput')?.addEventListener('input', () => {
+    filtrarTratamientos();
+  });
+
+  document.querySelectorAll('.close-modal').forEach(button => {
+    button.addEventListener('click', () => {
+      closeEditModal();
+      closeCreateModal();
+    });
+  });
+	
+
+  document.querySelector('tbody')?.addEventListener('click', async (e) => {
+    const target = e.target.closest('button');
+    if (!target) return;
+
+    const row = target.closest('tr');
+    if (!row) return;
+
+    const treatment = {
+      id: row.dataset.id,
+      nombre: row.dataset.nombre,
+      descripcion: row.dataset.descripcion
+    };
+
+    if (target.classList.contains('edit-button')) {
+      openEditModal(treatment);
+    }
+
+    if (target.classList.contains('delete-button')) {
+      await handleDelete(treatment.id, treatment.nombre);
+    }
+  });
+
+  document.getElementById('createForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await handleCreate(new FormData(e.target));
+    } catch (error) {
+      showNotification(error.message, 'error');
+    }
+  });
+
+  document.getElementById('editForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await handleEdit(new FormData(e.target));
+    } catch (error) {
+      showNotification(error.message, 'error');
+    }
+  });
+});
+</script>
+
+<LayoutProtected>
+<LayoutCommon>
+  <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 dark:from-slate-900 dark:to-slate-800 lg:p-16">
+    <div class="mx-auto max-w-6xl">
+      <div class="flex justify-between items-center mb-6">
+				<div class="flex items-center gap-4">
+					<button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+						← Volver al inicio
+					</button>
+					<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Tratamientos</h2>
+				</div>
+				<button id="createTreatmentButton" 
+								class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 
+											 focus:ring-2 focus:ring-green-300 transition-colors duration-200">
+					Nuevo Tratamiento
+				</button>
+			</div>
+
+			<div class="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+				<div class="space-y-2">
+					<input
+						type="text"
+						id="searchInput"
+						placeholder="Buscar por nombre o descripción..."
+						class="w-full rounded-lg border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+					/>
+				</div>
+			</div>
+
+      <div class="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-100 dark:bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                Nombre
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                Descripción
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <!-- Filled dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-1/3">
+      <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Editar Tratamiento</h2>
+      <form id="editForm" class="space-y-4">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+          <input type="text" name="nombre" required
+                 class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 
+                        focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"/>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+          <textarea name="descripcion" required rows="3"
+                    class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 
+                           focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-4">
+          <button type="button" class="close-modal px-4 py-2 text-sm font-medium text-white bg-gray-600 
+                                     rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-300">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 
+                                     rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-300">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Modal -->
+  <div id="createModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-1/3">
+      <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Nuevo Tratamiento</h2>
+      <form id="createForm" class="space-y-4">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+          <input type="text" name="nombre" required placeholder="Nombre del tratamiento"
+                 class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 
+                        focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"/>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+          <textarea name="descripcion" required rows="3" placeholder="Descripción detallada del tratamiento"
+                    class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 
+                         focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+          ></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-4">
+          <button type="button" 
+                  class="close-modal px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg 
+                         hover:bg-gray-700 focus:ring-2 focus:ring-gray-300">
+            Cancelar
+          </button>
+          <button type="submit" 
+                  class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg 
+                         hover:bg-green-700 focus:ring-2 focus:ring-green-300">
+            Crear
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</LayoutCommon>
+</LayoutProtected>
+
+<style>
+.notification {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.modal-overlay {
+  backdrop-filter: blur(4px);
+}
+</style>
