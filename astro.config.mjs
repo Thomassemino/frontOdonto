@@ -2,21 +2,20 @@ import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import vercel from '@astrojs/vercel/serverless';
 
+// https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: vercel(),
+  adapter: vercel({
+    functionPerRoute: false,
+    maxDuration: 10
+  }),
   integrations: [tailwind()],
   vite: {
     build: {
-      rollupOptions: {
-        external: ['flowbite/dist/flowbite.min.js'],
-      }
+      minify: false
     },
     ssr: {
-      noExternal: ['flowbite-react']
-    },
-    optimizeDeps: {
-      exclude: ['@astrojs/vercel/serverless']
+      noExternal: ['flowbite', 'flowbite-react']
     }
   }
 });
