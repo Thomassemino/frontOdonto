@@ -113,7 +113,7 @@ function deserializeActionResult(res) {
         })
       };
     }
-    if (Object.assign(__vite_import_meta_env__, { OS: process.env.OS })?.PROD) {
+    if (Object.assign(__vite_import_meta_env__, { OS: process.env.OS, _: process.env._ })?.PROD) {
       return { error: ActionError.fromJson(json), data: undefined };
     } else {
       const error = ActionError.fromJson(json);
