@@ -1,0 +1,11 @@
+---
+---
+
+<script>
+  import { requireAuth } from '../auth/middleware';
+  if (!requireAuth()) {
+    throw new Error('Not authenticated');
+  }
+</script>
+
+<slot />

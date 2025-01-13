@@ -1,0 +1,369 @@
+---
+import LayoutCommon from '../app/LayoutCommon.astro';
+---
+
+<LayoutCommon>
+<div class="flex flex-col items-center justify-center min-h-screen px-6 mx-auto dark:bg-gray-900">
+  <div class="w-full max-w-md p-8 space-y-3 rounded-xl bg-white dark:bg-gray-800">
+    <h1 class="text-2xl font-bold text-center text-gray-700 dark:text-white">
+      Registro de Usuario
+    </h1>
+
+    <form id="signupForm" class="space-y-6">
+      <div>
+        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Correo electrónico</label>
+        <input type="email" name="email" id="email" placeholder="ejemplo@correo.com" 
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+      </div>
+
+      <div>
+        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Contraseña</label>
+        <input type="password" name="password" id="password" placeholder="••••••••" 
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+      </div>
+
+      <div>
+        <label for="rol" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Rol</label>
+        <select id="rol" name="rol" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+          <option value="">Selecciona un rol</option>
+          <option value="odontologo">Médico/a</option>
+          <option value="secretaria">Secretario/a</option>
+        </select>
+      </div>
+
+      <!-- Campos de Médico -->
+      <div id="camposMedico" class="hidden space-y-6">
+        <div>
+          <label for="nombreMedico" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Nombre completo</label>
+          <input type="text" name="nombre" id="nombreMedico" placeholder="Ingrese nombre completo" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+        </div>
+        <div>
+          <label for="especialidad" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Especialidad</label>
+          <input type="text" name="especialidad" id="especialidad" placeholder="Ingrese especialidad" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+        </div>
+        <div>
+          <label for="celularMedico" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Celular</label>
+          <input type="tel" name="celular" id="celularMedico" placeholder="Ingrese número de celular" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+        </div>
+        <div>
+          <label for="nMatricula" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Número de Matrícula</label>
+          <input type="text" name="nMatricula" id="nMatricula" placeholder="Ingrese número de matrícula" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+        </div>
+      </div>
+
+      <!-- Campos de Secretaria -->
+      <div id="camposSecretaria" class="hidden space-y-6">
+        <div>
+          <label for="nombreSecretaria" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Nombre completo</label>
+          <input type="text" name="nombre" id="nombreSecretaria" placeholder="Ingrese nombre completo" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+        </div>
+        <div>
+          <label for="celularSecretaria" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Celular</label>
+          <input type="tel" name="celular" id="celularSecretaria" placeholder="Ingrese número de celular" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+        </div>
+      </div>
+
+      <button type="submit" id="submitBtn" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" disabled>
+        Crear cuenta
+        <div role="status" id="loadingSpinner" class="hidden mt-2">
+          <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+          </svg>
+          <span class="sr-only">Cargando...</span>
+        </div>
+      </button>
+
+      <div class="text-sm font-medium text-gray-500 dark:text-gray-300">
+        ¿Ya tienes una cuenta? <a href="/login" class="text-blue-700 hover:underline dark:text-blue-500">Inicia sesión</a>
+      </div>
+    </form>
+  </div>
+</div>
+</LayoutCommon>
+
+<script>
+const BASE_URL = 'https://consultorio-odontologico-backend-production-b1c8.up.railway.app/api';
+
+// Obtener referencias a elementos del DOM
+const form = document.getElementById('signupForm');
+const rolSelect = document.getElementById('rol');
+const camposMedico = document.getElementById('camposMedico');
+const camposSecretaria = document.getElementById('camposSecretaria');
+const submitBtn = document.getElementById('submitBtn');
+const loadingSpinner = document.getElementById('loadingSpinner');
+
+// Funciones de validación
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePhone = (phone) => {
+  const phoneRegex = /^\d{6,14}$/;
+  return phoneRegex.test(phone);
+};
+
+const validateName = (name) => {
+  const nameRegex = /^[a-zA-ZÀ-ÿ\s]{3,40}$/;
+  return nameRegex.test(name);
+};
+
+// Función para mostrar mensajes de error
+const createErrorMessage = (input, message) => {
+  const existingError = input.nextElementSibling?.classList.contains('error-message') 
+    ? input.nextElementSibling 
+    : document.createElement('div');
+    
+  if (!input.nextElementSibling?.classList.contains('error-message')) {
+    existingError.classList.add('error-message', 'text-sm', 'text-red-500', 'mt-1');
+    input.parentNode.insertBefore(existingError, input.nextSibling);
+  }
+  
+  existingError.textContent = message;
+  existingError.style.display = message ? 'block' : 'none';
+  
+  // Actualizar clases de validación
+  if (message) {
+    input.classList.remove('border-gray-300', 'focus:border-blue-500');
+    input.classList.add('border-red-500', 'focus:border-red-500');
+  } else {
+    input.classList.remove('border-red-500', 'focus:border-red-500');
+    input.classList.add('border-gray-300', 'focus:border-blue-500');
+  }
+};
+
+// Validar campo individual
+const validateField = (input) => {
+  if (input.disabled) return true;
+  
+  const value = input.value.trim();
+  let errorMessage = '';
+
+  if (!value) {
+    errorMessage = 'Este campo es obligatorio';
+  } else {
+    switch(input.name) {
+      case 'email':
+        if (!validateEmail(value)) {
+          errorMessage = 'Email inválido';
+        }
+        break;
+      case 'password':
+        if (value.length < 6) {
+          errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+        }
+        break;
+      case 'nombre':
+        if (!validateName(value)) {
+          errorMessage = 'Solo se permiten letras y espacios (3-40 caracteres)';
+        }
+        break;
+      case 'celular':
+        if (!validatePhone(value)) {
+          errorMessage = 'El celular debe tener entre 6 y 14 dígitos';
+        }
+        break;
+    }
+  }
+
+  createErrorMessage(input, errorMessage);
+  return !errorMessage;
+};
+
+// Event listener para cambios en el rol
+rolSelect.addEventListener('change', () => {
+  const selectedRol = rolSelect.value;
+  
+  // Mostrar/ocultar campos según el rol seleccionado
+  camposMedico.classList.toggle('hidden', selectedRol !== 'odontologo');
+  camposSecretaria.classList.toggle('hidden', selectedRol !== 'secretaria');
+  
+  // Gestionar campos según el rol
+  if (selectedRol === 'odontologo') {
+    document.querySelectorAll('#camposSecretaria input').forEach(input => {
+      input.disabled = true;
+      createErrorMessage(input, '');
+    });
+    document.querySelectorAll('#camposMedico input').forEach(input => {
+      input.disabled = false;
+    });
+  } else if (selectedRol === 'secretaria') {
+    document.querySelectorAll('#camposMedico input').forEach(input => {
+      input.disabled = true;
+      createErrorMessage(input, '');
+    });
+    document.querySelectorAll('#camposSecretaria input').forEach(input => {
+      input.disabled = false;
+    });
+  }
+
+  validateForm();
+});
+
+// Validación del formulario completo
+const validateForm = () => {
+  const selectedRol = rolSelect.value;
+  if (!selectedRol) {
+    submitBtn.disabled = true;
+    return false;
+  }
+
+  let isValid = true;
+
+  // Validar campos comunes
+  isValid = validateField(document.getElementById('password')) && isValid;
+
+  // Validar campos según rol
+  if (selectedRol === 'odontologo') {
+    const medicoFields = ['nombreMedico', 'especialidad', 'celularMedico', 'nMatricula'];
+    medicoFields.forEach(fieldId => {
+      const input = document.getElementById(fieldId);
+      if (!input.disabled) {
+        isValid = validateField(input) && isValid;
+      }
+    });
+  } else if (selectedRol === 'secretaria') {
+    const secretariaFields = ['nombreSecretaria', 'celularSecretaria'];
+    secretariaFields.forEach(fieldId => {
+      const input = document.getElementById(fieldId);
+      if (!input.disabled) {
+        isValid = validateField(input) && isValid;
+      }
+    });
+  }
+
+  submitBtn.disabled = !isValid;
+  return isValid;
+};
+
+// Validación en tiempo real
+form.querySelectorAll('input').forEach(input => {
+  ['input', 'blur'].forEach(eventType => {
+    input.addEventListener(eventType, () => {
+      if (!input.disabled) {
+        validateField(input);
+        validateForm();
+      }
+    });
+  });
+});
+
+// Manejo del envío del formulario
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  if (!validateForm()) {
+    return;
+  }
+
+  // Mostrar estado de carga
+  submitBtn.innerHTML = `
+    <div class="flex justify-center items-center">
+      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Creando cuenta...
+    </div>
+  `;
+  submitBtn.disabled = true;
+
+  const selectedRol = rolSelect.value;
+  
+  try {
+    // Crear usuario base
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const userData = {
+      email: email.toLowerCase(),
+      password: password,
+      rol: selectedRol
+    };
+
+    console.log('Enviando datos de usuario:', userData);
+
+    const userResponse = await fetch(`${BASE_URL}/login/registro`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Origin': 'http://localhost:4321'
+      },
+      body: JSON.stringify(userData)
+    });
+
+    if (!userResponse.ok) {
+      const errorData = await userResponse.json();
+      throw new Error(errorData.message || 'Error al crear usuario');
+    }
+
+    // Crear perfil específico según rol
+    if (selectedRol === 'secretaria') {
+      const secretariaData = {
+        nombre: document.getElementById('nombreSecretaria').value.toLowerCase(),
+        email: email.toLowerCase(),
+        celular: document.getElementById('celularSecretaria').value.replace(/\D/g, '')
+      };
+
+      console.log('Enviando datos de secretaria:', secretariaData);
+
+      const secretariaResponse = await fetch(`${BASE_URL}/secretaria/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:4321'
+        },
+        body: JSON.stringify(secretariaData)
+      });
+
+      if (!secretariaResponse.ok) {
+        const errorData = await secretariaResponse.json();
+        throw new Error(errorData.message || 'Error al crear perfil de secretaria');
+      }
+    } else if (selectedRol === 'odontologo') {
+      const medicoData = {
+        nombre: document.getElementById('nombreMedico').value.toLowerCase(),
+        email: email.toLowerCase(),
+        especialidad: document.getElementById('especialidad').value,
+        celular: document.getElementById('celularMedico').value.replace(/\D/g, ''),
+        nMatricula: document.getElementById('nMatricula').value,
+        clave: password
+      };
+
+      console.log('Enviando datos de médico:', medicoData);
+
+      const medicoResponse = await fetch(`${BASE_URL}/api/medico/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:4321'
+        },
+        body: JSON.stringify(medicoData)
+      });
+
+      if (!medicoResponse.ok) {
+        const errorData = await medicoResponse.json();
+        throw new Error(errorData.message || 'Error al crear perfil de médico');
+      }
+    }
+
+    // Redirigir tras éxito
+    alert('Cuenta creada exitosamente');
+    window.location.href = '/login';
+  } catch (error) {
+    console.error('Error:', error);
+    alert(error.message || 'Error en el registro');
+    
+    // Restaurar el botón
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = 'Crear cuenta';
+  }
+});
+</script>
