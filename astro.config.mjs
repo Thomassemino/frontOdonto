@@ -1,10 +1,10 @@
 // @ts-check
-import { defineConfig } from "astro/config";
-import vercel from "@astrojs/vercel/serverless";
-import tailwind from "@astrojs/tailwind";
+import { defineConfig } from 'astro/config';
+import vercel from '@astrojs/vercel'; // Cambia esta línea
+import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
-  integrations: [tailwind({})],
-  output: "server",
-  adapter: vercel(),
+  integrations: [tailwind()],
+  output: 'server',
+  adapter: vercel()
 });
