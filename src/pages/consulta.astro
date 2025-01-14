@@ -431,13 +431,13 @@ interface ConsultaData {
             <input
               type="radio"
               name="higieneBucal"
-              value={option.toLowerCase().replace(" ", "")}
+              value={option.toLowerCase().trim()}
               class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{option}</span>
           </label>
         ))}
-      </div>
+      </div>      
     </fieldset>
     <div>
       <label for="anotacionesMedico" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
