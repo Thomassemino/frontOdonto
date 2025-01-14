@@ -236,16 +236,18 @@ import LayoutProtected from "../app/LayoutProtected.astro";
       </div>
     </div>
 
-	<div id="historiaClinicaModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-		<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-		<div class="relative bg-slate-50 dark:bg-slate-800 rounded-xl shadow-2xl p-8 w-3/4 max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-slate-700">
+    <div id="historiaClinicaModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      <div class="relative bg-slate-50 dark:bg-slate-800 rounded-xl shadow-2xl p-4 sm:p-6 md:p-8 w-[95%] sm:w-[85%] md:w-3/4 max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-slate-700 mx-4">
 			<div class="flex justify-between items-center mb-6">
 				<h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Historia Clínica</h2>
-				<button class="close-hc-modal p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-					<svg class="w-6 h-6 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-					</svg>
-				</button>
+        <button class="close-hc-modal p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+          <div class="flex items-center justify-center w-full h-full">
+              <svg class="w-6 h-6 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+          </div>
+      </button>
 			</div>
 			
 			<div id="historiaClinicaContent" class="space-y-8">
@@ -415,7 +417,7 @@ import LayoutProtected from "../app/LayoutProtected.astro";
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </button>
-            <button onclick="window.location.href='/odontograma/${row.id}'"
+            <button onclick="window.location.href='/pacientes'"
                     class="group relative p-2 text-blue-600 hover:text-blue-800 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m0-15C9.5 4.5 7 3 4.5 3c0 8 0 16 0 16C7 19 9.5 17.5 12 17.5m0-13c2.5-1.5 5-3 7.5-3 0 8 0 16 0 16-2.5 0-5-1.5-7.5-1.5" />
@@ -637,6 +639,7 @@ const closeEditModal = () => {
   document.getElementById('editForm')?.reset();
 };
 
+
 const openCreateModal = () => {
   const createModal = document.getElementById('createModal');
   if (createModal) {
@@ -816,18 +819,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Event Listeners para modales
   document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('close-create-modal')) {
-      if (e.target.closest('#editModal')) {
-        closeEditModal();
-      }
-      if (e.target.closest('#createModal')) {
-        closeCreateModal();
-      }
+  // Use closest() to find the nearest matching element, even if you clicked inside the button
+  const closeCreateModalButton = e.target.closest('.close-create-modal');
+  const closeHcModalButton = e.target.closest('.close-hc-modal');
+
+  if (closeCreateModalButton) {
+    if (closeCreateModalButton.closest('#editModal')) {
+      closeEditModal();
     }
-    if (e.target.classList.contains('close-hc-modal')) {
-      document.getElementById('historiaClinicaModal')?.classList.add('hidden');
+    if (closeCreateModalButton.closest('#createModal')) {
+      closeCreateModal();
     }
-  });
+  }
+
+  if (closeHcModalButton) {
+    document.getElementById('historiaClinicaModal')?.classList.add('hidden');
+  }
+});
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
