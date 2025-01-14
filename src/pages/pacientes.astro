@@ -3,809 +3,238 @@ import LayoutCommon from "../app/LayoutCommon.astro";
 import LayoutProtected from "../app/LayoutProtected.astro";
 ---	
 
+<LayoutProtected>
+  <LayoutCommon>
+    <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 text-slate-800 dark:from-slate-900 dark:to-slate-800 dark:text-slate-100 lg:p-16">
+      <div class="mx-auto max-w-7xl">
+        <!-- Header -->
+        <div class="mb-6 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div class="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
+            <button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+              ← Volver al inicio
+            </button>
+            <h1 class="text-2xl font-bold">Pacientes</h1>
+          </div>
+          <button id="createPatientButton" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Nuevo Paciente
+          </button>
+        </div>
 
-<script>
+        <!-- Search -->
+        <div class="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div class="space-y-2">
+            <label for="searchInput" class="block text-sm font-medium">Buscar Paciente</label>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Buscar por nombre, DNI o email..."
+              class="w-full rounded-lg border border-gray-300 p-2.5 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+            />
+          </div>
+        </div>
 
-const BASE_URL = 'https://consultorio-odontologico-backend-production-b1c8.up.railway.app/api';
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">DNI</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Nombre Completo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Email</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Número de Celular</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Ver Más</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="pacientesTableBodyDesktop" class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+              <!-- Filled dynamically -->
+            </tbody>
+          </table>
+        </div>
 
-// Estado y Variables Globales
-const state = {
-  modals: {
-    edit: { isOpen: false, selectedPatient: null },
-    create: { isOpen: false }
-  }
-};
+        <!-- Mobile Cards -->
+        <div class="md:hidden space-y-4" id="pacientesTableBodyMobile">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+    </div>
 
-// Validaciones
-const validatePatient = (patient) => {
-  const errors = [];
-  const dniRegex = /^[0-9]{8}$/;
-  const phoneRegex = /^\d{6,14}$/;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black opacity-50"></div>
+      <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-2xl mx-auto mt-20">
+        <div class="flex justify-between items-start mb-6">
+          <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Editar Paciente</h3>
+          <button type="button" class="close-create-modal text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
-  if (!patient.nombre.trim()) errors.push('El nombre es requerido');
-  if (!dniRegex.test(patient.dni)) errors.push('DNI inválido (8 números)');
-  if (!emailRegex.test(patient.mail)) errors.push('Email inválido');
-  if (!phoneRegex.test(patient.telefono)) errors.push('Teléfono inválido (6 a 14 dígitos)');
+        <form id="editForm" class="space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+              <input 
+                type="text" 
+                name="name"
+                required
+                placeholder="Ingrese Nombre y Apellido"
+                class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
 
-  return errors;
-};
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">DNI</label>
+              <input 
+                type="text" 
+                name="dni"
+                required
+                placeholder="Ingrese 8 números"
+                class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
 
-//Notificaciones
-const showNotification = (message, type = 'success') => {
-  const existingNotification = document.querySelector('.notification');
-  if (existingNotification) existingNotification.remove();
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+              <input 
+                type="email" 
+                name="mail"
+                required
+                placeholder="ejemplo@correo.com"
+                class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
 
-  const notification = document.createElement('div');
-  const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
-  
-  notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${bgColor} transition-opacity duration-300`;
-  notification.textContent = message;
-  
-  document.body.appendChild(notification);
-  setTimeout(() => {
-    notification.style.opacity = '0';
-    setTimeout(() => notification.remove(), 3000);
-  }, 3000);
-};
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
+              <div class="flex gap-2">
+                <select
+                  name="areaCode"
+                  class="w-24 rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="+54">+54</option>
+                  <option value="+1">+1</option>
+                </select>
+                <input
+                  type="text"
+                  name="telefono"
+                  required
+                  placeholder="Número de teléfono"
+                  class="flex-1 rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
 
-// Filtrar Pacientes
-async function filtrarPacientes() {
-  try {
-    // Obtener todos los pacientes primero
-    const response = await fetch(`${BASE_URL}/paciente`);
-    const data = await response.json();
-    const todosLosPacientes = data.pacientes;
-
-    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase().trim();
-    
-    if (!searchTerm) {
-      await actualizarTabla();
-      return;
-    }
-
-    // Filtrar los pacientes
-    const pacientesFiltrados = todosLosPacientes.filter(paciente => 
-      (paciente.nombre?.toLowerCase() || '').includes(searchTerm) ||
-      (paciente.dni?.toString() || '').includes(searchTerm) ||
-      (paciente.mail?.toLowerCase() || '').includes(searchTerm)
-    );
-
-    // Actualizar la tabla con los resultados filtrados
-    const tbody = document.querySelector('tbody');
-    if (!tbody) return;
-
-    tbody.innerHTML = pacientesFiltrados.map(row => `
-      <tr 
-        class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-150"
-        data-name="${row.nombre || ''}"
-        data-dni="${row.dni || ''}"
-        data-telefono="${row.telefono || ''}"
-        data-mail="${row.mail || ''}"
-      >
-        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.dni || ''}</td>
-        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.nombre || ''}</td>
-        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.mail || ''}</td>
-        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-          <span>${row.areaCode || ''}</span><span>${row.telefono || ''}</span>
-        </td>
-        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-          <div class="flex space-x-2">
+          <div class="flex justify-end space-x-4 pt-4">
             <button 
-              class="edit-button p-2 text-blue-600 hover:text-blue-700 focus:outline-none"
-              title="Editar"
+              type="button"
+              class="close-create-modal px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
+              Cancelar
             </button>
             <button 
-              class="delete-button p-2 text-red-600 hover:text-red-700 focus:outline-none"
-              title="Eliminar"
+              type="submit"
+              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 6h18"></path>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
+              Guardar
             </button>
           </div>
-        </td>
-      </tr>
-    `).join('');
-  } catch (error) {
-    console.error('Error al filtrar pacientes:', error);
-    showNotification('Error al filtrar los pacientes', 'error');
-  }
-}
-
-// Actualizar Tabla
-async function actualizarTabla() {
-  const tbody = document.querySelector('tbody');
-  if (!tbody) return;
-
-  try {
-		const response = await fetch(`${BASE_URL}/paciente`);
-const data = await response.json();
-const pacientes = data.pacientes;
-console.log('Datos de pacientes:', pacientes);
-
-tbody.innerHTML = pacientes.map(row => `
-  <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-150"
-      data-name="${row.nombre || ''}"
-      data-dni="${row.dni || ''}"
-      data-telefono="${row.telefono || ''}"
-      data-mail="${row.mail || ''}">
-    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.dni || ''}</td>
-    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.nombre || ''}</td>
-    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.mail || ''}</td>
-    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-      <span>${row.areaCode || ''}</span><span>${row.telefono || ''}</span>
-    </td>
-    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-      <div class="flex space-x-2">
-        <button onclick="mostrarHistoriaClinica('${row.historiaClinica}')"
-                class="group relative p-2 text-blue-600 hover:text-blue-800 transition-colors"
-                title="Historia Clínica">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span class="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-            Historia Clínica
-          </span>
-        </button>
-        <button onclick="window.location.href='/odontograma/${row.id}'"
-                class="group relative p-2 text-blue-600 hover:text-blue-800 transition-colors"
-                title="Odontograma">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m0-15C9.5 4.5 7 3 4.5 3c0 8 0 16 0 16C7 19 9.5 17.5 12 17.5m0-13c2.5-1.5 5-3 7.5-3 0 8 0 16 0 16-2.5 0-5-1.5-7.5-1.5" />
-          </svg>
-          <span class="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-            Odontograma
-          </span>
-        </button>
-      </div>
-    </td>
-    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-      <div class="flex space-x-2">
-        <button class="edit-button p-2 text-blue-600 hover:text-blue-700 focus:outline-none"
-                title="Editar">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-        </button>
-        <button class="delete-button p-2 text-red-600 hover:text-red-700 focus:outline-none"
-                title="Eliminar">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 6h18"/>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-          </svg>
-        </button>
-      </div>
-    </td>
-  </tr>
-`).join('');
-
-  } catch (error) {
-    console.error('Error al obtener pacientes:', error);
-    showNotification('No se pudieron cargar los pacientes', 'error');
-  }
-}
-
-window.mostrarHistoriaClinica = async function(historiaClinicaId) {
-  try {
-    const hcResponse = await fetch(`${BASE_URL}/historiaClinica/getHc/${historiaClinicaId}`);
-    if (!hcResponse.ok) {
-      throw new Error('Error al obtener la historia clínica');
-    }
-
-    const hcData = await hcResponse.json();
-		console.log('Datos recibidos de la API:', hcData);
-    if (!hcData || !hcData.historiaClinica) {
-      showNotification('No se encontró la historia clínica', 'error');
-      return;
-    }
-
-    const hc = hcData.historiaClinica;
-    const formatBoolean = (value) => value ? 'Sí' : 'No';
-
-    // Función helper para actualizar campos
-    const updateField = (id, value, defaultValue = 'No especificado') => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.textContent = value ?? defaultValue;
-      }
-    };
-    
-
-    // Actualizar datos personales médicos
-    updateField('hc-enfermedades', hc.datosPersonalesMedicos?.enfermedades);
-    updateField('hc-tratamientoActual', hc.datosPersonalesMedicos?.tratamientoActual);
-    updateField('hc-medicamentos', hc.datosPersonalesMedicos?.medicamentosRegulares);
-    updateField('hc-enfInfectoInfecciosa', hc.datosPersonalesMedicos?.enfermedadInfectoInfecciosa);
-    updateField('hc-fuma', formatBoolean(hc.datosPersonalesMedicos?.fuma));
-    updateField('hc-embarazo', formatBoolean(hc.datosPersonalesMedicos?.embarazo));
-    updateField('hc-alergias', hc.datosPersonalesMedicos?.alergias);
-    updateField('hc-diabetes', formatBoolean(hc.datosPersonalesMedicos?.diabetes));
-    updateField('hc-motivoConsulta', hc.datosPersonalesMedicos?.motivoConsulta);
-
-    // Actualizar antecedentes
-    updateField('hc-consultoOdontologo', formatBoolean(hc.antecedentesMedicosOdontologicos?.consultoOdontologo));
-    updateField('hc-tratamientoOdontologico', hc.antecedentesMedicosOdontologicos?.tratamientoOdontologico?.descripcion);
-    updateField('hc-dolor', formatearDolor(hc.antecedentesMedicosOdontologicos?.dolor));
-    updateField('hc-fracturaDiente', hc.antecedentesMedicosOdontologicos?.fracturaDiente);
-    updateField('hc-dificultadMasticar', formatBoolean(hc.antecedentesMedicosOdontologicos?.dificultadMasticar));
-    updateField('hc-dificultadAbrirBoca', formatBoolean(hc.antecedentesMedicosOdontologicos?.dificultadAbrirBoca));
-
-    // Actualizar estado actual
-    updateField('hc-anormalidadBoca', hc.estadoActual?.anormalidadBoca);
-    updateField('hc-sangradoEncias', formatBoolean(hc.estadoActual?.sangradoEncias));
-    updateField('hc-hinchazonCara', formatBoolean(hc.estadoActual?.hinchazonCara));
-    updateField('hc-higieneBucal', hc.estadoActual?.higieneBucal);
-    updateField('hc-aclaraciones', hc.aclaracionesFinalesMedico);
-
-    document.getElementById('historiaClinicaModal').classList.remove('hidden');
-  } catch (error) {
-    console.error('Error completo:', error);
-    showNotification('Error al cargar la historia clínica', 'error');
-  }
-};
-
-// Manejadores de Modales
-const openEditModal = async (patient) => {
-  state.modals.edit.selectedPatient = { ...patient, originalDni: patient.dni };
-  state.modals.edit.isOpen = true;
-
-  const modal = document.getElementById('editModal');
-  const form = document.getElementById('editForm');
-
-  modal?.classList.remove('hidden');
-
-  if (form) {
-    Object.entries(patient).forEach(([key, value]) => {
-      const input = form.elements[key];
-      if (input) input.value = value;
-    });
-  }
-};
-
-const formatearDolor = (dolorStr) => {
-  try {
-    const dolor = JSON.parse(dolorStr);
-    const parts = [];
-    
-    if (dolor.rango) parts.push(`Intensidad: ${dolor.rango}`);
-    if (dolor.tipo) parts.push(`Tipo: ${dolor.tipo}`);
-    
-    if (dolor.caracteristicas && dolor.caracteristicas.length > 0) {
-      parts.push(`Características: ${dolor.caracteristicas.join(', ')}`);
-    }
-    
-    if (dolor.sensibilidad && dolor.sensibilidad.length > 0) {
-      parts.push(`Sensibilidad: ${dolor.sensibilidad.join(', ')}`);
-    }
-    
-    if (dolor.localizacion) {
-      // Formatear la localización para que sea más legible
-      const localizacion = dolor.localizacion
-        .replace(/([A-Z])/g, ' $1') // Agrega espacio antes de cada mayúscula
-        .toLowerCase()
-        .replace(/^./, str => str.toUpperCase()); // Capitaliza la primera letra
-      parts.push(`Localización: ${localizacion}`);
-    }
-    
-    return parts.join('. ');
-  } catch (e) {
-    return dolorStr || 'No especificado';
-  }
-};
-
-const closeEditModal = () => {
-  state.modals.edit.isOpen = false;
-  state.modals.edit.selectedPatient = null;
-  document.getElementById('editModal')?.classList.add('hidden');
-  document.getElementById('editForm')?.reset();
-};
-
-const openCreateModal = () => {
-  const createModal = document.getElementById('createModal');
-  if (createModal) {
-    createModal.classList.remove('hidden');
-    state.modals.create.isOpen = true;
-  } else {
-    console.error('Modal de creación no encontrado');
-  }
-};
-
-const closeCreateModal = () => {
-  const createModal = document.getElementById('createModal');
-  if (createModal) {
-    createModal.classList.add('hidden');
-    state.modals.create.isOpen = false;
-    document.getElementById('createForm')?.reset();
-  }
-};
-
-document.addEventListener('click', (e) => {
-  if (e.target.closest('.close-hc-modal')) {
-    document.getElementById('historiaClinicaModal').classList.add('hidden');
-  }
-});
-
-// Manejo de Formularios
-const handleFormSubmit = async (endpoint, formData, onSuccess) => {
-  const patient = {
-    nombre: formData.get('name')?.toString().trim(), 
-    dni: formData.get('dni')?.toString().trim(),
-    mail: formData.get('mail')?.toString().trim(),
-    telefono: formData.get('telefono')?.toString().trim(),
-    areaCode: formData.get('areaCode')?.toString().trim(),
-    // Campos adicionales para cumplir con el schema
-    edad: 0,
-    direccion: '',
-    obraSocial: 'No especificada',
-    ultCons: new Date(),
-    tratamientoMedico: 'No',
-    tomaMedicamentos: 'No',
-    alergias: '',
-    embarazada: false,
-    motivoConsulta: 'Consulta general'
-  };
-
-  const errors = validatePatient(patient);
-  if (errors.length > 0) {
-    throw new Error(errors.join('\n'));
-  }
-
-  const response = await fetch(`${BASE_URL}/paciente/create`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Origin': 'http://localhost:4321'
-    },
-    body: JSON.stringify(patient)
-  });
-
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || `Error del servidor: ${response.status}`);
-  }
-
-  onSuccess(result);
-  return result;
-};
-
-const handleDelete = async (dni, nombre, row, button) => {
-  try {
-    // Primero obtener el ID del paciente usando el DNI
-    const findResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`, {
-      method: 'GET',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Origin': 'http://localhost:4321'
-      }
-    });
-
-    if (!findResponse.ok) {
-      const errorData = await findResponse.json();
-      throw new Error(errorData.message || `Error del servidor: ${findResponse.status}`);
-    }
-
-    const findResult = await findResponse.json();
-    const pacienteId = findResult.paciente.id;
-
-    // Ahora sí eliminar usando el ID
-    const deleteResponse = await fetch(`${BASE_URL}/paciente/deleteById/${pacienteId}`, {
-      method: 'DELETE',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Origin': 'http://localhost:4321'
-      }
-    });
-
-    // Importante: Primero obtener el cuerpo de la respuesta
-    const result = await deleteResponse.json();
-
-    // Luego verificar si la respuesta no fue exitosa
-    if (!deleteResponse.ok) {
-      throw new Error(result.message || `Error del servidor: ${deleteResponse.status}`);
-    }
-
-    if (result.status === 'success') {
-      showNotification('Paciente eliminado correctamente');
-      row.remove();
-    } else {
-      throw new Error(result.message || 'Error al eliminar el paciente');
-    }
-  } catch (error) {
-    // Asegurarse de mostrar el mensaje de error específico del backend
-    showNotification(error.message, 'error');
-    if (row.parentNode) {
-      button.disabled = false;
-      // Restaurar el botón a su estado original
-      button.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 6h18"/>
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-        </svg>
-      `;
-    }
-  }
-};
-
-const handleEdit = async (patient, row, button) => {
-  try {
-		// el response 2 es porque vos sacas los datos del formulario y no de la db, y ahi no tenes el id, entonces haces un get para obtener el id y despues poder hacer el put. es una chanchada pero no se arreglarlo jajac
-		//alejo putoooo
-		//trolo
-		const originalDni = state.modals.edit.selectedPatient.originalDni;
-		const response22 = await fetch(`${BASE_URL}/paciente/findByDni/${originalDni}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Origin': 'http://localhost:4321'
-      },
-    });
-		const dataaa = await response22.json();
-		const id = dataaa.paciente.id
-    const response = await fetch(`${BASE_URL}/paciente/updateById/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Origin': 'http://localhost:4321'
-      },
-      body: JSON.stringify(patient)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error del servidor: ${response.status}`);
-    }
-
-    showNotification('Paciente actualizado correctamente');
-    await actualizarTabla();
-    closeEditModal(); 
-  } catch (error) {
-    showNotification(error.message, 'error');
-  }
-};
-
-// Inicialización y Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-  // Inicialización
-  actualizarTabla();
-
-  // Event Listeners
-  document.getElementById('volverBtn')?.addEventListener('click', () => {
-    window.location.href = '/';
-  });
-
-  document.getElementById('searchInput')?.addEventListener('input', async () => {
-    await filtrarPacientes();
-  });
-
-  document.getElementById('createPatientButton')?.addEventListener('click', openCreateModal);
-
-
-	document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('close-create-modal')) {
-    if (e.target.closest('#editModal')) {
-      closeEditModal();
-    }
-    if (e.target.closest('#createModal')) {
-      closeCreateModal();
-    }
-  }
-});
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeEditModal();
-      closeCreateModal();
-    }
-  });
-
-  document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal-overlay')) {
-      closeEditModal();
-      closeCreateModal();
-    }
-  });
-
-  // Event Listeners para la tabla
-  document.querySelector('tbody')?.addEventListener('click', async (e) => {
-    const target = e.target;
-    if (!target) return;
-
-    const row = target.closest('tr');
-    if (!row) return;
-
-    const button = target.closest('.edit-button, .delete-button');
-    if (!button) return;
-
-    const hasActive = button.getAttribute('data-has-active') === 'true';
-    
-    if (button.classList.contains('edit-button')) {
-      if (button.hasAttribute('disabled')) {
-        showNotification('No se puede editar el paciente en este momento debido a que tiene consultas activas o en proceso.', 'error');
-        return;
-      }
-      
-      const patient = {
-        name: row.dataset.name,
-        dni: row.dataset.dni,
-        mail: row.dataset.mail,
-        telefono: row.dataset.telefono
-      };
-      await openEditModal(patient);
-    }
-
-    if (button.classList.contains('delete-button')) {
-      if (hasActive) {
-        showNotification('No se puede eliminar el paciente en este momento debido a que tiene consultas activas o en proceso.', 'error');
-        return;
-      }
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (confirm(`¿Está seguro que desea eliminar al paciente ${row.dataset.name}?`)) {
-        await handleDelete(row.dataset.dni, row.dataset.name, row, button);
-      }
-    }
-  });
-
-  // Formularios
-  document.getElementById('createForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const submitButton = form.querySelector('button[type="submit"]');
-    const originalText = submitButton.textContent;
-
-    try {
-      submitButton.disabled = true;
-      submitButton.textContent = 'Creando...';
-
-      await handleFormSubmit(
-        '/paciente', 
-        new FormData(form),
-        () => {
-          showNotification('Paciente creado correctamente');
-          closeCreateModal();
-          window.location.reload();
-        }
-      );
-    } catch (error) {
-      showNotification(error.message, 'error');
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = originalText;
-    }
-  });
-
-  document.getElementById('editForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  const patient = {
-    nombre: form.elements.name.value,
-    dni: form.elements.dni.value,
-    mail: form.elements.mail.value,
-    telefono: form.elements.telefono.value,
-    areaCode: form.elements.areaCode.value
-  };
-
-  await handleEdit(patient);
-});
-})
-</script>
-
-<LayoutProtected>
-<LayoutCommon>
-  <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 text-slate-800 dark:from-slate-900 dark:to-slate-800 dark:text-slate-100 lg:p-16">
-    <div class="mx-auto max-w-6xl">
-      <!-- Encabezado -->
-      <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center gap-4">
-          <button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-            ← Volver al inicio
-          </button>
-          <h2 class="text-2xl font-bold">Pacientes</h2>
-        </div>
-        <button
-          id="createPatientButton"
-          class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-300 dark:focus:ring-green-900 transition-colors duration-200"
-        >
-          Crear Nuevo Paciente
-        </button>
-      </div>
-
-      <!-- Búsqueda -->
-      <div class="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div class="space-y-2">
-          <label for="searchInput" class="block text-sm font-medium">Buscar Paciente</label>
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Buscar por nombre, DNI o email..."
-            class="w-full rounded-lg border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-          />
-        </div>
-      </div>
-
-      <!-- Tabla de Pacientes -->
-      <div class="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800 w-full">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-100 dark:bg-gray-700">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">DNI</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Nombre Completo</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Email</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Número de Celular</th>
-							<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Ver Más</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <!-- Se llena dinámicamente via JavaScript -->
-          </tbody>
-        </table>
+        </form>
       </div>
     </div>
-  </div>
 
-  <!-- Modal de Edición -->
-  <div id="editModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-    <div class="absolute inset-0 bg-black opacity-50 modal-overlay"></div>
-    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-1/3">
-      <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Editar Paciente</h2>
-      <form id="editForm" class="space-y-4">
-        <!-- Campos de edición (igual que en el modal de creación) -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
-          <input 
-            type="text" 
-            name="name"
-            placeholder="Ingrese Nombre y Apellido"
-            required
-            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" 
-          />
-        </div>
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">DNI</label>
-          <input 
-            type="text" 
-            name="dni"
-            required
-            placeholder="Ingrese 8 números"
-            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" 
-          />
-        </div>
-        
-        <div class="mb-4 flex items-center">
-          <select
-            name="areaCode"
-            class="mr-2 block w-24 border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-          >
-            <option value="+54">+54</option>
-            <option value="+1">+1</option>
-          </select>
-          <input
-            type="text"
-            name="telefono"
-            required
-            placeholder="Número de teléfono"
-            class="flex-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-          />
-        </div>
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-          <input 
-            type="email" 
-            name="mail"
-            required
-            placeholder="ejemplo@correo.com"
-            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" 
-          />
-        </div>
-
-        <div class="flex justify-end space-x-4">
-          <button 
-            type="button" 
-            class="close-create-modal px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-700"
-          >
-            Cancelar
-          </button>
-          <button 
-            type="submit" 
-            class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-300 dark:focus:ring-green-900"
-          >
-            Guardar
+    <!-- Create Modal -->
+    <div id="createModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black opacity-50"></div>
+      <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-2xl mx-auto mt-20">
+        <div class="flex justify-between items-start mb-6">
+          <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Nuevo Paciente</h3>
+          <button type="button" class="close-create-modal text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
-      </form>
+
+        <form id="createForm" class="space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+              <input 
+                type="text" 
+                name="name"
+                required
+                placeholder="Ingrese Nombre y Apellido"
+                class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">DNI</label>
+              <input 
+                type="text" 
+                name="dni"
+                required
+                placeholder="Ingrese 8 números"
+                class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+              <input 
+                type="email" 
+                name="mail"
+                required
+                placeholder="ejemplo@correo.com"
+                class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
+              <div class="flex gap-2">
+                <select
+                  name="areaCode"
+                  class="w-24 rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="+54">+54</option>
+                  <option value="+1">+1</option>
+                </select>
+                <input
+                  type="text"
+                  name="telefono"
+                  required
+                  placeholder="Número de teléfono"
+                  class="flex-1 rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-4 pt-4">
+            <button 
+              type="button"
+              class="close-create-modal px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit"
+              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Crear
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-
-  <!-- Modal de Creación -->
-  <div id="createModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-    <div class="absolute inset-0 bg-black opacity-50 modal-overlay"></div>
-    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-1/3">
-      <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Crear Nuevo Paciente</h2>
-      <form id="createForm" class="space-y-4">
-        <!-- Campos de creación (igual que en el modal de edición) -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
-          <input 
-            type="text" 
-            name="name"
-            placeholder="Ingrese Nombre y Apellido"
-            required
-            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" 
-          />
-        </div>
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">DNI</label>
-          <input 
-            type="text" 
-            name="dni"
-            required
-            placeholder="Ingrese 8 números"
-            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" 
-          />
-        </div>
-        
-        <div class="mb-4 flex items-center">
-          <select
-            name="areaCode"
-            class="mr-2 block w-24 border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-          >
-            <option value="+54">+54</option>
-            <option value="+1">+1</option>
-          </select>
-          <input
-            type="text"
-            name="telefono"
-            required
-            placeholder="Número de teléfono"
-            class="flex-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-          />
-        </div>
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-          <input 
-            type="email" 
-            name="mail"
-            required
-            placeholder="ejemplo@correo.com"
-            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" 
-          />
-        </div>
-
-        <div class="flex justify-end space-x-4">
-          <button 
-            type="button" 
-            class="close-create-modal px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-700"
-          >
-            Cancelar
-          </button>
-          <button 
-            type="submit" 
-            class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-300 dark:focus:ring-green-900"
-          >
-            Crear
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 
 	<div id="historiaClinicaModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
 		<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
@@ -866,3 +295,588 @@ document.addEventListener('DOMContentLoaded', () => {
 	</div>
 </LayoutCommon>
 </LayoutProtected>
+
+
+<script>
+  const BASE_URL = 'https://consultorio-odontologico-backend-production-b1c8.up.railway.app/api';
+  
+  // Estado y Variables Globales
+  const state = {
+    modals: {
+      edit: { isOpen: false, selectedPatient: null },
+      create: { isOpen: false }
+    }
+  };
+  
+  // Validaciones
+  const validatePatient = (patient) => {
+    const errors = [];
+    const dniRegex = /^[0-9]{8}$/;
+    const phoneRegex = /^\d{6,14}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    if (!patient.nombre.trim()) errors.push('El nombre es requerido');
+    if (!dniRegex.test(patient.dni)) errors.push('DNI inválido (8 números)');
+    if (!emailRegex.test(patient.mail)) errors.push('Email inválido');
+    if (!phoneRegex.test(patient.telefono)) errors.push('Teléfono inválido (6 a 14 dígitos)');
+  
+    return errors;
+  };
+  
+  // Notificaciones
+  const showNotification = (message, type = 'success') => {
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) existingNotification.remove();
+  
+    const notification = document.createElement('div');
+    const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+    
+    notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${bgColor} transition-opacity duration-300`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => notification.remove(), 3000);
+    }, 3000);
+  };
+  
+  // Actualizar Tabla
+  async function actualizarTabla() {
+    const tbodyDesktop = document.getElementById('pacientesTableBodyDesktop');
+    const containerMobile = document.getElementById('pacientesTableBodyMobile');
+    
+    if (!tbodyDesktop || !containerMobile) return;
+  
+    try {
+      const response = await fetch(`${BASE_URL}/paciente`);
+      const data = await response.json();
+      const pacientes = data.pacientes;
+      
+      renderizarVistas(pacientes);
+    } catch (error) {
+      console.error('Error al obtener pacientes:', error);
+      showNotification('No se pudieron cargar los pacientes', 'error');
+    }
+  }
+  
+  // Filtrar Pacientes
+  async function filtrarPacientes() {
+    try {
+      const response = await fetch(`${BASE_URL}/paciente`);
+      const data = await response.json();
+      const todosLosPacientes = data.pacientes;
+  
+      const searchTerm = document.getElementById('searchInput')?.value.toLowerCase().trim();
+      
+      if (!searchTerm) {
+        renderizarVistas(todosLosPacientes);
+        return;
+      }
+  
+      const pacientesFiltrados = todosLosPacientes.filter(paciente => 
+        (paciente.nombre?.toLowerCase() || '').includes(searchTerm) ||
+        (paciente.dni?.toString() || '').includes(searchTerm) ||
+        (paciente.mail?.toLowerCase() || '').includes(searchTerm)
+      );
+  
+      renderizarVistas(pacientesFiltrados);
+    } catch (error) {
+      console.error('Error al filtrar pacientes:', error);
+      showNotification('Error al filtrar los pacientes', 'error');
+    }
+  }
+  
+  // Renderizar ambas vistas
+  function renderizarVistas(pacientes) {
+    const tbodyDesktop = document.getElementById('pacientesTableBodyDesktop');
+    const containerMobile = document.getElementById('pacientesTableBodyMobile');
+    
+    if (!tbodyDesktop || !containerMobile) return;
+  
+    // Vista Desktop
+    tbodyDesktop.innerHTML = pacientes.map(row => `
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+          data-name="${row.nombre || ''}"
+          data-dni="${row.dni || ''}"
+          data-telefono="${row.telefono || ''}"
+          data-mail="${row.mail || ''}">
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.dni || ''}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.nombre || ''}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.mail || ''}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+          <span>${row.areaCode || ''}</span><span>${row.telefono || ''}</span>
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+          <div class="flex space-x-2">
+            <button onclick="window.mostrarHistoriaClinica('${row.historiaClinica}')"
+                    class="group relative p-2 text-blue-600 hover:text-blue-800 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </button>
+            <button onclick="window.location.href='/odontograma/${row.id}'"
+                    class="group relative p-2 text-blue-600 hover:text-blue-800 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m0-15C9.5 4.5 7 3 4.5 3c0 8 0 16 0 16C7 19 9.5 17.5 12 17.5m0-13c2.5-1.5 5-3 7.5-3 0 8 0 16 0 16-2.5 0-5-1.5-7.5-1.5" />
+              </svg>
+            </button>
+          </div>
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+          <div class="flex space-x-2">
+            <button class="edit-button p-2 text-blue-600 hover:text-blue-700 focus:outline-none"
+                    data-patient='${JSON.stringify({
+                      name: row.nombre,
+                      dni: row.dni,
+                      mail: row.mail,
+                      telefono: row.telefono,
+                      areaCode: row.areaCode
+                    })}'>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="delete-button p-2 text-red-600 hover:text-red-700 focus:outline-none"
+                    data-dni="${row.dni}">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  
+    // Vista Mobile
+    containerMobile.innerHTML = pacientes.map(row => `
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-3"
+           data-name="${row.nombre || ''}"
+           data-dni="${row.dni || ''}"
+           data-telefono="${row.telefono || ''}"
+           data-mail="${row.mail || ''}">
+        <div class="flex justify-between items-start">
+          <div class="space-y-1">
+            <div class="font-medium text-gray-900 dark:text-white">${row.nombre || ''}</div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">DNI: ${row.dni || ''}</div>
+          </div>
+          <div class="flex space-x-2">
+            <button onclick="window.mostrarHistoriaClinica('${row.historiaClinica}')"
+                    class="p-2 text-blue-600 hover:text-blue-800 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </button>
+            <button onclick="window.location.href='/odontograma/${row.id}'"
+                    class="p-2 text-blue-600 hover:text-blue-800 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m0-15C9.5 4.5 7 3 4.5 3c0 8 0 16 0 16C7 19 9.5 17.5 12 17.5m0-13c2.5-1.5 5-3 7.5-3 0 8 0 16 0 16-2.5 0-5-1.5-7.5-1.5" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="text-sm">
+          <span class="text-gray-500 dark:text-gray-400">Email:</span>
+          <p class="mt-1 text-gray-900 dark:text-white">${row.mail || ''}</p>
+        </div>
+        
+        <div class="text-sm">
+          <span class="text-gray-500 dark:text-gray-400">Teléfono:</span>
+          <p class="mt-1 text-gray-900 dark:text-white">
+            <span>${row.areaCode || ''}</span><span>${row.telefono || ''}</span>
+          </p>
+        </div>
+  
+        <div class="flex justify-end space-x-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <button class="edit-button inline-flex items-center px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  data-patient='${JSON.stringify({
+                    name: row.nombre,
+                    dni: row.dni,
+                    mail: row.mail,
+                    telefono: row.telefono,
+                    areaCode: row.areaCode
+                  })}'>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Editar
+          </button>
+          <button class="delete-button inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-700 transition-colors"
+                  data-dni="${row.dni}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            Eliminar
+          </button>
+        </div>
+      </div>
+    `).join('');
+  
+    // Setup event listeners for both views
+    setupEventListeners();
+  }
+  
+  // Historia Clínica
+  window.mostrarHistoriaClinica = async function(historiaClinicaId) {
+  try {
+    const hcResponse = await fetch(`${BASE_URL}/historiaClinica/getHc/${historiaClinicaId}`);
+    if (!hcResponse.ok) {
+      throw new Error('Error al obtener la historia clínica');
+    }
+
+    const hcData = await hcResponse.json();
+    if (!hcData || !hcData.historiaClinica) {
+      showNotification('No se encontró la historia clínica', 'error');
+      return;
+    }
+
+    const hc = hcData.historiaClinica;
+    const formatBoolean = (value) => value ? 'Sí' : 'No';
+
+    // Función helper para actualizar campos
+    const updateField = (id, value, defaultValue = 'No especificado') => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value ?? defaultValue;
+      }
+    };
+
+    // Actualizar datos personales médicos
+    updateField('hc-enfermedades', hc.datosPersonalesMedicos?.enfermedades);
+    updateField('hc-tratamientoActual', hc.datosPersonalesMedicos?.tratamientoActual);
+    updateField('hc-medicamentos', hc.datosPersonalesMedicos?.medicamentosRegulares);
+    updateField('hc-enfInfectoInfecciosa', hc.datosPersonalesMedicos?.enfermedadInfectoInfecciosa);
+    updateField('hc-fuma', formatBoolean(hc.datosPersonalesMedicos?.fuma));
+    updateField('hc-embarazo', formatBoolean(hc.datosPersonalesMedicos?.embarazo));
+    updateField('hc-alergias', hc.datosPersonalesMedicos?.alergias);
+    updateField('hc-diabetes', formatBoolean(hc.datosPersonalesMedicos?.diabetes));
+    updateField('hc-motivoConsulta', hc.datosPersonalesMedicos?.motivoConsulta);
+
+    // Actualizar antecedentes
+    updateField('hc-consultoOdontologo', formatBoolean(hc.antecedentesMedicosOdontologicos?.consultoOdontologo));
+    updateField('hc-tratamientoOdontologico', hc.antecedentesMedicosOdontologicos?.tratamientoOdontologico?.descripcion);
+    updateField('hc-dolor', formatearDolor(hc.antecedentesMedicosOdontologicos?.dolor));
+    updateField('hc-fracturaDiente', hc.antecedentesMedicosOdontologicos?.fracturaDiente);
+    updateField('hc-dificultadMasticar', formatBoolean(hc.antecedentesMedicosOdontologicos?.dificultadMasticar));
+    updateField('hc-dificultadAbrirBoca', formatBoolean(hc.antecedentesMedicosOdontologicos?.dificultadAbrirBoca));
+
+    // Actualizar estado actual
+    updateField('hc-anormalidadBoca', hc.estadoActual?.anormalidadBoca);
+    updateField('hc-sangradoEncias', formatBoolean(hc.estadoActual?.sangradoEncias));
+    updateField('hc-hinchazonCara', formatBoolean(hc.estadoActual?.hinchazonCara));
+    updateField('hc-higieneBucal', hc.estadoActual?.higieneBucal);
+    updateField('hc-aclaraciones', hc.aclaracionesFinalesMedico);
+
+    document.getElementById('historiaClinicaModal').classList.remove('hidden');
+  } catch (error) {
+    console.error('Error completo:', error);
+    showNotification('Error al cargar la historia clínica', 'error');
+  }
+};
+
+// Utilidades
+const formatearDolor = (dolorStr) => {
+  try {
+    const dolor = JSON.parse(dolorStr);
+    const parts = [];
+    
+    if (dolor.rango) parts.push(`Intensidad: ${dolor.rango}`);
+    if (dolor.tipo) parts.push(`Tipo: ${dolor.tipo}`);
+    
+    if (dolor.caracteristicas && dolor.caracteristicas.length > 0) {
+      parts.push(`Características: ${dolor.caracteristicas.join(', ')}`);
+    }
+    
+    if (dolor.sensibilidad && dolor.sensibilidad.length > 0) {
+      parts.push(`Sensibilidad: ${dolor.sensibilidad.join(', ')}`);
+    }
+    
+    if (dolor.localizacion) {
+      const localizacion = dolor.localizacion
+        .replace(/([A-Z])/g, ' $1')
+        .toLowerCase()
+        .replace(/^./, str => str.toUpperCase());
+      parts.push(`Localización: ${localizacion}`);
+    }
+    
+    return parts.join('. ');
+  } catch (e) {
+    return dolorStr || 'No especificado';
+  }
+};
+
+// Manejadores de Modales
+const openEditModal = async (patient) => {
+  state.modals.edit.selectedPatient = { ...patient, originalDni: patient.dni };
+  state.modals.edit.isOpen = true;
+
+  const modal = document.getElementById('editModal');
+  const form = document.getElementById('editForm');
+
+  modal?.classList.remove('hidden');
+
+  if (form) {
+    Object.entries(patient).forEach(([key, value]) => {
+      const input = form.elements[key];
+      if (input) input.value = value;
+    });
+  }
+};
+
+const closeEditModal = () => {
+  state.modals.edit.isOpen = false;
+  state.modals.edit.selectedPatient = null;
+  document.getElementById('editModal')?.classList.add('hidden');
+  document.getElementById('editForm')?.reset();
+};
+
+const openCreateModal = () => {
+  const createModal = document.getElementById('createModal');
+  if (createModal) {
+    createModal.classList.remove('hidden');
+    state.modals.create.isOpen = true;
+  } else {
+    console.error('Modal de creación no encontrado');
+  }
+};
+
+const closeCreateModal = () => {
+  const createModal = document.getElementById('createModal');
+  if (createModal) {
+    createModal.classList.add('hidden');
+    state.modals.create.isOpen = false;
+    document.getElementById('createForm')?.reset();
+  }
+};
+
+// Manejo de Formularios
+const handleFormSubmit = async (endpoint, formData, onSuccess) => {
+  const patient = {
+    nombre: formData.get('name')?.toString().trim(), 
+    dni: formData.get('dni')?.toString().trim(),
+    mail: formData.get('mail')?.toString().trim(),
+    telefono: formData.get('telefono')?.toString().trim(),
+    areaCode: formData.get('areaCode')?.toString().trim(),
+    edad: 0,
+    direccion: '',
+    obraSocial: 'No especificada',
+    ultCons: new Date(),
+    tratamientoMedico: 'No',
+    tomaMedicamentos: 'No',
+    alergias: '',
+    embarazada: false,
+    motivoConsulta: 'Consulta general'
+  };
+
+  const errors = validatePatient(patient);
+  if (errors.length > 0) {
+    throw new Error(errors.join('\n'));
+  }
+
+  const response = await fetch(`${BASE_URL}/paciente/create`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Origin': 'http://localhost:4321'
+    },
+    body: JSON.stringify(patient)
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || `Error del servidor: ${response.status}`);
+  }
+
+  onSuccess(result);
+  return result;
+};
+
+const handleDelete = async (dni, nombre, container) => {
+  try {
+    const findResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`, {
+      method: 'GET',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Origin': 'http://localhost:4321'
+      }
+    });
+
+    if (!findResponse.ok) {
+      const errorData = await findResponse.json();
+      throw new Error(errorData.message || `Error del servidor: ${findResponse.status}`);
+    }
+
+    const findResult = await findResponse.json();
+    const pacienteId = findResult.paciente.id;
+
+    const deleteResponse = await fetch(`${BASE_URL}/paciente/deleteById/${pacienteId}`, {
+      method: 'DELETE',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Origin': 'http://localhost:4321'
+      }
+    });
+
+    const result = await deleteResponse.json();
+
+    if (!deleteResponse.ok) {
+      throw new Error(result.message || `Error del servidor: ${deleteResponse.status}`);
+    }
+
+    showNotification('Paciente eliminado correctamente');
+    container.remove();
+    
+  } catch (error) {
+    showNotification(error.message, 'error');
+  }
+};
+
+const handleEdit = async (patient) => {
+  try {
+    const originalDni = state.modals.edit.selectedPatient.originalDni;
+    const response22 = await fetch(`${BASE_URL}/paciente/findByDni/${originalDni}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Origin': 'http://localhost:4321'
+      },
+    });
+    const dataaa = await response22.json();
+    const id = dataaa.paciente.id;
+    
+    const response = await fetch(`${BASE_URL}/paciente/updateById/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Origin': 'http://localhost:4321'
+      },
+      body: JSON.stringify(patient)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error del servidor: ${response.status}`);
+    }
+
+    showNotification('Paciente actualizado correctamente');
+    await actualizarTabla();
+    closeEditModal(); 
+  } catch (error) {
+    showNotification(error.message, 'error');
+  }
+};
+
+// Event Listeners
+function setupEventListeners() {
+  // Event listeners para botones de editar
+  document.querySelectorAll('.edit-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const patientData = JSON.parse(button.dataset.patient || '{}');
+      openEditModal(patientData);
+    });
+  });
+
+  // Event listeners para botones de eliminar
+  document.querySelectorAll('.delete-button').forEach(button => {
+    button.addEventListener('click', async () => {
+      const container = button.closest('[data-dni]');
+      if (!container) return;
+      
+      const dni = container.dataset.dni;
+      const nombre = container.dataset.name;
+
+      if (confirm(`¿Está seguro que desea eliminar al paciente${nombre ? ' ' + nombre : ''}?`)) {
+        await handleDelete(dni, nombre, container);
+      }
+    });
+  });
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+  actualizarTabla();
+
+  // Event Listeners básicos
+  document.getElementById('volverBtn')?.addEventListener('click', () => {
+    window.location.href = '/';
+  });
+
+  document.getElementById('searchInput')?.addEventListener('input', async () => {
+    await filtrarPacientes();
+  });
+
+  document.getElementById('createPatientButton')?.addEventListener('click', openCreateModal);
+
+  // Event Listeners para modales
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('close-create-modal')) {
+      if (e.target.closest('#editModal')) {
+        closeEditModal();
+      }
+      if (e.target.closest('#createModal')) {
+        closeCreateModal();
+      }
+    }
+    if (e.target.classList.contains('close-hc-modal')) {
+      document.getElementById('historiaClinicaModal')?.classList.add('hidden');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeEditModal();
+      closeCreateModal();
+      document.getElementById('historiaClinicaModal')?.classList.add('hidden');
+    }
+  });
+
+  // Formularios
+  document.getElementById('createForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+
+    try {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Creando...';
+
+      await handleFormSubmit(
+        '/paciente', 
+        new FormData(form),
+        () => {
+          showNotification('Paciente creado correctamente');
+          closeCreateModal();
+          window.location.reload();
+        }
+      );
+    } catch (error) {
+      showNotification(error.message, 'error');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    }
+  });
+
+  document.getElementById('editForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const patient = {
+      nombre: form.elements.name.value,
+      dni: form.elements.dni.value,
+      mail: form.elements.mail.value,
+      telefono: form.elements.telefono.value,
+      areaCode: form.elements.areaCode.value
+    };
+
+    await handleEdit(patient);
+  });
+});
+</script>
