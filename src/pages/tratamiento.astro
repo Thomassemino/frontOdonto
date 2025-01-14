@@ -13,10 +13,12 @@ const state = {
   }
 };
 
+// Funciones de validación y utilidad
 const validateTreatment = (treatment) => {
   const errors = [];
   if (!treatment.nombre.trim()) errors.push('El nombre es requerido');
   if (!treatment.descripcion.trim()) errors.push('La descripción es requerida');
+  if (treatment.monto < 0) errors.push('El monto no puede ser negativo');
   return errors;
 };
 
@@ -37,6 +39,7 @@ const showNotification = (message, type = 'success') => {
   }, 3000);
 };
 
+// Funciones de tabla y filtrado
 async function filtrarTratamientos() {
   const searchTerm = document.getElementById('searchInput')?.value.toLowerCase().trim();
   const tbody = document.querySelector('tbody');
@@ -51,16 +54,19 @@ async function filtrarTratamientos() {
       ? data 
       : data.filter(tratamiento => 
           tratamiento.nombre.toLowerCase().includes(searchTerm) ||
-          tratamiento.descripcion.toLowerCase().includes(searchTerm)
+          tratamiento.descripcion.toLowerCase().includes(searchTerm) ||
+          tratamiento.monto?.toString().includes(searchTerm)
         );
 
     tbody.innerHTML = tratamientosFiltrados.map(row => `
       <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-150"
           data-id="${row._id}"
           data-nombre="${row.nombre}"
-          data-descripcion="${row.descripcion}">
+          data-descripcion="${row.descripcion}"
+          data-monto="${row.monto || 0}">
         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.nombre}</td>
         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.descripcion}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">$${row.monto || 0}</td>
         <td class="px-6 py-4">
           <div class="flex space-x-2">
             <button class="edit-button p-2 text-blue-600 hover:text-blue-700">
@@ -103,19 +109,23 @@ async function actualizarTabla() {
       <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-150"
           data-id="${row._id}"
           data-nombre="${row.nombre}"
-          data-descripcion="${row.descripcion}">
+          data-descripcion="${row.descripcion}"
+          data-monto="${row.monto || 0}">
         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.nombre}</td>
         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.descripcion}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">$${row.monto || 0}</td>
         <td class="px-6 py-4">
           <div class="flex space-x-2">
             <button class="edit-button p-2 text-blue-600 hover:text-blue-700">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
               </svg>
             </button>
             <button class="delete-button p-2 text-red-600 hover:text-red-700">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 6h18"/>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
                 <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -131,10 +141,12 @@ async function actualizarTabla() {
   }
 }
 
+// Funciones de manejo de formularios
 async function handleCreate(formData) {
   const treatment = {
     nombre: formData.get('nombre')?.toString().trim(),
-    descripcion: formData.get('descripcion')?.toString().trim()
+    descripcion: formData.get('descripcion')?.toString().trim(),
+    monto: parseFloat(formData.get('monto')?.toString() || '0')
   };
 
   const errors = validateTreatment(treatment);
@@ -164,7 +176,8 @@ async function handleEdit(formData) {
   const id = state.modals.edit.selectedTreatment.id;
   const treatment = {
     nombre: formData.get('nombre')?.toString().trim(),
-    descripcion: formData.get('descripcion')?.toString().trim()
+    descripcion: formData.get('descripcion')?.toString().trim(),
+    monto: parseFloat(formData.get('monto')?.toString() || '0')
   };
 
   const errors = validateTreatment(treatment);
@@ -215,7 +228,7 @@ async function handleDelete(id, nombre) {
   }
 }
 
-// Modal handlers
+// Funciones de modal
 function openEditModal(treatment) {
   state.modals.edit.selectedTreatment = { ...treatment };
   state.modals.edit.isOpen = true;
@@ -227,6 +240,7 @@ function openEditModal(treatment) {
   if (form) {
     form.elements.nombre.value = treatment.nombre;
     form.elements.descripcion.value = treatment.descripcion;
+    form.elements.monto.value = treatment.monto || 0;
   }
 }
 
@@ -253,11 +267,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('createTreatmentButton')?.addEventListener('click', openCreateModal);
 
-	document.getElementById('volverBtn')?.addEventListener('click', () => {
+  document.getElementById('volverBtn')?.addEventListener('click', () => {
     window.location.href = '/';
-	});
+  });
 
-	document.getElementById('searchInput')?.addEventListener('input', () => {
+  document.getElementById('searchInput')?.addEventListener('input', () => {
     filtrarTratamientos();
   });
 
@@ -267,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
       closeCreateModal();
     });
   });
-	
 
   document.querySelector('tbody')?.addEventListener('click', async (e) => {
     const target = e.target.closest('button');
@@ -279,7 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const treatment = {
       id: row.dataset.id,
       nombre: row.dataset.nombre,
-      descripcion: row.dataset.descripcion
+      descripcion: row.dataset.descripcion,
+      monto: parseFloat(row.dataset.monto || '0')
     };
 
     if (target.classList.contains('edit-button')) {
@@ -312,137 +326,248 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <LayoutProtected>
-<LayoutCommon>
-  <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 dark:from-slate-900 dark:to-slate-800 lg:p-16">
-    <div class="mx-auto max-w-6xl">
-      <div class="flex justify-between items-center mb-6">
-				<div class="flex items-center gap-4">
-					<button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-						← Volver al inicio
-					</button>
-					<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Tratamientos</h2>
-				</div>
-				<button id="createTreatmentButton" 
-								class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 
-											 focus:ring-2 focus:ring-green-300 transition-colors duration-200">
-					Nuevo Tratamiento
-				</button>
-			</div>
+  <LayoutCommon>
+    <div
+      class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 dark:from-slate-900 dark:to-slate-800 lg:p-16"
+    >
+      <div class="mx-auto max-w-6xl">
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center gap-4">
+            <button
+              id="volverBtn"
+              class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              ← Volver al inicio
+            </button>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
+              Tratamientos
+            </h2>
+          </div>
+          <button
+            id="createTreatmentButton"
+            class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700
+											 focus:ring-2 focus:ring-green-300 transition-colors duration-200"
+          >
+            Nuevo Tratamiento
+          </button>
+        </div>
 
-			<div class="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-				<div class="space-y-2">
-					<input
-						type="text"
-						id="searchInput"
-						placeholder="Buscar por nombre o descripción..."
-						class="w-full rounded-lg border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-					/>
-				</div>
-			</div>
+        <div class="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div class="space-y-2">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Buscar por nombre o descripción..."
+              class="w-full rounded-lg border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            />
+          </div>
+        </div>
 
-      <div class="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-100 dark:bg-gray-700">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                Nombre
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                Descripción
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <!-- Filled dynamically -->
-          </tbody>
-        </table>
+        <div
+          class="overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800"
+        >
+          <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+          >
+            <thead class="bg-gray-100 dark:bg-gray-700">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
+                >
+                  Nombre
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
+                >
+                  Descripción
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
+                >
+                  Monto
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
+                >
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <!-- Filled dynamically -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Edit Modal -->
-  <div id="editModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-    <div class="absolute inset-0 bg-black opacity-50"></div>
-    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-1/3">
-      <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Editar Tratamiento</h2>
-      <form id="editForm" class="space-y-4">
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
-          <input type="text" name="nombre" required
-                 class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 
-                        focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"/>
-        </div>
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
-          <textarea name="descripcion" required rows="3"
-                    class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 
-                           focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
-        </div>
+    <!-- Edit Modal -->
+    <div
+      id="editModal"
+      class="fixed inset-0 flex items-center justify-center z-50 hidden"
+    >
+      <div class="absolute inset-0 bg-black opacity-50"></div>
+      <div
+        class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-1/3"
+      >
+        <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
+          Editar Tratamiento
+        </h2>
+        <form id="editForm" class="space-y-4">
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Nombre</label
+            >
+            <input
+              type="text"
+              name="nombre"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500
+                        focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+            />
+          </div>
 
-        <div class="flex justify-end space-x-4">
-          <button type="button" class="close-modal px-4 py-2 text-sm font-medium text-white bg-gray-600 
-                                     rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-300">
-            Cancelar
-          </button>
-          <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 
-                                     rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-300">
-            Guardar
-          </button>
-        </div>
-      </form>
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Descripción</label
+            >
+            <textarea
+              name="descripcion"
+              required
+              rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500
+                           focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+            ></textarea>
+          </div>
+
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Monto</label
+            >
+            <input
+              type="number"
+              name="monto"
+              required
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500
+                        focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+            />
+          </div>
+
+          <div class="flex justify-end space-x-4">
+            <button
+              type="button"
+              class="close-modal px-4 py-2 text-sm font-medium text-white bg-gray-600
+                                     rounded-lg hover:bg-gray-700 focus:ring-2 focus:ring-gray-300"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 text-sm font-medium text-white bg-blue-600
+                                     rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-300"
+            >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <!-- Create Modal -->
-  <div id="createModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-    <div class="absolute inset-0 bg-black opacity-50"></div>
-    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-1/3">
-      <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Nuevo Tratamiento</h2>
-      <form id="createForm" class="space-y-4">
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
-          <input type="text" name="nombre" required placeholder="Nombre del tratamiento"
-                 class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 
-                        focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"/>
-        </div>
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
-          <textarea name="descripcion" required rows="3" placeholder="Descripción detallada del tratamiento"
-                    class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 
+    <!-- Create Modal -->
+    <div
+      id="createModal"
+      class="fixed inset-0 flex items-center justify-center z-50 hidden"
+    >
+      <div class="absolute inset-0 bg-black opacity-50"></div>
+      <div
+        class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-1/3"
+      >
+        <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
+          Nuevo Tratamiento
+        </h2>
+        <form id="createForm" class="space-y-4">
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Nombre</label
+            >
+            <input
+              type="text"
+              name="nombre"
+              required
+              placeholder="Nombre del tratamiento"
+              class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500
+                        focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Descripción</label
+            >
+            <textarea
+              name="descripcion"
+              required
+              rows="3"
+              placeholder="Descripción detallada del tratamiento"
+              class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500
                          focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-          ></textarea>
-        </div>
+            ></textarea>
+          </div>
 
-        <div class="flex justify-end space-x-4">
-          <button type="button" 
-                  class="close-modal px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg 
-                         hover:bg-gray-700 focus:ring-2 focus:ring-gray-300">
-            Cancelar
-          </button>
-          <button type="submit" 
-                  class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg 
-                         hover:bg-green-700 focus:ring-2 focus:ring-green-300">
-            Crear
-          </button>
-        </div>
-      </form>
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Monto</label
+            >
+            <input
+              type="number"
+              name="monto"
+              required
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500
+                        focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+            />
+          </div>
+
+          <div class="flex justify-end space-x-4">
+            <button
+              type="button"
+              class="close-modal px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg
+                         hover:bg-gray-700 focus:ring-2 focus:ring-gray-300"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg
+                         hover:bg-green-700 focus:ring-2 focus:ring-green-300"
+            >
+              Crear
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-</LayoutCommon>
+  </LayoutCommon>
 </LayoutProtected>
 
 <style>
-.notification {
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out;
-}
+  .notification {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
 
-.modal-overlay {
-  backdrop-filter: blur(4px);
-}
+  .modal-overlay {
+    backdrop-filter: blur(4px);
+  }
 </style>
