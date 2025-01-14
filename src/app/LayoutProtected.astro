@@ -1,12 +1,16 @@
----
----
-
 <script>
-    import { requireAuth } from '../auth/middleware';
-    if (!requireAuth()) {
-      throw new Error('Not authenticated');
-    }
-  </script>
-  
-  <slot />
-  
+  import { requireAuth } from '../auth/middleware';
+  import SessionManager from '../auth/sessionManager';
+
+  if (!requireAuth()) {
+    throw new Error('Not authenticated');
+  }
+
+  // Crear instancia del SessionManager con 30 minutos de inactividad
+   const sessionManager = new SessionManager();
+
+  // Si quieres un tiempo personalizado de inactividad (ejemplo: 15 minutos)
+  // const sessionManager = new SessionManager(15 * 60 * 1000);
+</script>
+
+<slot />
