@@ -51,7 +51,6 @@ import ColorModeSwitcher from '../components/ColorModeSwitcher.astro';
 			</div>
 
 			<div class="flex items-center">
-			
 				<ColorModeSwitcher />
 
 				<!-- Profile -->
@@ -66,6 +65,7 @@ import ColorModeSwitcher from '../components/ColorModeSwitcher.astro';
 						>
 							<span class="sr-only">Menú Desplegable</span>
 							<img
+								id="userProfileImage"
 								class="w-8 h-8 rounded-full"
 								src="/images/perfil-logo.png"
 								alt="user photo"
@@ -106,87 +106,98 @@ import ColorModeSwitcher from '../components/ColorModeSwitcher.astro';
 	</div>
 </nav>
 
-
 <script>
   const BASE_URL = 'https://odontoback-production.up.railway.app/api';
   
 	async function cargarDatosUsuario() {
-  try {
-    const userId = localStorage.getItem('userId');
-    const userRole = localStorage.getItem('userRole');
-    
-    console.log('ID de usuario:', userId);
-    console.log('Rol de usuario:', userRole);
-    
-    if (!userId) {
-      console.log('No hay usuario logueado');
-      return;
-    }
-    
-    // Determinar el endpoint según el rol
-    let endpoint = '';
-    if (userRole === 'odontologo') {
-      endpoint = `${BASE_URL}/medico/findById/${userId}`;
-    } else if (userRole === 'secretaria') {
-      endpoint = `${BASE_URL}/secretaria/buscarId/${userId}`;
-    } else {
-      console.log('Rol no reconocido:', userRole);
-      return;
-    }
-    
-    console.log('Consultando endpoint:', endpoint);
-    
-    const response = await fetch(endpoint);
-    console.log('Estado de la respuesta:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error response:', errorText);
-      throw new Error(`Error al cargar datos del usuario (${response.status})`);
-    }
-    
-    const data = await response.json();
-    console.log('Datos recibidos:', data);
-    
-    // Si es médico, extraer de data.medico, si es secretaria, extraer de data.secretaria
-    let user;
-    if (userRole === 'odontologo') {
-      user = data.medico; // Del controlador de médicos vemos que devuelve { medico: {...} }
-    } else {
-      user = data.secretaria; // Del controlador de secretarias vemos que devuelve { secretaria: {...} }
-    }
-    
-    console.log('Datos procesados del usuario:', user);
-    
-    if (!user) {
-      throw new Error('No se encontraron datos del usuario');
-    }
-    
-    // Actualizar los elementos del DOM
-    const nombreElement = document.querySelector('#user-name');
-    const emailElement = document.querySelector('#user-email');
-    
-    if (nombreElement) {
-      nombreElement.textContent = user.nombre || 'Nombre no disponible';
-    }
-    
-    if (emailElement) {
-      emailElement.textContent = user.email || 'Email no disponible';
-    }
-  } catch (error) {
-    console.error('Error completo:', error);
-    // Actualizar la UI para mostrar el error
-    const nombreElement = document.querySelector('#user-name');
-    const emailElement = document.querySelector('#user-email');
-    
-    if (nombreElement) {
-      nombreElement.textContent = 'Error al cargar';
-    }
-    if (emailElement) {
-      emailElement.textContent = 'Error al cargar';
+    try {
+      const userId = localStorage.getItem('userId');
+      const userRole = localStorage.getItem('userRole');
+      
+      console.log('ID de usuario:', userId);
+      console.log('Rol de usuario:', userRole);
+      
+      if (!userId) {
+        console.log('No hay usuario logueado');
+        return;
+      }
+
+      // Actualizar la imagen de perfil según el rol
+      const profileImage = document.getElementById('userProfileImage');
+      if (profileImage) {
+        profileImage.src = userRole === 'secretaria' ? '/images/perfil-logo-secretaria.png' : '/images/perfil-logo.png';
+      }
+      
+      // Determinar el endpoint según el rol
+      let endpoint = '';
+      if (userRole === 'odontologo') {
+        endpoint = `${BASE_URL}/medico/findById/${userId}`;
+      } else if (userRole === 'secretaria') {
+        endpoint = `${BASE_URL}/secretaria/buscarId/${userId}`;
+      } else {
+        console.log('Rol no reconocido:', userRole);
+        return;
+      }
+      
+      console.log('Consultando endpoint:', endpoint);
+      
+      const response = await fetch(endpoint);
+      console.log('Estado de la respuesta:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Error al cargar datos del usuario (${response.status})`);
+      }
+      
+      const data = await response.json();
+      console.log('Datos recibidos:', data);
+      
+      // Si es médico, extraer de data.medico, si es secretaria, extraer de data.secretaria
+      let user;
+      if (userRole === 'odontologo') {
+        user = data.medico; // Del controlador de médicos vemos que devuelve { medico: {...} }
+      } else {
+        user = data.secretaria; // Del controlador de secretarias vemos que devuelve { secretaria: {...} }
+      }
+      
+      console.log('Datos procesados del usuario:', user);
+      
+      if (!user) {
+        throw new Error('No se encontraron datos del usuario');
+      }
+      
+      // Actualizar los elementos del DOM
+      const nombreElement = document.querySelector('#user-name');
+      const emailElement = document.querySelector('#user-email');
+      
+      if (nombreElement) {
+        nombreElement.textContent = user.nombre || 'Nombre no disponible';
+      }
+      
+      if (emailElement) {
+        emailElement.textContent = user.email || 'Email no disponible';
+      }
+
+      // Si el usuario tiene una foto personalizada, actualizarla
+      if (user.photoUrl && profileImage) {
+        profileImage.src = user.photoUrl;
+      }
+
+    } catch (error) {
+      console.error('Error completo:', error);
+      // Actualizar la UI para mostrar el error
+      const nombreElement = document.querySelector('#user-name');
+      const emailElement = document.querySelector('#user-email');
+      
+      if (nombreElement) {
+        nombreElement.textContent = 'Error al cargar';
+      }
+      if (emailElement) {
+        emailElement.textContent = 'Error al cargar';
+      }
     }
   }
-}
 
   // Manejar el logout
   const logoutButton = document.getElementById('logoutButton');
