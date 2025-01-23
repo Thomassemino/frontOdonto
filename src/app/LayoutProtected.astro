@@ -1,16 +1,19 @@
+---
+import { SecureSessionManager } from '../auth/secureAuth';
+
+let authenticated = false;
+---
+
 <script>
-  import { requireAuth } from '../auth/middleware';
-  import SessionManager from '../auth/sessionManager';
+  const initAuth = async () => {
+    const sessionManager = new SecureSessionManager();
+    if (!(await sessionManager.isAuthenticated())) {
+      window.location.href = '/login';
+      throw new Error('Not authenticated');
+    }
+  };
 
-  if (!requireAuth()) {
-    throw new Error('Not authenticated');
-  }
-
-  // Crear instancia del SessionManager con 30 minutos de inactividad
-   const sessionManager = new SessionManager();
-
-  // Si quieres un tiempo personalizado de inactividad (ejemplo: 15 minutos)
-  // const sessionManager = new SessionManager(15 * 60 * 1000);
+  initAuth().catch(console.error);
 </script>
 
 <slot />

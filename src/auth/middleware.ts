@@ -1,4 +1,3 @@
-// auth/middleware.ts
 
 // Verificar autenticación
 export function isAuthenticated(): boolean {
