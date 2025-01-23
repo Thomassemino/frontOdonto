@@ -191,7 +191,6 @@ import LayoutProtected from "../app/LayoutProtected.astro";
               <input 
                 type="email" 
                 name="mail"
-                required
                 placeholder="ejemplo@correo.com"
                 class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
               />
@@ -702,8 +701,9 @@ const handleFormSubmit = async (endpoint, formData, onSuccess) => {
   return result;
 };
 
-const handleDelete = async (dni, nombre, container) => {
+const handleDelete = async (dni, nombre) => {
   try {
+    // Find patient by DNI
     const findResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`, {
       method: 'GET',
       headers: { 
@@ -720,6 +720,7 @@ const handleDelete = async (dni, nombre, container) => {
     const findResult = await findResponse.json();
     const pacienteId = findResult.paciente.id;
 
+    // Delete patient
     const deleteResponse = await fetch(`${BASE_URL}/paciente/deleteById/${pacienteId}`, {
       method: 'DELETE',
       headers: { 
@@ -728,14 +729,14 @@ const handleDelete = async (dni, nombre, container) => {
       }
     });
 
-    const result = await deleteResponse.json();
-
     if (!deleteResponse.ok) {
+      const result = await deleteResponse.json();
       throw new Error(result.message || `Error del servidor: ${deleteResponse.status}`);
     }
 
     showNotification('Paciente eliminado correctamente');
-    container.remove();
+    
+    await actualizarTabla();
     
   } catch (error) {
     showNotification(error.message, 'error');
@@ -788,19 +789,18 @@ function setupEventListeners() {
 
   // Event listeners para botones de eliminar
   document.querySelectorAll('.delete-button').forEach(button => {
-    button.addEventListener('click', async () => {
-      const container = button.closest('[data-dni]');
-      if (!container) return;
-      
-      const dni = container.dataset.dni;
-      const nombre = container.dataset.name;
+  button.addEventListener('click', async () => {
+    const container = button.closest('[data-dni]');
+    if (!container) return;
+    
+    const dni = container.dataset.dni;
+    const nombre = container.dataset.name;
 
-      if (confirm(`¿Está seguro que desea eliminar al paciente${nombre ? ' ' + nombre : ''}?`)) {
-        await handleDelete(dni, nombre, container);
-      }
-    });
+    if (confirm(`¿Está seguro que desea eliminar al paciente${nombre ? ' ' + nombre : ''}?`)) {
+      await handleDelete(dni, nombre);
+    }
   });
-}
+});
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
