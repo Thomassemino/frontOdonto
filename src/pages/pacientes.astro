@@ -299,7 +299,7 @@ import LayoutProtected from "../app/LayoutProtected.astro";
 
 
 <script>
-  const BASE_URL = 'https://odontoback-production.up.railway.app/api';
+  const BASE_URL = 'http://odontoback-production.up.railway.app/api';
   
   // Estado y Variables Globales
   const state = {
@@ -797,7 +797,7 @@ function setupEventListeners() {
       const nombre = container.dataset.name;
 
       if (confirm(`¿Está seguro que desea eliminar al paciente${nombre ? ' ' + nombre : ''}?`)) {
-        await handleDelete(dni, nombre, container);
+        await handleDelete(dni, nombre);
       }
     });
   });
