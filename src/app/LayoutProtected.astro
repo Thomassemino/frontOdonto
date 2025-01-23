@@ -1,10 +1,10 @@
 ---
-import { SecureSessionManager } from '../auth/secureAuth';
-
 let authenticated = false;
 ---
 
 <script>
+  import { SecureSessionManager } from '../auth/secureAuth';
+  
   const initAuth = async () => {
     const sessionManager = new SecureSessionManager();
     if (!(await sessionManager.isAuthenticated())) {
