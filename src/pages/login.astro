@@ -84,6 +84,7 @@ const validateUser = async (email: string, password: string): Promise<LoginRespo
     });
 
     if (!loginResponse.ok) {
+      console.log(BASE_URL);
       throw new Error('Error al iniciar sesión. Verifica tus credenciales.');
     }
 
