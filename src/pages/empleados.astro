@@ -70,7 +70,7 @@ import LayoutProtected from "../app/LayoutProtected.astro";
 </LayoutProtected>
 
 <script>
-  const BASE_URL = "http://odontoback-production.up.railway.app/api";
+  const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
   let empleadosData = [];
   
   function showNotification(message, type = 'success') {

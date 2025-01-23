@@ -196,7 +196,7 @@ import LayoutProtected from "../app/LayoutProtected.astro";
 </style>
 
 <script>
-const BASE_URL = "http://odontoback-production.up.railway.app/api";
+const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
 
 const state = {
   modals: {
