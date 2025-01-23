@@ -3,9 +3,8 @@ let authenticated = false;
 ---
 
 <script>
-  import { SecureSessionManager } from '../auth/secureAuth';
-  
   const initAuth = async () => {
+    const { SecureSessionManager } = await import('../auth/secureAuth');
     const sessionManager = new SecureSessionManager();
     if (!(await sessionManager.isAuthenticated())) {
       window.location.href = '/login';
