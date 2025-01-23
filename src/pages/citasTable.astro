@@ -181,7 +181,7 @@ interface Consulta {
 
 
 <script>
-const BASE_URL = 'http://odontoback-production.up.railway.app/api';
+const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
 
   interface Consulta {
     _id: string;

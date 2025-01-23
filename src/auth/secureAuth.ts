@@ -1,4 +1,5 @@
-import { encrypt, decrypt } from './encryption';
+// auth/secureAuth.ts
+import { subtle } from 'crypto';
 import { jwtVerify, SignJWT } from 'jose';
 
 interface UserSession {
@@ -38,8 +39,58 @@ export class SecureSessionManager {
     }
   }
 
+  private async encrypt(data: string): Promise<string> {
+    const key = await subtle.importKey(
+      'raw',
+      new TextEncoder().encode(process.env.ENCRYPTION_KEY),
+      { name: 'AES-GCM' },
+      false,
+      ['encrypt']
+    );
+
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encoded = new TextEncoder().encode(data);
+
+    const ciphertext = await subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      encoded
+    );
+
+    const combined = new Uint8Array(iv.length + ciphertext.byteLength);
+    combined.set(iv);
+    combined.set(new Uint8Array(ciphertext), iv.length);
+
+    return btoa(String.fromCharCode(...combined));
+  }
+
+  private async decrypt(encryptedData: string): Promise<string> {
+    const key = await subtle.importKey(
+      'raw',
+      new TextEncoder().encode(process.env.ENCRYPTION_KEY),
+      { name: 'AES-GCM' },
+      false,
+      ['decrypt']
+    );
+
+    const combined = new Uint8Array(
+      atob(encryptedData).split('').map(char => char.charCodeAt(0))
+    );
+
+    const iv = combined.slice(0, 12);
+    const ciphertext = combined.slice(12);
+
+    const decrypted = await subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      ciphertext
+    );
+
+    return new TextDecoder().decode(decrypted);
+  }
+
   private async saveSession(session: UserSession): Promise<void> {
-    const encryptedSession = await encrypt(JSON.stringify(session));
+    const encryptedSession = await this.encrypt(JSON.stringify(session));
     sessionStorage.setItem(this.SESSION_KEY, encryptedSession);
   }
 
@@ -48,7 +99,7 @@ export class SecureSessionManager {
     if (!encryptedSession) return null;
 
     try {
-      const decryptedSession = await decrypt(encryptedSession);
+      const decryptedSession = await this.decrypt(encryptedSession);
       return JSON.parse(decryptedSession);
     } catch {
       return null;
@@ -64,14 +115,23 @@ export class SecureSessionManager {
     };
 
     await this.saveSession(session);
-    document.cookie = `auth_token=${token}; Secure; SameSite=Strict; HttpOnly`;
+    document.cookie = `auth_token=${token}; Secure; SameSite=Strict; HttpOnly; Path=/`;
+  }
+
+  public async getUserId(): Promise<string | null> {
+    const session = await this.getSession();
+    return session?.userId || null;
+  }
+
+  public async getUserRole(): Promise<string | null> {
+    const session = await this.getSession();
+    return session?.role || null;
   }
 
   public async isAuthenticated(): Promise<boolean> {
     const session = await this.getSession();
     if (!session) return false;
 
-    // Verificar edad de la sesión
     if (Date.now() - session.timestamp > this.MAX_SESSION_AGE) {
       await this.logout();
       return false;
@@ -110,7 +170,7 @@ export class SecureSessionManager {
 
   public async logout(): Promise<void> {
     sessionStorage.removeItem(this.SESSION_KEY);
-    document.cookie = 'auth_token=; Max-Age=0; Secure; SameSite=Strict; HttpOnly';
+    document.cookie = 'auth_token=; Max-Age=0; Secure; SameSite=Strict; HttpOnly; Path=/';
     window.location.href = '/login';
   }
 

@@ -1,10 +1,19 @@
+---
+import { SecureSessionManager } from '../auth/secureAuth';
+
+let authenticated = false;
+---
+
 <script>
-  import { SecureSessionManager } from '../auth/secureMiddleware';
-  
-  const sessionManager = new SecureSessionManager();
-  if (!(await sessionManager.isAuthenticated())) {
-    throw new Error('Not authenticated');
-  }
-  </script>
-  
-  <slot />
+  const initAuth = async () => {
+    const sessionManager = new SecureSessionManager();
+    if (!(await sessionManager.isAuthenticated())) {
+      window.location.href = '/login';
+      throw new Error('Not authenticated');
+    }
+  };
+
+  initAuth().catch(console.error);
+</script>
+
+<slot />
