@@ -789,18 +789,19 @@ function setupEventListeners() {
 
   // Event listeners para botones de eliminar
   document.querySelectorAll('.delete-button').forEach(button => {
-  button.addEventListener('click', async () => {
-    const container = button.closest('[data-dni]');
-    if (!container) return;
-    
-    const dni = container.dataset.dni;
-    const nombre = container.dataset.name;
+    button.addEventListener('click', async () => {
+      const container = button.closest('[data-dni]');
+      if (!container) return;
+      
+      const dni = container.dataset.dni;
+      const nombre = container.dataset.name;
 
-    if (confirm(`¿Está seguro que desea eliminar al paciente${nombre ? ' ' + nombre : ''}?`)) {
-      await handleDelete(dni, nombre);
-    }
+      if (confirm(`¿Está seguro que desea eliminar al paciente${nombre ? ' ' + nombre : ''}?`)) {
+        await handleDelete(dni, nombre, container);
+      }
+    });
   });
-});
+}
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
