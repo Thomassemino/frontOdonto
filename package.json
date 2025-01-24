@@ -9,6 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@panzoom/panzoom": "^4.6.0",
     "astro": "^5.1.6",
     "crypto": "^1.0.1",
     "flatpickr": "^4.6.13",
