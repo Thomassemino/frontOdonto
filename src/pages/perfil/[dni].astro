@@ -46,11 +46,11 @@ const { dni } = Astro.params;
             <!-- Secciones de Historia Clínica -->
           </div>
         </div>
+      </div>
 
-        <!-- Odontograma -->
-        <div class="mb-8">
-          <DentalChart dni={dni} />
-        </div>
+      <!-- Odontograma -->
+      <div class="mb-8 grid gap-6 lg:grid-cols-2">
+        <DentalChart dni={dni} />
       </div>
     </div>
   </LayoutCommon>
