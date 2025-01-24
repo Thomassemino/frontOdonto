@@ -50,7 +50,7 @@ const { dni } = Astro.params;
   </LayoutCommon>
 </LayoutProtected>
 
-<script define:vars={{ dni }}>
+<script type="module" define:vars={{ dni }}>
 const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
 
 async function cargarPerfil() {
