@@ -476,32 +476,38 @@ async function handleDelete(id, nombre) {
 
 // Event Listeners y Setup
 function setupEventListeners() {
-  document.addEventListener('click', async (e) => {
-    const editButton = e.target.closest('.edit-button');
-    const deleteButton = e.target.closest('.delete-button');
+  // Remover event listeners existentes
+  document.removeEventListener('click', handleButtonClick);
+  // Añadir nuevo event listener
+  document.addEventListener('click', handleButtonClick);
+}
 
-    if (editButton) {
-      const container = editButton.closest('[data-id]');
-      if (container) {
-        const treatment = {
-          id: container.dataset.id,
-          nombre: container.dataset.nombre,
-          descripcion: container.dataset.descripcion,
-          monto: parseFloat(container.dataset.monto || '0')
-        };
-        openEditModal(treatment);
-      }
-    }
+// Función separada para manejar clicks
+async function handleButtonClick(e) {
+  const editButton = e.target.closest('.edit-button');
+  const deleteButton = e.target.closest('.delete-button');
 
-    if (deleteButton) {
-      const container = deleteButton.closest('[data-id]');
-      if (container) {
-        const id = container.dataset.id;
-        const nombre = container.dataset.nombre;
-        await handleDelete(id, nombre);
-      }
+  if (editButton) {
+    const container = editButton.closest('[data-id]');
+    if (container) {
+      const treatment = {
+        id: container.dataset.id,
+        nombre: container.dataset.nombre,
+        descripcion: container.dataset.descripcion,
+        monto: parseFloat(container.dataset.monto || '0')
+      };
+      openEditModal(treatment);
     }
-  });
+  }
+
+  if (deleteButton) {
+    const container = deleteButton.closest('[data-id]');
+    if (container) {
+      const id = container.dataset.id;
+      const nombre = container.dataset.nombre;
+      await handleDelete(id, nombre);
+    }
+  }
 }
 
 // Inicialización
