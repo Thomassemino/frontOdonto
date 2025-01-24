@@ -447,7 +447,10 @@ async function handleEdit(formData) {
 }
 
 async function handleDelete(id, nombre) {
-  if (!confirm(`¿Está seguro que desea eliminar el tratamiento "${nombre}"?`)) {
+
+  const confirmDelete = window.confirm(`¿Está seguro que desea eliminar el tratamiento "${nombre}"?`);
+
+  if (!confirmDelete) {
     return;
   }
 
