@@ -254,13 +254,31 @@ function initializeThemeToggle() {
 }
 
 function selectToothPart(tooth, surface, element) {
+  // Clear previous selections
   document.querySelectorAll('.tooth-part.selected').forEach(el => {
     el.classList.remove('selected');
   });
   
+  // Add selected class and update state
   element.classList.add('selected');
   selectedTooth = tooth;
   selectedSurface = surface;
+  
+  // Apply treatment color if one is selected
+  const treatment = document.getElementById('treatment-select').value;
+  if (treatment) {
+    const treatmentInfo = TREATMENTS[treatment];
+    
+    // Remove any existing treatment colors
+    Object.values(TREATMENTS).forEach(t => {
+      element.classList.remove(t.color.replace('bg-', ''));
+      element.classList.remove(t.clase);
+    });
+    
+    // Apply new treatment color
+    element.classList.add(treatmentInfo.color.replace('bg-', ''));
+    element.classList.add(treatmentInfo.clase);
+  }
   
   const saveButton = document.getElementById('save');
   saveButton.disabled = false;
