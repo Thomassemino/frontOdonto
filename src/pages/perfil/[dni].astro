@@ -51,7 +51,7 @@ const { dni } = Astro.params;
 </LayoutProtected>
 
 <script type="module" define:vars={{ dni }}>
-const BASE_URL = import.meta.env.PUBLIC_BASE_URL || "https://odontoback-production.up.railway.app/api";
+const BASE_URL = "https://odontoback-production.up.railway.app/api";
 async function cargarPerfil() {
   try {
     console.log('Cargando perfil para DNI:', dni);
