@@ -328,7 +328,7 @@ async function saveTreatment() {
     const diente = await dienteResponse.json();
 
     // Guardar odontograma
-    const odontogramaResponse = await fetch(`${API_URL}/odontograma`, {
+    const odontogramaResponse = await fetch(`${BASE_URL}/odontograma`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
