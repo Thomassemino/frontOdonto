@@ -1,6 +1,7 @@
 ---
 import LayoutCommon from "../../app/LayoutCommon.astro";
 import LayoutProtected from "../../app/LayoutProtected.astro";
+import DentalChart from "../../components/DentalChart.astro";
 
 const { dni } = Astro.params;
 ---
@@ -44,6 +45,11 @@ const { dni } = Astro.params;
           <div class="space-y-8" id="historiaClinica">
             <!-- Secciones de Historia Clínica -->
           </div>
+        </div>
+
+        <!-- Odontograma -->
+        <div class="mb-8">
+          <DentalChart dni={dni} />
         </div>
       </div>
     </div>

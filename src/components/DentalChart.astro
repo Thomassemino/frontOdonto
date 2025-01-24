@@ -1,0 +1,250 @@
+---
+const { dni } = Astro.props;
+---
+
+<div class="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+  <h2 class="mb-4 text-xl font-semibold text-slate-800 dark:text-slate-100">Odontograma</h2>
+  
+  <div class="flex items-center justify-center p-3 mt-0">
+    <svg preserveaspectratio="xMidYMid" x="0" y="0" viewbox="0 0 289 379" width="289" height="370" 
+      class="w-full min-h-[370px] border border-gray-300 dark:border-gray-700">
+      <g id="chart-scene">
+        <path id="path2" stroke-linecap="round" stroke="#000" fill="none" d="M113.894 31.724c.056.434 3.082 4.911 3.844 6.934 1.032 2.183 2.674 4.157 7.047 5.194 3.571-.368 7.193-.447 10.199-4.033l7.39-9.405 1.347-2.992c.973-2.16-1.134-4.147-3.107-4.999l-5.35-1.197c-3.124-.168-5.197-.936-11.302.6l-5.728 1.047c-2.084.771-4.867.47-4.92 4.357.109 1.486-.585 2.858.58 4.494z" class="tooth-11 tooth-11-parent"/>
+        <!-- Include all paths from original SVG -->
+        <text id="text388" font-family="Sans" word-spacing="0" letter-spacing="0" font-weight="400" font-size="10.135" style="line-height:125%" y="17.284" x="120.378">
+          <tspan id="tspan386" y="17.284" x="120.378">11</tspan>
+        </text>
+        <!-- Include all text elements -->
+        <ellipse ry="13.40733" rx="13.32548" cy="31.839413" cx="128.78391" id="tooth-11-circle" class="opacity-0 fill-blue"/>
+        <!-- Include all ellipse elements -->
+      </g>
+    </svg>
+  </div>
+
+  <div class="mt-6 space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Diente</label>
+      <select id="tooth-select" 
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 
+               text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+        <option value="" disabled selected>Seleccionar diente</option>
+        {[11,12,13,14,15,16,17,18,21,22,23,24,25,26,27,28,31,32,33,34,35,36,37,38,41,42,43,44,45,46,47,48].map(num => (
+          <option value={num}>{num}</option>
+        ))}
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Superficie</label>
+      <select class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 
+                     text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+        <option value="" disabled selected>Seleccionar superficie</option>
+        {["Incisal", "Occlusal", "Mesial", "Distal", "Buccal", "Labial", "Palatal", "Lingual", "Cervical"].map(surface => (
+          <option value={surface.toLowerCase()}>{surface}</option>
+        ))}
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Tipo de Tratamiento</label>
+      <select class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 
+                     text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+        <option value="" disabled selected>Seleccionar tratamiento</option>
+        {["Restauración", "Carilla de Porcelana", "Sellador de Fisuras", "Corona"].map(treatment => (
+          <option value={treatment.toLowerCase()}>{treatment}</option>
+        ))}
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Notas</label>
+      <textarea class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 
+                      text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 
+                      min-h-[3em] md:min-h-[auto]"></textarea>
+    </div>
+
+    <div class="flex space-x-4">
+      <button id="addTreatmentBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium">
+        Agregar Tratamiento
+      </button>
+      <button id="cancelBtn" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 
+                     text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md font-medium">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ dni }}>
+  const TOOTH_NUMBERS = [
+    11, 12, 13, 14, 15, 16, 17, 18,
+    21, 22, 23, 24, 25, 26, 27, 28,
+    31, 32, 33, 34, 35, 36, 37, 38,
+    41, 42, 43, 44, 45, 46, 47, 48
+  ];
+
+  const BASE_URL = "https://odontoback-production.up.railway.app/api";
+  let globalToothElems = [];
+  let lastTouchedElems = [];
+  let toothSelectElement;
+  let myPanzoom;
+
+  function handleToothClick(toothNumber, toothElems) {
+    return function() {
+      const opts = toothSelectElement.options;
+      for (let i = 0; i < opts.length; i++) {
+        if (opts[i].value == toothNumber) {
+          toothSelectElement.selectedIndex = i;
+          break;
+        }
+      }
+      
+      lastTouchedElems.forEach(elem => {
+        elem.style.fill = "none";
+        elem.style["stroke-width"] = "1";
+      });
+      
+      globalToothElems.forEach(elem => {
+        elem.style.stroke = "#ababab";
+      });
+      
+      toothElems.forEach(elem => {
+        elem.style.stroke = "#000";
+        elem.style.fill = "#ff9999";
+        elem.style["stroke-width"] = "2";
+      });
+      
+      lastTouchedElems = toothElems;
+    };
+  }
+
+  function handleToothSelect(event) {
+    const toothNumber = event.target.value;
+    const toothClass = `tooth-${toothNumber}`;
+    const toothElems = document.getElementsByClassName(toothClass);
+    
+    lastTouchedElems.forEach(elem => {
+      elem.style.fill = "none";
+      elem.style["stroke-width"] = "1";
+    });
+    
+    globalToothElems.forEach(elem => {
+      elem.style.stroke = "#ababab";
+    });
+    
+    Array.from(toothElems).forEach(elem => {
+      elem.style.stroke = "#000";
+      elem.style.fill = "#ff9999";
+      elem.style["stroke-width"] = "2";
+    });
+    
+    lastTouchedElems = Array.from(toothElems);
+  }
+
+  async function saveTreatment() {
+    try {
+      const treatment = {
+        toothNumber: toothSelectElement.value,
+        surface: document.querySelector('select:nth-of-type(2)').value,
+        treatmentType: document.querySelector('select:nth-of-type(3)').value,
+        notes: document.querySelector('textarea').value,
+        dni: dni
+      };
+
+      const response = await fetch(`${BASE_URL}/tratamiento/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(treatment)
+      });
+
+      if (!response.ok) throw new Error('Error al guardar el tratamiento');
+      
+      mostrarNotificacion('Tratamiento guardado exitosamente');
+      resetForm();
+    } catch (error) {
+      console.error('Error:', error);
+      mostrarNotificacion(error.message, 'error');
+    }
+  }
+
+  function resetForm() {
+    toothSelectElement.selectedIndex = 0;
+    document.querySelector('select:nth-of-type(2)').selectedIndex = 0;
+    document.querySelector('select:nth-of-type(3)').selectedIndex = 0;
+    document.querySelector('textarea').value = '';
+    
+    lastTouchedElems.forEach(elem => {
+      elem.style.fill = "none";
+      elem.style["stroke-width"] = "1";
+    });
+    
+    globalToothElems.forEach(elem => {
+      elem.style.stroke = "#ababab";
+    });
+    
+    lastTouchedElems = [];
+  }
+
+  function mostrarNotificacion(mensaje, tipo = 'success') {
+    const notificacionExistente = document.querySelector('.notification');
+    if (notificacionExistente) notificacionExistente.remove();
+
+    const notificacion = document.createElement('div');
+    const bgColor = tipo === 'success' ? 'bg-green-500' : 'bg-red-500';
+    
+    notificacion.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${bgColor} transition-opacity duration-300`;
+    notificacion.textContent = mensaje;
+    
+    document.body.appendChild(notificacion);
+    setTimeout(() => {
+      notificacion.style.opacity = '0';
+      setTimeout(() => notificacion.remove(), 300);
+    }, 3000);
+  }
+
+  // Initialization
+  document.addEventListener('DOMContentLoaded', () => {
+    const element = document.querySelector('#chart-scene');
+    myPanzoom = panzoom(element, {
+      bounds: true,
+      boundsPadding: 0.5,
+      onTouch: function(e) {
+        return true;
+      }
+    });
+
+    toothSelectElement = document.getElementById('tooth-select');
+    toothSelectElement.addEventListener('change', handleToothSelect);
+
+    TOOTH_NUMBERS.forEach(toothNumber => {
+      const toothClass = `tooth-${toothNumber}`;
+      const circle = document.getElementById(`${toothClass}-circle`);
+      const toothElems = document.getElementsByClassName(toothClass);
+      globalToothElems = [...globalToothElems, ...Array.from(toothElems)];
+      
+      if (circle) {
+        circle.addEventListener('click', handleToothClick(toothNumber, Array.from(toothElems)));
+      }
+    });
+
+    document.getElementById('addTreatmentBtn').addEventListener('click', saveTreatment);
+    document.getElementById('cancelBtn').addEventListener('click', resetForm);
+  });
+
+  // Handle Astro page transitions
+  document.addEventListener('astro:page-load', () => {
+    console.log('Reinicializando odontograma...');
+    const element = document.querySelector('#chart-scene');
+    if (element) {
+      myPanzoom = panzoom(element, {
+        bounds: true,
+        boundsPadding: 0.5,
+        onTouch: function(e) {
+          return true;
+        }
+      });
+    }
+  });
+</script>
