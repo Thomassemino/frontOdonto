@@ -61,15 +61,17 @@ async function cargarPerfil() {
     const pacienteData = await pacienteResponse.json();
     const paciente = pacienteData.paciente;
 
-    const hcResponse = await fetch(`${BASE_URL}/historiaClinica/getHc/${paciente.historiaClinica}`);
-    if (!hcResponse.ok) throw new Error('Historia clínica no encontrada');
-    
-    const hcData = await hcResponse.json();
-    const historiaClinica = hcData.historiaClinica;
+    if (paciente.historiaClinica) {
+      const hcResponse = await fetch(`${BASE_URL}/historiaClinica/getHc/${paciente.historiaClinica}`);
+      if (!hcResponse.ok) throw new Error('Historia clínica no encontrada');
+      
+      const hcData = await hcResponse.json();
+      const historiaClinica = hcData.historiaClinica;
+      renderizarHistoriaClinica(historiaClinica);
+    }
 
     renderizarDatosPersonales(paciente);
     renderizarInfoContacto(paciente);
-    renderizarHistoriaClinica(historiaClinica);
   } catch (error) {
     console.error('Error:', error);
     mostrarNotificacion(error.message, 'error');
@@ -82,19 +84,11 @@ function renderizarDatosPersonales(paciente) {
     <div class="grid gap-4">
       <div>
         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Nombre Completo</label>
-        <p class="text-gray-900 dark:text-white">${paciente.nombre}</p>
+        <p class="text-gray-900 dark:text-white">${paciente.nombre || 'No especificado'}</p>
       </div>
       <div>
         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">DNI</label>
-        <p class="text-gray-900 dark:text-white">${paciente.dni}</p>
-      </div>
-      <div>
-        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Edad</label>
-        <p class="text-gray-900 dark:text-white">${paciente.edad || 'No especificada'}</p>
-      </div>
-      <div>
-        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Obra Social</label>
-        <p class="text-gray-900 dark:text-white">${paciente.obraSocial || 'No especificada'}</p>
+        <p class="text-gray-900 dark:text-white">${paciente.dni || 'No especificado'}</p>
       </div>
     </div>
   `;
@@ -106,11 +100,11 @@ function renderizarInfoContacto(paciente) {
     <div class="grid gap-4">
       <div>
         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
-        <p class="text-gray-900 dark:text-white">${paciente.mail}</p>
+        <p class="text-gray-900 dark:text-white">${paciente.mail || 'No especificado'}</p>
       </div>
       <div>
         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Teléfono</label>
-        <p class="text-gray-900 dark:text-white">${paciente.areaCode} ${paciente.telefono}</p>
+        <p class="text-gray-900 dark:text-white">${paciente.areaCode || ''} ${paciente.telefono || 'No especificado'}</p>
       </div>
       <div>
         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Dirección</label>
@@ -122,6 +116,10 @@ function renderizarInfoContacto(paciente) {
 
 function renderizarHistoriaClinica(hc) {
   const container = document.getElementById('historiaClinica');
+  if (!hc) {
+    container.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No hay historia clínica disponible</p>';
+    return;
+  }
   
   container.innerHTML = `
     <div class="space-y-8">
@@ -132,10 +130,25 @@ function renderizarHistoriaClinica(hc) {
           ${renderizarCampo('Enfermedades', hc.datosPersonalesMedicos?.enfermedades)}
           ${renderizarCampo('Tratamiento Actual', hc.datosPersonalesMedicos?.tratamientoActual)}
           ${renderizarCampo('Medicamentos', hc.datosPersonalesMedicos?.medicamentosRegulares)}
+          ${renderizarCampo('Enfermedad Infecto-Infecciosa', hc.datosPersonalesMedicos?.enfermedadInfectoInfecciosa)}
           ${renderizarCampo('Alergias', hc.datosPersonalesMedicos?.alergias)}
           ${renderizarCampo('Diabetes', hc.datosPersonalesMedicos?.diabetes ? 'Sí' : 'No')}
           ${renderizarCampo('Fuma', hc.datosPersonalesMedicos?.fuma ? 'Sí' : 'No')}
           ${renderizarCampo('Embarazo', hc.datosPersonalesMedicos?.embarazo ? 'Sí' : 'No')}
+          ${renderizarCampo('Motivo de Consulta', hc.datosPersonalesMedicos?.motivoConsulta)}
+        </div>
+      </div>
+
+      <!-- Antecedentes Médicos Odontológicos -->
+      <div class="rounded-lg border border-gray-200 p-6 dark:border-gray-700">
+        <h3 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">Antecedentes Médicos Odontológicos</h3>
+        <div class="grid gap-4 md:grid-cols-2">
+          ${renderizarCampo('Consultó Odontólogo', hc.antecedentesMedicosOdontologicos?.consultoOdontologo ? 'Sí' : 'No')}
+          ${renderizarCampo('Tratamiento Odontológico', hc.antecedentesMedicosOdontologicos?.tratamientoOdontologico?.descripcion)}
+          ${renderizarCampo('Dolor', formatearDolor(hc.antecedentesMedicosOdontologicos?.dolor))}
+          ${renderizarCampo('Fractura de Diente', hc.antecedentesMedicosOdontologicos?.fracturaDiente)}
+          ${renderizarCampo('Dificultad para Masticar', hc.antecedentesMedicosOdontologicos?.dificultadMasticar ? 'Sí' : 'No')}
+          ${renderizarCampo('Dificultad para Abrir la Boca', hc.antecedentesMedicosOdontologicos?.dificultadAbrirBoca ? 'Sí' : 'No')}
         </div>
       </div>
 
@@ -145,7 +158,7 @@ function renderizarHistoriaClinica(hc) {
         <div class="grid gap-4 md:grid-cols-2">
           ${renderizarCampo('Anormalidad en Boca', hc.estadoActual?.anormalidadBoca)}
           ${renderizarCampo('Sangrado de Encías', hc.estadoActual?.sangradoEncias ? 'Sí' : 'No')}
-          ${renderizarCampo('Hinchazón en Cara', hc.estadoActual?.hinchazonCara ? 'Sí' : 'No')}
+          ${renderizarCampo('Hinchazón en la Cara', hc.estadoActual?.hinchazonCara ? 'Sí' : 'No')}
           ${renderizarCampo('Higiene Bucal', hc.estadoActual?.higieneBucal)}
         </div>
       </div>
@@ -168,8 +181,52 @@ function renderizarCampo(label, valor) {
   `;
 }
 
+function formatearDolor(dolorStr) {
+  try {
+    if (!dolorStr) return 'No especificado';
+    
+    const dolor = JSON.parse(dolorStr);
+    const parts = [];
+    
+    if (dolor.rango) parts.push(`Intensidad: ${dolor.rango}`);
+    if (dolor.tipo) parts.push(`Tipo: ${dolor.tipo}`);
+    
+    if (dolor.caracteristicas && dolor.caracteristicas.length > 0) {
+      parts.push(`Características: ${dolor.caracteristicas.join(', ')}`);
+    }
+    
+    if (dolor.sensibilidad && dolor.sensibilidad.length > 0) {
+      parts.push(`Sensibilidad: ${dolor.sensibilidad.join(', ')}`);
+    }
+    
+    if (dolor.localizacion) {
+      const localizacion = dolor.localizacion
+        .replace(/([A-Z])/g, ' $1')
+        .toLowerCase()
+        .replace(/^./, str => str.toUpperCase());
+      parts.push(`Localización: ${localizacion}`);
+    }
+    return parts.join('. ') || 'No especificado';
+  } catch (e) {
+    return dolorStr || 'No especificado';
+  }
+}
+
 function mostrarNotificacion(mensaje, tipo = 'success') {
-  // Implementar notificación similar a la página de pacientes
+  const notificacionExistente = document.querySelector('.notification');
+  if (notificacionExistente) notificacionExistente.remove();
+
+  const notificacion = document.createElement('div');
+  const bgColor = tipo === 'success' ? 'bg-green-500' : 'bg-red-500';
+  
+  notificacion.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${bgColor} transition-opacity duration-300`;
+  notificacion.textContent = mensaje;
+  
+  document.body.appendChild(notificacion);
+  setTimeout(() => {
+    notificacion.style.opacity = '0';
+    setTimeout(() => notificacion.remove(), 300);
+  }, 3000);
 }
 
 // Inicialización
