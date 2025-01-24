@@ -5,19 +5,19 @@ const TEETH = {
 };
 
 const TREATMENTS = {
-  "Restauración": {color: "bg-blue-500", icon: "🔵"},
-  "Carilla de Porcelana": {color: "bg-purple-500", icon: "🟣"},
-  "Sellador de Fisuras": {color: "bg-green-500", icon: "🟢"},
-  "Corona": {color: "bg-yellow-500", icon: "🟡"}
+  "Restauración": {color: "bg-blue-500", icon: "🔵", clase: "blue", hover: "hover:bg-blue-600"},
+  "Carilla de Porcelana": {color: "bg-purple-500", icon: "🟣", clase: "purple", hover: "hover:bg-purple-600"},
+  "Sellador de Fisuras": {color: "bg-green-500", icon: "🟢", clase: "green", hover: "hover:bg-green-600"}, 
+  "Corona": {color: "bg-yellow-500", icon: "🟡", clase: "yellow", hover: "hover:bg-yellow-600"}
 };
 
 const SURFACES = [
   "Incisal",
-  "Oclusal",
+  "Oclusal", 
   "Mesial",
   "Distal",
   "Bucal",
-  "Labial",
+  "Labial", 
   "Palatina",
   "Lingual",
   "Cervical"
@@ -47,7 +47,8 @@ const { patientId } = Astro.props;
     <!-- Treatment Legend -->
     <div class="flex flex-wrap gap-4 mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
       {Object.entries(TREATMENTS).map(([name, {color, icon}]) => (
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform" 
+             data-treatment={name}>
           <span class={`w-4 h-4 rounded-full ${color}`}></span>
           <span class="text-sm font-medium dark:text-white">{name}</span>
           <span>{icon}</span>
@@ -64,15 +65,20 @@ const { patientId } = Astro.props;
             <div class="aspect-square relative transform transition-transform hover:scale-110">
               <div class="tooth-parts">
                 <div class="absolute inset-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 rounded tooth-part 
-                            hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="central"></div>
+                            hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="central"></div>
                 <div class="absolute top-0 left-[25%] right-[25%] h-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="vestibular"></div>
+                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="vestibular"></div>
                 <div class="absolute bottom-0 left-[25%] right-[25%] h-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="palatino"></div>
+                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="palatino"></div>
                 <div class="absolute top-[25%] bottom-[25%] left-0 w-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="mesial"></div>
+                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="mesial"></div>
                 <div class="absolute top-[25%] bottom-[25%] right-0 w-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="distal"></div>
+                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="distal"></div>
               </div>
               <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-medium dark:text-white 
                          opacity-0 group-hover:opacity-100 transition-opacity">{tooth}</span>
@@ -91,15 +97,20 @@ const { patientId } = Astro.props;
             <div class="aspect-square relative transform transition-transform hover:scale-110">
               <div class="tooth-parts">
                 <div class="absolute inset-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 rounded tooth-part 
-                            hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="central"></div>
+                            hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="central"></div>
                 <div class="absolute top-0 left-[25%] right-[25%] h-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="vestibular"></div>
+                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="vestibular"></div>
                 <div class="absolute bottom-0 left-[25%] right-[25%] h-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="lingual"></div>
+                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="lingual"></div>
                 <div class="absolute top-[25%] bottom-[25%] left-0 w-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="mesial"></div>
+                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="mesial"></div>
                 <div class="absolute top-[25%] bottom-[25%] right-0 w-[25%] bg-white dark:bg-gray-700 border-2 border-gray-400 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" data-surface="distal"></div>
+                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                     data-surface="distal"></div>
               </div>
               <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-medium dark:text-white 
                          opacity-0 group-hover:opacity-100 transition-opacity">{tooth}</span>
@@ -188,15 +199,21 @@ const { patientId } = Astro.props;
 .notification-animation {
   animation: fadeIn 0.3s ease-out;
 }
+
+.blue { background-color: #3b82f6; }
+.purple { background-color: #9333ea; }
+.green { background-color: #22c55e; }
+.yellow { background-color: #eab308; }
 </style>
 
-<script define:vars={{patientId}}>
+<script type="module" define:vars={{patientId, TREATMENTS, SURFACES}}>
 let selectedTooth = null;
 let selectedSurface = null;
-const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
+const BASE_URL = "https://odontoback-production.up.railway.app/api";
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeToothListeners();
+  initializeTreatmentListeners();
   initializeThemeToggle();
   loadExistingTreatments();
   
@@ -213,6 +230,15 @@ function initializeToothListeners() {
       
       selectToothPart(tooth, surface, e.target);
       updateSurfaceSelect(surface);
+    });
+  });
+}
+
+function initializeTreatmentListeners() {
+  document.querySelectorAll('[data-treatment]').forEach(elem => {
+    elem.addEventListener('click', () => {
+      const treatment = elem.dataset.treatment;
+      document.getElementById('treatment-select').value = treatment;
     });
   });
 }
@@ -242,112 +268,150 @@ function selectToothPart(tooth, surface, element) {
 
 function updateSurfaceSelect(surface) {
   const surfaceSelect = document.getElementById('surface-select');
-  surfaceSelect.value = surface;
+  if(SURFACES.includes(surface)) {
+    surfaceSelect.value = surface;
+  }
 }
 
 async function loadExistingTreatments() {
   try {
-    const response = await fetch(`${API_URL}/odontograma/patient/${patientId}`);
-    if (!response.ok) throw new Error('Error al cargar tratamientos');
+    // const response = await fetch(`${BASE_URL}/odontograma/patient/${patientId}`);
+    // if (!response.ok) throw new Error('Error al cargar tratamientos');
     
-    const odontogramas = await response.json();
+    // const odontogramas = await response.json();
     const historyContainer = document.getElementById('treatment-history');
     historyContainer.innerHTML = '';
+
+    if (!odontogramas?.length) {
+      historyContainer.innerHTML = `
+        <div class="text-gray-500 dark:text-gray-400 text-center py-4">
+          No hay tratamientos registrados
+        </div>
+      `;
+      return;
+    }
     
     odontogramas.forEach(odontograma => {
-      odontograma.dientes.forEach(diente => {
-        // Actualizar visual del diente
-        const toothElement = document.querySelector(`[data-tooth="${diente.numeroDiente}"]`);
-        if (toothElement) {
-          diente.superficies.forEach(superficie => {
-            const surfaceElement = toothElement.querySelector(`[data-surface="${superficie.toLowerCase()}"]`);
-            if (surfaceElement) {
-              Object.entries(TREATMENTS).forEach(([name, {color}]) => {
-                if (name === diente.tratamiento) {
-                  surfaceElement.classList.add(color);
-                }
-              });
-            }
-          });
-        }
-
-        // Agregar al historial
-        const treatmentRecord = document.createElement('div');
-        treatmentRecord.className = 'p-3 bg-gray-50 dark:bg-gray-700 rounded-md';
-        treatmentRecord.innerHTML = `
-          <div class="flex justify-between">
-            <span class="font-medium">Diente ${diente.numeroDiente}</span>
-            <span class="text-sm text-gray-500">${new Date(odontograma.fecha).toLocaleDateString()}</span>
-          </div>
-          <div class="text-sm">${diente.tratamiento} - ${diente.superficies.join(', ')}</div>
-          ${diente.notas ? `<div class="text-sm text-gray-500 mt-1">${diente.notas}</div>` : ''}
-        `;
-        historyContainer.appendChild(treatmentRecord);
-      });
+      if (odontograma?.dientes?.length) {
+        odontograma.dientes.forEach(diente => {
+          if (diente) {
+            updateToothVisual(diente);
+            addTreatmentToHistory(diente, odontograma.fecha);
+          }
+        });
+      }
     });
-  } catch (error) {console.error('Error al cargar tratamientos:', error);
+  } catch (error) {
+    console.error('Error:', error);
     showNotification('Error al cargar tratamientos', 'error');
   }
+}
+
+function updateToothVisual(diente) {
+  const toothElement = document.querySelector(`[data-tooth="${diente.numeroDiente}"]`);
+  if (!toothElement) return;
+
+  diente.superficies.forEach(superficie => {
+    const surfaceElement = toothElement.querySelector(`[data-surface="${superficie.toLowerCase()}"]`);
+    if (!surfaceElement) return;
+
+    // Remove previous treatment colors
+    Object.values(TREATMENTS).forEach(t => {
+      surfaceElement.classList.remove(t.color.replace('bg-', ''));
+      surfaceElement.classList.remove(t.clase);
+    });
+
+    // Add new treatment color
+    const treatment = TREATMENTS[diente.tratamiento];
+    if (treatment) {
+      surfaceElement.classList.add(treatment.color.replace('bg-', ''));
+      surfaceElement.classList.add(treatment.clase);
+    }
+  });
+}
+
+function addTreatmentToHistory(diente, fecha) {
+  const historyContainer = document.getElementById('treatment-history');
+  const treatment = TREATMENTS[diente.tratamiento];
+  
+  const treatmentRecord = document.createElement('div');
+  treatmentRecord.className = 'p-3 bg-gray-50 dark:bg-gray-700 rounded-md hover:shadow-md transition-shadow';
+  treatmentRecord.innerHTML = `
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="font-medium">Diente ${diente.numeroDiente}</span>
+        <span class="text-sm ${treatment?.color} rounded-full w-4 h-4"></span>
+      </div>
+      <span class="text-sm text-gray-500 dark:text-gray-400">
+        ${new Date(fecha).toLocaleDateString()}
+      </span>
+    </div>
+    <div class="text-sm mt-1 flex items-center gap-1">
+      <span>${treatment?.icon}</span>
+      <span>${diente.tratamiento}</span>
+      <span class="text-gray-500">-</span>
+      <span>${diente.superficies.join(', ')}</span>
+    </div>
+    ${diente.notas ? `
+      <div class="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
+        <span>📝</span>
+        <span>${diente.notas}</span>
+      </div>
+    ` : ''}
+  `;
+  historyContainer.prepend(treatmentRecord);
 }
 
 async function saveTreatment() {
   if (!validateForm()) return;
 
-  const treatment = document.getElementById('treatment-select').value;
-  const notes = document.getElementById('notes').value;
+  const saveButton = document.getElementById('save');
+  saveButton.disabled = true;
+  saveButton.innerHTML = '<span class="animate-pulse">Guardando...</span>';
 
   try {
-    // Aplicar color visual
-    const selectedElement = document.querySelector('.tooth-part.selected');
-    if (selectedElement) {
-      Object.entries(TREATMENTS).forEach(([name, {color}]) => {
-        selectedElement.classList.remove(color);
-      });
-      
-      const treatmentInfo = TREATMENTS[treatment];
-      if (treatmentInfo) {
-        selectedElement.classList.add(treatmentInfo.color);
-      }
-    }
+    const treatment = document.getElementById('treatment-select').value;
+    const notes = document.getElementById('notes').value;
 
-    // Guardar diente
-    const dienteResponse = await fetch(`${BASE_URL}/diente`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        numeroDiente: selectedTooth,
-        superficies: [selectedSurface],
-        tratamiento: treatment,
-        notas: notes
-      })
-    });
+    const dienteData = {
+      numeroDiente: selectedTooth,
+      superficies: [selectedSurface],
+      tratamiento: treatment,
+      notas: notes
+    };
+
+    // const dienteResponse = await fetch(`${BASE_URL}/diente`, {
+    //   method: 'POST',
+    //   headers: {'Content-Type': 'application/json'},
+    //   body: JSON.stringify(dienteData)
+    // });
 
     if (!dienteResponse.ok) throw new Error('Error al guardar el diente');
     const diente = await dienteResponse.json();
 
-    // Guardar odontograma
+    const odontogramaData = {
+      idPaciente: patientId,
+      dientes: [diente._id]
+    };
+
     const odontogramaResponse = await fetch(`${BASE_URL}/odontograma`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        idPaciente: patientId,
-        dientes: [diente._id]
-      })
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(odontogramaData)
     });
 
     if (!odontogramaResponse.ok) throw new Error('Error al guardar el odontograma');
-    
+
+    updateToothVisual(dienteData);
+    addTreatmentToHistory(dienteData, new Date());
     showNotification('Tratamiento guardado exitosamente', 'success');
-    await loadExistingTreatments(); // Recargar historial
     resetSelection();
-    
   } catch (error) {
     console.error('Error:', error);
     showNotification('Error al guardar el tratamiento', 'error');
+  } finally {
+    saveButton.disabled = false;
+    saveButton.innerHTML = 'Guardar';
   }
 }
 
@@ -393,8 +457,9 @@ function resetSelection() {
   document.getElementById('save').disabled = true;
 }
 
-// Inicializar tema al cargar
-const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+// Initialize theme
+const theme = localStorage.getItem('theme') || 
+  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 if (theme === 'dark') {
   document.documentElement.classList.add('dark');
 }
