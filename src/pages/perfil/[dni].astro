@@ -55,10 +55,14 @@ const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
 
 async function cargarPerfil() {
   try {
+    console.log('Cargando perfil para DNI:', dni);
     const pacienteResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
+    console.log('Respuesta del servidor:', pacienteResponse);
+    
     if (!pacienteResponse.ok) throw new Error('Paciente no encontrado');
     
     const pacienteData = await pacienteResponse.json();
+    console.log('Datos del paciente:', pacienteData);
     const paciente = pacienteData.paciente;
 
     if (paciente.historiaClinica) {
@@ -236,5 +240,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('volverBtn')?.addEventListener('click', () => {
     window.history.back();
   });
+});
+
+// Al final del script
+document.addEventListener('astro:page-load', () => {
+  console.log('Página cargada, iniciando carga de perfil...');
+  cargarPerfil();
 });
 </script>
