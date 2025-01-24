@@ -1,57 +1,43 @@
 ---
 import LayoutCommon from "../../app/LayoutCommon.astro";
 import LayoutProtected from "../../app/LayoutProtected.astro";
-import DentalChart from "../../components/DentalChart.astro";
+import Dental from "../../components/Dental.astro";
 
 const { dni } = Astro.params;
 ---
 
 <LayoutProtected>
   <LayoutCommon>
-    <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 dark:from-slate-900 dark:to-slate-800 lg:p-16">
+    <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-3 dark:from-slate-900 dark:to-slate-800 sm:p-4 lg:p-8">
       <div class="mx-auto max-w-7xl">
-        <!-- Header -->
-        <div class="mb-8 flex items-center justify-between">
-          <div class="flex items-center space-x-4">
+        <div class="mb-6 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div class="flex items-center space-x-3">
             <button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
               ← Volver
             </button>
-            <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Perfil del Paciente</h1>
+            <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100 sm:text-2xl">Perfil del Paciente</h1>
           </div>
         </div>
 
-        <!-- Información Principal -->
-        <div class="mb-8 grid gap-6 lg:grid-cols-2">
-          <!-- Datos Personales -->
-          <div class="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
-            <h2 class="mb-4 text-xl font-semibold text-slate-800 dark:text-slate-100">Datos Personales</h2>
-            <div class="space-y-4" id="datosPersonales">
-              <!-- Se llena dinámicamente -->
-            </div>
+        <div class="grid gap-4 sm:gap-6 lg:grid-cols-2">
+          <div class="rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:p-6">
+            <h2 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">Datos Personales</h2>
+            <div class="space-y-3" id="datosPersonales"></div>
           </div>
 
-          <!-- Información de Contacto -->
-          <div class="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
-            <h2 class="mb-4 text-xl font-semibold text-slate-800 dark:text-slate-100">Información de Contacto</h2>
-            <div class="space-y-4" id="infoContacto">
-              <!-- Se llena dinámicamente -->
-            </div>
+          <div class="rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:p-6">
+            <h2 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">Información de Contacto</h2>
+            <div class="space-y-3" id="infoContacto"></div>
           </div>
         </div>
 
-        <!-- Historia Clínica -->
-        <div class="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
-          <h2 class="mb-6 text-2xl font-semibold text-slate-800 dark:text-slate-100">Historia Clínica</h2>
-          <div class="space-y-8" id="historiaClinica">
-            <!-- Secciones de Historia Clínica -->
-          </div>
+        <div class="mt-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-6 sm:p-6">
+          <h2 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">Historia Clínica</h2>
+          <div class="space-y-6" id="historiaClinica"></div>
         </div>
 
-        <!-- Odontograma -->
-        <div class="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
-          <div class="space-y-4">
-          <DentalChart dni={dni} />
-          </div>
+        <div class="mt-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-6 sm:p-6">
+          <Dental dni={dni} />
         </div>
       </div>
     </div>
@@ -60,39 +46,32 @@ const { dni } = Astro.params;
 
 <script type="module" define:vars={{ dni }}>
 const BASE_URL = "https://odontoback-production.up.railway.app/api";
+
 async function cargarPerfil() {
   try {
-    console.log('Cargando perfil para DNI:', dni);
     const pacienteResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
-    console.log('Respuesta del servidor:', pacienteResponse);
-    
     if (!pacienteResponse.ok) throw new Error('Paciente no encontrado');
     
-    const pacienteData = await pacienteResponse.json();
-    console.log('Datos del paciente:', pacienteData);
-    const paciente = pacienteData.paciente;
+    const { paciente } = await pacienteResponse.json();
 
     if (paciente.historiaClinica) {
       const hcResponse = await fetch(`${BASE_URL}/historiaClinica/getHc/${paciente.historiaClinica}`);
-      if (!hcResponse.ok) throw new Error('Historia clínica no encontrada');
-      
-      const hcData = await hcResponse.json();
-      const historiaClinica = hcData.historiaClinica;
-      renderizarHistoriaClinica(historiaClinica);
+      if (hcResponse.ok) {
+        const { historiaClinica } = await hcResponse.json();
+        renderizarHistoriaClinica(historiaClinica);
+      }
     }
 
     renderizarDatosPersonales(paciente);
     renderizarInfoContacto(paciente);
   } catch (error) {
-    console.error('Error:', error);
     mostrarNotificacion(error.message, 'error');
   }
 }
 
 function renderizarDatosPersonales(paciente) {
-  const container = document.getElementById('datosPersonales');
-  container.innerHTML = `
-    <div class="grid gap-4">
+  document.getElementById('datosPersonales').innerHTML = `
+    <div class="grid gap-3">
       <div>
         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Nombre Completo</label>
         <p class="text-gray-900 dark:text-white">${paciente.nombre || 'No especificado'}</p>
@@ -106,9 +85,8 @@ function renderizarDatosPersonales(paciente) {
 }
 
 function renderizarInfoContacto(paciente) {
-  const container = document.getElementById('infoContacto');
-  container.innerHTML = `
-    <div class="grid gap-4">
+  document.getElementById('infoContacto').innerHTML = `
+    <div class="grid gap-3">
       <div>
         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
         <p class="text-gray-900 dark:text-white">${paciente.mail || 'No especificado'}</p>
@@ -129,11 +107,10 @@ function renderizarHistoriaClinica(hc) {
   }
   
   container.innerHTML = `
-    <div class="space-y-8">
-      <!-- Datos Personales Médicos -->
-      <div class="rounded-lg border border-gray-200 p-6 dark:border-gray-700">
-        <h3 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">Datos Personales Médicos</h3>
-        <div class="grid gap-4 md:grid-cols-2">
+    <div class="space-y-6">
+      <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
+        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Datos Personales Médicos</h3>
+        <div class="grid gap-4 sm:grid-cols-2">
           ${renderizarCampo('Enfermedades', hc.datosPersonalesMedicos?.enfermedades)}
           ${renderizarCampo('Tratamiento Actual', hc.datosPersonalesMedicos?.tratamientoActual)}
           ${renderizarCampo('Medicamentos', hc.datosPersonalesMedicos?.medicamentosRegulares)}
@@ -144,12 +121,11 @@ function renderizarHistoriaClinica(hc) {
           ${renderizarCampo('Embarazo', hc.datosPersonalesMedicos?.embarazo ? 'Sí' : 'No')}
           ${renderizarCampo('Motivo de Consulta', hc.datosPersonalesMedicos?.motivoConsulta)}
         </div>
-      </div>
+      </section>
 
-      <!-- Antecedentes Médicos Odontológicos -->
-      <div class="rounded-lg border border-gray-200 p-6 dark:border-gray-700">
-        <h3 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">Antecedentes Médicos Odontológicos</h3>
-        <div class="grid gap-4 md:grid-cols-2">
+      <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
+        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Antecedentes Médicos Odontológicos</h3>
+        <div class="grid gap-4 sm:grid-cols-2">
           ${renderizarCampo('Consultó Odontólogo', hc.antecedentesMedicosOdontologicos?.consultoOdontologo ? 'Sí' : 'No')}
           ${renderizarCampo('Tratamiento Odontológico', hc.antecedentesMedicosOdontologicos?.tratamientoOdontologico?.descripcion)}
           ${renderizarCampo('Dolor', formatearDolor(hc.antecedentesMedicosOdontologicos?.dolor))}
@@ -157,33 +133,31 @@ function renderizarHistoriaClinica(hc) {
           ${renderizarCampo('Dificultad para Masticar', hc.antecedentesMedicosOdontologicos?.dificultadMasticar ? 'Sí' : 'No')}
           ${renderizarCampo('Dificultad para Abrir la Boca', hc.antecedentesMedicosOdontologicos?.dificultadAbrirBoca ? 'Sí' : 'No')}
         </div>
-      </div>
+      </section>
 
-      <!-- Estado Actual -->
-      <div class="rounded-lg border border-gray-200 p-6 dark:border-gray-700">
-        <h3 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">Estado Actual</h3>
-        <div class="grid gap-4 md:grid-cols-2">
+      <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
+        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Estado Actual</h3>
+        <div class="grid gap-4 sm:grid-cols-2">
           ${renderizarCampo('Anormalidad en Boca', hc.estadoActual?.anormalidadBoca)}
           ${renderizarCampo('Sangrado de Encías', hc.estadoActual?.sangradoEncias ? 'Sí' : 'No')}
           ${renderizarCampo('Hinchazón en la Cara', hc.estadoActual?.hinchazonCara ? 'Sí' : 'No')}
           ${renderizarCampo('Higiene Bucal', hc.estadoActual?.higieneBucal)}
         </div>
-      </div>
+      </section>
 
-      <!-- Aclaraciones -->
-      <div class="rounded-lg border border-gray-200 p-6 dark:border-gray-700">
-        <h3 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">Aclaraciones Finales del Médico</h3>
+      <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
+        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Aclaraciones Finales del Médico</h3>
         <p class="text-gray-700 dark:text-gray-300">${hc.aclaracionesFinalesMedico || 'Sin aclaraciones'}</p>
-      </div>
+      </section>
     </div>
-  ` || `No Tiene Historial Clinico`;
+  `;
 }
 
 function renderizarCampo(label, valor) {
   return `
-    <div>
+    <div class="space-y-1">
       <label class="text-sm font-medium text-gray-500 dark:text-gray-400">${label}</label>
-      <p class="text-gray-900 dark:text-white">${valor || 'No especificado'}</p>
+      <p class="break-words text-gray-900 dark:text-white">${valor || 'No especificado'}</p>
     </div>
   `;
 }
@@ -197,15 +171,8 @@ function formatearDolor(dolorStr) {
     
     if (dolor.rango) parts.push(`Intensidad: ${dolor.rango}`);
     if (dolor.tipo) parts.push(`Tipo: ${dolor.tipo}`);
-    
-    if (dolor.caracteristicas && dolor.caracteristicas.length > 0) {
-      parts.push(`Características: ${dolor.caracteristicas.join(', ')}`);
-    }
-    
-    if (dolor.sensibilidad && dolor.sensibilidad.length > 0) {
-      parts.push(`Sensibilidad: ${dolor.sensibilidad.join(', ')}`);
-    }
-    
+    if (dolor.caracteristicas?.length) parts.push(`Características: ${dolor.caracteristicas.join(', ')}`);
+    if (dolor.sensibilidad?.length) parts.push(`Sensibilidad: ${dolor.sensibilidad.join(', ')}`);
     if (dolor.localizacion) {
       const localizacion = dolor.localizacion
         .replace(/([A-Z])/g, ' $1')
@@ -214,7 +181,7 @@ function formatearDolor(dolorStr) {
       parts.push(`Localización: ${localizacion}`);
     }
     return parts.join('. ') || 'No especificado';
-  } catch (e) {
+  } catch {
     return dolorStr || 'No especificado';
   }
 }
@@ -224,9 +191,9 @@ function mostrarNotificacion(mensaje, tipo = 'success') {
   if (notificacionExistente) notificacionExistente.remove();
 
   const notificacion = document.createElement('div');
-  const bgColor = tipo === 'success' ? 'bg-green-500' : 'bg-red-500';
-  
-  notificacion.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${bgColor} transition-opacity duration-300`;
+  notificacion.className = `notification fixed right-4 top-4 z-50 rounded-lg p-4 text-white shadow-lg transition-opacity duration-300 ${
+    tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
+  }`;
   notificacion.textContent = mensaje;
   
   document.body.appendChild(notificacion);
@@ -236,18 +203,10 @@ function mostrarNotificacion(mensaje, tipo = 'success') {
   }, 3000);
 }
 
-// Inicialización
 document.addEventListener('DOMContentLoaded', () => {
   cargarPerfil();
-
-  document.getElementById('volverBtn')?.addEventListener('click', () => {
-    window.history.back();
-  });
+  document.getElementById('volverBtn')?.addEventListener('click', () => window.history.back());
 });
 
-// Al final del script
-document.addEventListener('astro:page-load', () => {
-  console.log('Página cargada, iniciando carga de perfil...');
-  cargarPerfil();
-});
+document.addEventListener('astro:page-load', cargarPerfil);
 </script>
