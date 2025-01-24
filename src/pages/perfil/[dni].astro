@@ -15,7 +15,7 @@ const { dni } = Astro.params;
             <button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
               ← Volver
             </button>
-            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Perfil del Paciente</h1>
+            <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Perfil del Paciente</h1>
           </div>
         </div>
 
@@ -109,10 +109,6 @@ function renderizarInfoContacto(paciente) {
         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Teléfono</label>
         <p class="text-gray-900 dark:text-white">${paciente.areaCode || ''} ${paciente.telefono || 'No especificado'}</p>
       </div>
-      <div>
-        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Dirección</label>
-        <p class="text-gray-900 dark:text-white">${paciente.direccion || 'No especificada'}</p>
-      </div>
     </div>
   `;
 }
@@ -172,7 +168,7 @@ function renderizarHistoriaClinica(hc) {
         <p class="text-gray-700 dark:text-gray-300">${hc.aclaracionesFinalesMedico || 'Sin aclaraciones'}</p>
       </div>
     </div>
-  `;
+  ` || `No Tiene Historial Clinico`;
 }
 
 function renderizarCampo(label, valor) {
