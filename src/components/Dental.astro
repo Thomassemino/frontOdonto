@@ -193,7 +193,7 @@ const { patientId } = Astro.props;
 <script define:vars={{patientId}}>
 let selectedTooth = null;
 let selectedSurface = null;
-const BASE_URL = 'https://odontoback-production.up.railway.app/api';
+const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeToothListeners();
