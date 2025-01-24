@@ -1,6 +1,8 @@
 ---
-import LayoutCommon from "../app/LayoutCommon.astro";
-import LayoutProtected from "../app/LayoutProtected.astro";
+import LayoutCommon from "../../app/LayoutCommon.astro";
+import LayoutProtected from "../../app/LayoutProtected.astro";
+
+const { dni } = Astro.params;
 ---
 
 <LayoutProtected>
@@ -48,20 +50,20 @@ import LayoutProtected from "../app/LayoutProtected.astro";
   </LayoutCommon>
 </LayoutProtected>
 
-<script>
+<script define:vars={{ dni }}>
 const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
 
 async function cargarPerfil() {
-  const dniPaciente = window.location.pathname.split('/').pop();
-  
   try {
-    // Cargar datos del paciente
-    const pacienteResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dniPaciente}`);
+    const pacienteResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
+    if (!pacienteResponse.ok) throw new Error('Paciente no encontrado');
+    
     const pacienteData = await pacienteResponse.json();
     const paciente = pacienteData.paciente;
 
-    // Cargar historia clínica
     const hcResponse = await fetch(`${BASE_URL}/historiaClinica/getHc/${paciente.historiaClinica}`);
+    if (!hcResponse.ok) throw new Error('Historia clínica no encontrada');
+    
     const hcData = await hcResponse.json();
     const historiaClinica = hcData.historiaClinica;
 
@@ -69,8 +71,8 @@ async function cargarPerfil() {
     renderizarInfoContacto(paciente);
     renderizarHistoriaClinica(historiaClinica);
   } catch (error) {
-    console.error('Error al cargar datos:', error);
-    mostrarNotificacion('Error al cargar los datos del paciente', 'error');
+    console.error('Error:', error);
+    mostrarNotificacion(error.message, 'error');
   }
 }
 
