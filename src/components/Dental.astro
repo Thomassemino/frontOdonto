@@ -389,7 +389,7 @@ const response = await fetch('/api/odontograma', {
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-    idPaciente: new mongoose.Types.ObjectId(patientId), // Convertir a ObjectId
+    idPaciente: patientId,  // El backend se encargará de la conversión
     dientes: [dienteData]
   })
 });
