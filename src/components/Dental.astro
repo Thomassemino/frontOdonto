@@ -393,6 +393,7 @@ function addTreatmentToHistory(diente, fecha) {
     ` : ''}
   `;
   historyContainer.prepend(treatmentRecord);
+  updateToothVisual();
 }
 
 async function saveTreatment() {
