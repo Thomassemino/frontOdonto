@@ -5,18 +5,14 @@ const TEETH = {
 };
 
 const TREATMENTS = {
-  "Caries para hacer": {color: "bg-blue-500", icon: "🔵", clase: "blue"},
-  "Arreglo hecho": {color: "bg-red-500", icon: "🔴", clase: "red"},
-  "Caries filtrada": {color: "bg-blue-500", icon: "⭕️", clase: "blue-circle"},
-  "Por fuera": {color: "bg-red-500", icon: "⬤", clase: "red-solid"},
-  "TC para hacer": {color: "bg-blue-500", icon: "TC", clase: "blue-tc"},
-  "TC hecho": {color: "bg-red-500", icon: "TC", clase: "red-tc"},
-  "Corona para hacer": {color: "bg-blue-500", icon: "⭕️", clase: "blue-crown"},
-  "Corona hecha": {color: "bg-red-500", icon: "⭕️", clase: "red-crown"},
-  "Extracción para hacer": {color: "bg-blue-500", icon: "❌", clase: "blue-x"},
-  "Extracción hecha": {color: "bg-red-500", icon: "❌", clase: "red-x"},
-  "Implante para hacer": {color: "bg-blue-500", icon: "IMP", clase: "blue-imp"},
-  "Implante hecho": {color: "bg-red-500", icon: "IMP", clase: "red-imp"}
+  "Caries": { icon: "🔵" },
+  "Arreglo": { icon: "🔴" },
+  "Caries filtrada": { icon: "⭕️" },
+  "Por fuera": { icon: "⬤" },
+  "TC": { icon: "TC" },
+  "Corona": { icon: "⭕️" },
+  "Extracción": { icon: "❌" },
+  "Implante": { icon: "IMP" }
 };
 
 interface Props {
@@ -33,10 +29,9 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
 
     <!-- Treatment Legend -->
     <div class="flex flex-wrap gap-4 mb-8 p-4 bg-gray-700 rounded-lg">
-      {Object.entries(TREATMENTS).map(([name, {color, icon}]) => (
+      {Object.entries(TREATMENTS).map(([name, {icon}]) => (
         <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform" 
              data-treatment={name}>
-          <span class={`w-4 h-4 rounded-full ${color}`}></span>
           <span class="text-sm font-medium text-white">{name}</span>
           <span>{icon}</span>
         </div>
@@ -51,20 +46,15 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
           <div class="tooth-container group" data-tooth={tooth}>
             <div class="aspect-square relative transform transition-transform hover:scale-110">
               <div class="tooth-parts">
-                <div class="absolute inset-[25%] bg-gray-700 border-2 border-gray-500 rounded tooth-part 
-                            hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute inset-[25%] bg-gray-700 border-2 border-gray-500 rounded tooth-part" 
                      data-surface="central"></div>
-                <div class="absolute top-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute top-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
                      data-surface="superior"></div>
-                <div class="absolute bottom-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute bottom-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
                      data-surface="inferior"></div>
-                <div class="absolute top-[25%] bottom-[25%] left-0 w-[25%] bg-gray-700 border-2 border-gray-500 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute top-[25%] bottom-[25%] left-0 w-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
                      data-surface="izquierda"></div>
-                <div class="absolute top-[25%] bottom-[25%] right-0 w-[25%] bg-gray-700 border-2 border-gray-500 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute top-[25%] bottom-[25%] right-0 w-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
                      data-surface="derecha"></div>
               </div>
               <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-medium text-gray-300
@@ -83,20 +73,15 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
           <div class="tooth-container group" data-tooth={tooth}>
             <div class="aspect-square relative transform transition-transform hover:scale-110">
               <div class="tooth-parts">
-                <div class="absolute inset-[25%] bg-gray-700 border-2 border-gray-500 rounded tooth-part 
-                            hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute inset-[25%] bg-gray-700 border-2 border-gray-500 rounded tooth-part" 
                      data-surface="central"></div>
-                <div class="absolute top-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute top-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
                      data-surface="superior"></div>
-                <div class="absolute bottom-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute bottom-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
                      data-surface="inferior"></div>
-                <div class="absolute top-[25%] bottom-[25%] left-0 w-[25%] bg-gray-700 border-2 border-gray-500 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute top-[25%] bottom-[25%] left-0 w-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
                      data-surface="izquierda"></div>
-                <div class="absolute top-[25%] bottom-[25%] right-0 w-[25%] bg-gray-700 border-2 border-gray-500 
-                            tooth-part hover:border-blue-500 hover:shadow-lg transition-all duration-200" 
+                <div class="absolute top-[25%] bottom-[25%] right-0 w-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
                      data-surface="derecha"></div>
               </div>
               <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-medium text-gray-300
@@ -108,40 +93,58 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     </div>
 
     <!-- Control Panel -->
-    <div class="mt-8 space-y-4">
-      <div class="grid md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Tratamiento</label>
-          <select id="treatment-select" class="w-full rounded-md border-gray-600 bg-gray-700 text-white">
-            <option value="">Seleccionar tratamiento</option>
-            {Object.entries(TREATMENTS).map(([name]) => (
-              <option value={name}>{name}</option>
-            ))}
-          </select>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Observaciones</label>
-          <textarea id="notes" rows="1" class="w-full rounded-md border-gray-600 bg-gray-700 text-white"></textarea>
-        </div>
+    <div class="grid md:grid-cols-3 gap-4 mb-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-1">Tratamiento</label>
+        <select id="treatment-select" class="w-full rounded-md border-gray-600 bg-gray-700 text-white" required>
+          <option value="">Seleccionar tratamiento</option>
+          {Object.entries(TREATMENTS).map(([name]) => (
+            <option value={name}>{name}</option>
+          ))}
+        </select>
       </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-1">Origen</label>
+        <select id="origin-select" class="w-full rounded-md border-gray-600 bg-gray-700 text-white" required>
+          <option value="">Seleccionar origen</option>
+          <option value="propio">Este estudio</option>
+          <option value="otro">Otro estudio</option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-1">Observaciones</label>
+        <textarea id="notes" rows="1" class="w-full rounded-md border-gray-600 bg-gray-700 text-white"></textarea>
+      </div>
+    </div>
 
-      <div class="flex justify-between items-center">
-        <div id="notification" class="hidden px-4 py-2 rounded-md"></div>
-        <div class="flex space-x-3">
-          <button id="reset" class="px-4 py-2 border border-gray-600 rounded-md text-gray-300 hover:bg-gray-700">
-            Reiniciar
-          </button>
-          <button id="save" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-            Guardar
-          </button>
-        </div>
+    <div class="flex justify-between items-center mb-6">
+      <div id="notification" class="hidden px-4 py-2 rounded-md"></div>
+      <div class="flex space-x-3">
+        <button id="clear-all" class="px-4 py-2 border border-red-600 rounded-md text-red-300 hover:bg-red-700/20">
+          Limpiar Todo
+        </button>
+        <button id="reset" class="px-4 py-2 border border-gray-600 rounded-md text-gray-300 hover:bg-gray-700">
+          Reiniciar
+        </button>
+        <button id="save" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+          Guardar
+        </button>
       </div>
     </div>
 
     <!-- Treatment History -->
     <div class="mt-8">
       <h3 class="text-lg font-medium text-white mb-4">Historial de Tratamientos</h3>
+      <!-- Search -->
+      <div class="mb-4">
+        <input type="text" 
+          id="search-input" 
+          placeholder="Buscar por número de diente o tratamiento..." 
+          class="w-2/4 rounded-md border-gray-600 bg-gray-700 text-white px-4 py-2"
+        />
+      </div>
       <div id="treatment-history" class="space-y-2">
         <!-- Treatments will be added here dynamically -->
       </div>
@@ -177,321 +180,426 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Treatment Colors and Styles */
-.blue { background-color: #3b82f6 !important; }
-.red { background-color: #ef4444 !important; }
-.blue-circle::after,
-.red-circle::after { 
-  content: "⭕️";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
+.tooth-part[data-origen="propio"] { 
+  background-color: #ef444430 !important; 
+  border-color: #ef4444 !important;
 }
-.blue-tc::after,
-.red-tc::after { 
-  content: "TC";
+
+.tooth-part[data-origen="otro"] { 
+  background-color: #3b82f630 !important;
+  border-color: #3b82f6 !important;
+}
+
+.tooth-part[data-treatment]:after {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 0.8em;
   font-weight: bold;
-  color: white;
+  color: #1f2937;
 }
-.blue-imp::after,
-.red-imp::after { 
-  content: "IMP";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 0.8em;
-  font-weight: bold;
-  color: white;
+
+[data-treatment="Caries"]:after { content: "🔵"; }
+[data-treatment="Arreglo"]:after { content: "🔴"; }
+[data-treatment="Caries filtrada"]:after { content: "⭕️"; }
+[data-treatment="Por fuera"]:after { content: "⬤"; }
+[data-treatment="TC"]:after { content: "TC"; }
+[data-treatment="Corona"]:after { content: "⭕️"; }
+[data-treatment="Extracción"]:after { content: "❌"; }
+[data-treatment="Implante"]:after { content: "IMP"; }
+
+.tratamiento-item {
+  padding: 0.75rem;
+  background-color: rgba(55, 65, 81, 0.5);
+  backdrop-filter: blur(4px);
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.2s;
 }
-.blue-x::after,
-.red-x::after {
-  content: "❌";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.blue-crown::after,
-.red-crown::after {
-  content: "⭕️";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
+
+.tratamiento-item:hover {
+  background-color: rgba(55, 65, 81, 0.7);
 }
 </style>
 
 <script type="module" define:vars={{ dni, TREATMENTS, BASE_URL }}>
-  let patientIdFromApi = null;
-  let selectedTooth = null;
-  let selectedSurface = null;
-  let pendingTreatments = [];
+let idPacienteDeApi = null;
 
-  document.addEventListener("DOMContentLoaded", async () => {
+function cargarTratamientosPendientes() {
+  return JSON.parse(localStorage.getItem('tratamientosPendientes') || '[]');
+}
+
+function guardarTratamientosPendientes(tratamientos) {
+  localStorage.setItem('tratamientosPendientes', JSON.stringify(tratamientos));
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
   try {
-    console.log('Loading patient with DNI:', dni);
-    const response = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
-    const responseText = await response.text();
-    console.log('Raw API Response:', responseText);
+    const respuesta = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
+    if (!respuesta.ok) throw new Error('Paciente no encontrado');
     
-    if (!response.ok) throw new Error('Paciente no encontrado');
-    const data = JSON.parse(responseText);
-    console.log('Parsed API Response:', data);
+    const datos = JSON.parse(await respuesta.text());
+    idPacienteDeApi = datos.paciente?.id;
     
-    patientIdFromApi = data.paciente?.id;
-    console.log('Patient ID from API:', patientIdFromApi);
-    
-    if (!patientIdFromApi) {
-      showNotification('Error: ID de paciente no encontrado', 'error');
+    if (!idPacienteDeApi) {
+      mostrarNotificacion('Error: ID de paciente no encontrado', 'error');
       return;
     }
 
-    initializeToothListeners();
-    initializeTreatmentListeners();
-    loadExistingTreatments();
+    inicializarEscuchadores();
+    await cargarTratamientosExistentes();
     
-    document.getElementById("save").addEventListener("click", saveTreatment);
-    document.getElementById("reset").addEventListener("click", resetSelection);
+    const tratamientosPendientes = cargarTratamientosPendientes();
+    tratamientosPendientes.forEach(t => {
+      const elementoDiente = document.querySelector(`[data-tooth="${t.numeroDiente}"]`);
+      if (elementoDiente) {
+        if (t.superficie === 'completo') {
+          elementoDiente.querySelectorAll('.tooth-part').forEach(superficie => {
+            actualizarVisualTratamiento(superficie, t.tratamiento, t.origen);
+          });
+        } else {
+          const elementoSuperficie = elementoDiente.querySelector(`[data-surface="${t.superficie}"]`);
+          if (elementoSuperficie) {
+            actualizarVisualTratamiento(elementoSuperficie, t.tratamiento, t.origen);
+          }
+        }
+      }
+    });
+
+    document.getElementById("save").disabled = tratamientosPendientes.length === 0;
   } catch (error) {
-    console.error('Error loading patient:', error);
-    showNotification('Error al cargar paciente', 'error');
+    console.error('Error al cargar paciente:', error);
+    mostrarNotificacion('Error al cargar paciente', 'error');
   }
 });
 
-function initializeToothListeners() {
-  document.querySelectorAll('.tooth-part').forEach(part => {
-    part.addEventListener('click', (e) => {
-      const toothElement = e.target.closest('.tooth-container');
-      const surface = e.target.dataset.surface;
-      const tooth = toothElement.dataset.tooth;
-      
-      selectToothPart(tooth, surface, e.target);
+function inicializarEscuchadores() {
+  document.querySelectorAll('.tooth-part').forEach(parte => {
+    parte.addEventListener('click', (e) => {
+      const elementoDiente = e.target.closest('.tooth-container');
+      const superficie = e.target.dataset.surface;
+      const diente = elementoDiente.dataset.tooth;
+      seleccionarParteDiente(diente, superficie, e.target);
     });
   });
-}
 
-function initializeTreatmentListeners() {
   document.querySelectorAll('[data-treatment]').forEach(elem => {
     elem.addEventListener('click', () => {
-      const treatment = elem.dataset.treatment;
-      document.getElementById('treatment-select').value = treatment;
+      document.getElementById('treatment-select').value = elem.dataset.treatment;
     });
   });
+
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    buscarTratamientos(e.target.value);
+  });
+
+  document.getElementById('save').addEventListener('click', guardarTratamiento);
+  document.getElementById('reset').addEventListener('click', reiniciarSeleccion);
+  document.getElementById('clear-all').addEventListener('click', limpiarTodo);
 }
 
-function selectToothPart(tooth, surface, element) {
-  element.classList.add('selected');
-  selectedTooth = tooth;
-  selectedSurface = surface;
+function seleccionarParteDiente(diente, superficie, elemento) {
+  const tratamiento = document.getElementById('treatment-select').value;
+  const origen = document.getElementById('origin-select').value;
   
-  const treatment = document.getElementById('treatment-select').value;
-  if (treatment) {
-    const treatmentInfo = TREATMENTS[treatment];
-    Object.values(TREATMENTS).forEach(t => {
-      element.classList.remove(t.clase);
+  if (!tratamiento || !origen) {
+    mostrarNotificacion('Seleccione tratamiento y origen', 'error');
+    return;
+  }
+
+  const tratamientosPendientes = cargarTratamientosPendientes();
+
+  if (tratamiento === 'Extracción') {
+    const elementoDiente = elemento.closest('.tooth-container');
+    elementoDiente.querySelectorAll('.tooth-part').forEach(elementoSuperficie => {
+      elementoSuperficie.classList.add('selected');
+      actualizarVisualTratamiento(elementoSuperficie, tratamiento, origen);
     });
-    element.classList.add(treatmentInfo.clase);
+
+    tratamientosPendientes.push({
+      numeroDiente: diente,
+      superficie: 'completo',
+      tratamiento,
+      origen
+    });
+  } else {
+    elemento.classList.add('selected');
+    actualizarVisualTratamiento(elemento, tratamiento, origen);
     
-    pendingTreatments.push({
-      numeroDiente: tooth,
-      superficie: surface,
-      tratamiento: treatment,
-      elemento: element
+    tratamientosPendientes.push({
+      numeroDiente: diente,
+      superficie,
+      tratamiento,
+      origen
     });
   }
   
+  guardarTratamientosPendientes(tratamientosPendientes);
   document.getElementById('save').disabled = false;
 }
 
-async function loadExistingTreatments() {
-  try {
-    console.log('Loading treatments for patient:', patientIdFromApi);
-    const response = await fetch(`${BASE_URL}/odontograma/patient/${patientIdFromApi}`);
-    
-    if (!response.ok) {
-      console.log('Response not OK:', await response.text());
-      throw new Error('Error al cargar tratamientos');
-    }
-    
-    const treatments = await response.json();
-    console.log('Loaded treatments:', treatments);
-    const historyContainer = document.getElementById('treatment-history');
-    historyContainer.innerHTML = '';
+function actualizarVisualTratamiento(elemento, tratamiento, origen) {
+  if (!TREATMENTS[tratamiento]) return;
+  
+  elemento.dataset.treatment = tratamiento;
+  elemento.dataset.origen = origen;
+}
 
-    if (treatments.length === 0) {
-      historyContainer.innerHTML = `
-        <div class="text-gray-400 text-center py-4">
-          No hay tratamientos registrados
-        </div>
-      `;
+async function cargarTratamientosExistentes() {
+  try {
+    if (!idPacienteDeApi) throw new Error('ID de paciente no disponible');
+    
+    const respuesta = await fetch(`${BASE_URL}/odontograma/patient/${idPacienteDeApi}`);
+    if (!respuesta.ok) throw new Error('Error al cargar tratamientos');
+    
+    const tratamientos = JSON.parse(await respuesta.text());
+    const contenedorHistorial = document.getElementById('treatment-history');
+    contenedorHistorial.innerHTML = '';
+
+    if (!Array.isArray(tratamientos) || tratamientos.length === 0) {
+      contenedorHistorial.innerHTML = '<div class="text-gray-400 text-center py-4">No hay tratamientos registrados</div>';
       return;
     }
 
-    treatments.forEach(odontograma => {
+    tratamientos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    // Primero limpiamos los dientes
+    document.querySelectorAll('.tooth-part').forEach(parte => {
+      delete parte.dataset.treatment;
+      delete parte.dataset.origen;
+    });
+
+    // Luego agregamos los tratamientos existentes
+    tratamientos.forEach(odontograma => {
       odontograma.dientes.forEach(diente => {
-        updateToothVisual(diente);
-        addTreatmentToHistory(diente, odontograma.fecha);
+        actualizarVisualDiente(diente);
+        agregarTratamientoAlHistorial(diente, odontograma.fecha, odontograma._id);
       });
     });
   } catch (error) {
-    console.error('Error loading treatments:', error);
-    showNotification('Error al cargar tratamientos', 'error');
+    console.error('Error al cargar tratamientos:', error);
+    mostrarNotificacion('Error al cargar tratamientos', 'error');
   }
 }
 
-function updateToothVisual(diente) {
-  const toothElement = document.querySelector(`[data-tooth="${diente.numeroDiente}"]`);
-  if (!toothElement) return;
-  const surfaceElement = toothElement.querySelector(`[data-surface="${diente.superficie}"]`);
-  if (!surfaceElement) return;
+function actualizarVisualDiente(diente) {
+  if (!diente?.numeroDiente || !diente?.superficie || !diente?.tratamiento) return;
 
-  const treatment = TREATMENTS[diente.tratamiento];
-  if (treatment) {
-    Object.values(TREATMENTS).forEach(t => {
-      surfaceElement.classList.remove(t.clase);
+  const elementoDiente = document.querySelector(`[data-tooth="${diente.numeroDiente}"]`);
+  if (!elementoDiente) return;
+
+  if (diente.superficie === 'completo') {
+    elementoDiente.querySelectorAll('.tooth-part').forEach(superficie => {
+      actualizarVisualTratamiento(superficie, diente.tratamiento, diente.origen);
     });
-    surfaceElement.classList.add(treatment.clase);
+  } else {
+    const elementoSuperficie = elementoDiente.querySelector(`[data-surface="${diente.superficie}"]`);
+    if (elementoSuperficie) {
+      actualizarVisualTratamiento(elementoSuperficie, diente.tratamiento, diente.origen);
+    }
   }
 }
 
-function addTreatmentToHistory(diente, fecha) {
-  const historyContainer = document.getElementById('treatment-history');
-  const treatment = TREATMENTS[diente.tratamiento];
+function agregarTratamientoAlHistorial(diente, fecha, id) {
+  const contenedorHistorial = document.getElementById('treatment-history');
+  const tratamiento = TREATMENTS[diente.tratamiento];
   
-  const treatmentRecord = document.createElement('div');
-  treatmentRecord.className = 'p-3 bg-gray-700 rounded-md hover:shadow-md transition-shadow';
-  treatmentRecord.innerHTML = `
-    <div class="flex justify-between items-center">
+  const registroTratamiento = document.createElement('div');
+  registroTratamiento.className = 'mb-2 px-4 py-3 bg-gray-700/50 backdrop-blur rounded-lg';
+  registroTratamiento.dataset.id = id;
+  registroTratamiento.dataset.fecha = new Date(fecha).getTime();
+  registroTratamiento.dataset.searchContent = `${diente.numeroDiente} ${diente.tratamiento}`.toLowerCase();
+  
+  registroTratamiento.innerHTML = `
+    <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="font-medium text-white">Diente ${diente.numeroDiente}</span>
-        <span class="text-sm ${treatment?.color} rounded-full w-4 h-4"></span>
+        <span class="text-lg">${tratamiento?.icon}</span>
+        <span class="${diente.origen === 'propio' ? 'text-red-400' : 'text-blue-400'} text-sm">
+          ${diente.origen === 'propio' ? 'Este estudio' : 'Otro estudio'}
+        </span>
       </div>
-      <span class="text-sm text-gray-400">
-        ${new Date(fecha).toLocaleDateString()}
-      </span>
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-400">${new Date(fecha).toLocaleDateString()}</span>
+        <button onclick="eliminarTratamiento('${id}')" class="text-gray-400 hover:text-red-400 transition-colors">
+          <span class="text-lg">🗑️</span>
+        </button>
+      </div>
     </div>
-    <div class="text-sm mt-1 flex items-center gap-1 text-gray-300">
-      <span>${treatment?.icon}</span>
+    <div class="mt-1.5 text-sm text-gray-300 flex gap-1 items-center">
       <span>${diente.tratamiento}</span>
       <span class="text-gray-500">-</span>
       <span>${diente.superficie}</span>
     </div>
     ${diente.notas ? `
-      <div class="text-sm text-gray-400 mt-1 flex items-center gap-1">
+      <div class="mt-1.5 text-sm text-gray-400 flex items-center gap-1">
         <span>📝</span>
         <span>${diente.notas}</span>
       </div>
     ` : ''}
   `;
-  historyContainer.prepend(treatmentRecord);
+
+  const registros = Array.from(contenedorHistorial.children);
+  const index = registros.findIndex(r => parseInt(r.dataset.fecha || 0) < new Date(fecha).getTime());
+
+  if (index === -1) {
+    contenedorHistorial.appendChild(registroTratamiento);
+  } else {
+    contenedorHistorial.insertBefore(registroTratamiento, registros[index]);
+  }
 }
 
-async function saveTreatment() {
-  console.log('Starting save with pending treatments:', pendingTreatments);
-  if (!validatePendingTreatments()) return;
+async function guardarTratamiento() {
+  const tratamientosPendientes = cargarTratamientosPendientes();
+  if (tratamientosPendientes.length === 0) {
+    mostrarNotificacion('No hay tratamientos pendientes', 'error');
+    return;
+  }
 
-  const saveButton = document.getElementById('save');
-  saveButton.disabled = true;
-  saveButton.innerHTML = '<span class="animate-pulse">Guardando...</span>';
+  const botonGuardar = document.getElementById('save');
+  botonGuardar.disabled = true;
+  botonGuardar.innerHTML = '<span class="animate-pulse">Guardando...</span>';
 
   try {
-    const notes = document.getElementById('notes').value;
-    console.log('Saving treatment with notes:', notes);
+    const notas = document.getElementById('notes').value;
+    const datosDientes = tratamientosPendientes.map(t => ({
+      numeroDiente: t.numeroDiente,
+      superficie: t.superficie,
+      tratamiento: t.tratamiento,
+      origen: t.origen,
+      notas
+    }));
+
+    const respuesta = await fetch(`${BASE_URL}/odontograma`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        idPaciente: idPacienteDeApi,
+        dientes: datosDientes
+      })
+    });
+
+    if (!respuesta.ok) throw new Error('Error al guardar');
     
-    for (const treatment of pendingTreatments) {
-      const dienteData = {
-        numeroDiente: treatment.numeroDiente,
-        superficie: treatment.superficie,
-        tratamiento: treatment.tratamiento,
-        notas: notes
-      };
-      console.log('Sending diente data:', dienteData);
+    const datosGuardados = await respuesta.json();
+    
+    // Limpiamos solo los pendientes sin afectar los existentes
+    document.querySelectorAll('.tooth-part.selected').forEach(el => {
+      el.classList.remove('selected');
+    });
+    
+    localStorage.removeItem('tratamientosPendientes');
+    document.getElementById('treatment-select').value = '';
+    document.getElementById('origin-select').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('save').disabled = true;
 
-      const response = await fetch(`${BASE_URL}/odontograma`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          idPaciente: patientIdFromApi,
-          dientes: [dienteData]
-        })
-      });
-
-      console.log('Save response status:', response.status);
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log('Error response:', errorText);
-        throw new Error('Error al guardar');
-      }
-      
-      const savedData = await response.json();
-      console.log('Saved data:', savedData);
-      addTreatmentToHistory(dienteData, new Date());
-    }
-
-    showNotification('Tratamientos guardados exitosamente', 'success');
-    resetSelection();
+    // Recargamos todos los tratamientos
+    await cargarTratamientosExistentes();
+    
+    mostrarNotificacion('Tratamientos guardados exitosamente', 'success');
   } catch (error) {
-    console.error('Error saving treatments:', error);
-    showNotification('Error al guardar los tratamientos', 'error');
+    console.error('Error al guardar tratamientos:', error);
+    mostrarNotificacion('Error al guardar los tratamientos', 'error');
   } finally {
-    saveButton.disabled = false;
-    saveButton.innerHTML = 'Guardar';
+    botonGuardar.disabled = false;
+    botonGuardar.innerHTML = 'Guardar';
   }
 }
 
-function validatePendingTreatments() {
-  if (pendingTreatments.length === 0) {
-    showNotification('Por favor seleccione al menos un tratamiento', 'error');
-    return false;
-  }
+async function eliminarTratamiento(id) {
+  if (!confirm('¿Está seguro de que desea eliminar este tratamiento?')) return;
 
-  const treatment = document.getElementById('treatment-select').value;
-  if (!treatment) {
-    showNotification('Por favor seleccione un tratamiento', 'error');
-    return false;
+  try {
+    const response = await fetch(`${BASE_URL}/odontograma/${id}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Error al eliminar tratamiento');
+    
+    document.querySelector(`[data-id="${id}"]`)?.remove();
+    await cargarTratamientosExistentes();
+    mostrarNotificacion('Tratamiento eliminado exitosamente', 'success');
+  } catch (error) {
+    console.error('Error:', error);
+    mostrarNotificacion('Error al eliminar el tratamiento', 'error');
   }
-
-  return true;
 }
 
-function showNotification(message, type) {
-  const notification = document.getElementById('notification');
-  notification.textContent = message;
-  notification.className = `px-4 py-2 rounded-md notification-animation ${
-    type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+async function limpiarTodo() {
+  if (!confirm('¿Está seguro de que desea eliminar todos los tratamientos?')) return;
+
+  try {
+    if (!idPacienteDeApi) throw new Error('ID de paciente no disponible');
+    
+    const response = await fetch(`${BASE_URL}/odontograma/patient/${idPacienteDeApi}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Error al eliminar tratamientos');
+    
+    // Limpiamos la selección y los tratamientos pendientes
+    localStorage.removeItem('tratamientosPendientes');
+    document.getElementById('treatment-select').value = '';
+    document.getElementById('origin-select').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('save').disabled = true;
+    
+    // Limpiamos los dientes
+    document.querySelectorAll('.tooth-part').forEach(parte => {
+      parte.classList.remove('selected');
+      delete parte.dataset.treatment;
+      delete parte.dataset.origen;
+    });
+    
+    document.getElementById('treatment-history').innerHTML = 
+      '<div class="text-gray-400 text-center py-4">No hay tratamientos registrados</div>';
+    
+    mostrarNotificacion('Todos los tratamientos eliminados', 'success');
+  } catch (error) {
+    console.error('Error:', error);
+    mostrarNotificacion('Error al eliminar los tratamientos', 'error');
+  }
+}
+
+function mostrarNotificacion(mensaje, tipo) {
+  const notificacion = document.getElementById('notification');
+  notificacion.textContent = mensaje;
+  notificacion.className = `px-4 py-2 rounded-md notification-animation ${
+    tipo === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
   }`;
-  notification.style.display = 'block';
+  notificacion.style.display = 'block';
 
   setTimeout(() => {
-    notification.style.display = 'none';
+    notificacion.style.display = 'none';
   }, 3000);
 }
 
-function resetSelection() {
-  selectedTooth = null;
-  selectedSurface = null;
-  pendingTreatments = [];
+function buscarTratamientos(query) {
+  const contenedorHistorial = document.getElementById('treatment-history');
+  const queryLower = query.toLowerCase();
   
+  Array.from(contenedorHistorial.children).forEach(registro => {
+    if (!registro.dataset.searchContent) return; // Ignorar mensajes de "No hay tratamientos"
+    const visible = registro.dataset.searchContent.includes(queryLower);
+    registro.style.display = visible ? 'block' : 'none';
+  });
+}
+
+function reiniciarSeleccion() {
+  localStorage.removeItem('tratamientosPendientes');
+  
+  // Solo removemos la selección y limpiamos los controles
   document.querySelectorAll('.tooth-part.selected').forEach(el => {
     el.classList.remove('selected');
-    Object.values(TREATMENTS).forEach(t => {
-      el.classList.remove(t.clase);
-    });
   });
   
   document.getElementById('treatment-select').value = '';
+  document.getElementById('origin-select').value = '';
   document.getElementById('notes').value = '';
   document.getElementById('save').disabled = true;
 }
+
+window.eliminarTratamiento = eliminarTratamiento;
 </script>
