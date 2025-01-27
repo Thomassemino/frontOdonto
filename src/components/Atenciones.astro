@@ -92,7 +92,7 @@ const { dni } = Astro.props;
         <div class="flex justify-end space-x-2">
           <button
             type="button"
-            id="cancelarBtn"
+            id="cancelarBtnA"
             class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             Cancelar
@@ -158,7 +158,7 @@ const { dni } = Astro.props;
         <div class="flex justify-end space-x-2">
           <button
             type="button"
-            id="cancelarEditarBtn"
+            id="cancelarEditarBtnA"
             class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             Cancelar
@@ -360,12 +360,12 @@ window.eliminarAtencionHandler = async function(pacienteId, fecha) {
 // Inicialización y eventos del DOM
 document.addEventListener('DOMContentLoaded', () => {
   // Vincular eventos de manera más explícita
-  document.getElementById('cancelarBtn').addEventListener('click', (e) => {
+  document.getElementById('cancelarBtnA').addEventListener('click', (e) => {
     document.getElementById('atencionModal').classList.add('hidden');
     document.getElementById('atencionForm').reset();
   });
 
-  document.getElementById('cancelarEditarBtn').addEventListener('click', (e) => {
+  document.getElementById('cancelarEditarBtnA').addEventListener('click', (e) => {
     document.getElementById('editarAtencionModal').classList.add('hidden');
     document.getElementById('editarAtencionForm').reset();
   });
