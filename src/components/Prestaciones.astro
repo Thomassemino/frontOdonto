@@ -281,36 +281,19 @@ async function actualizarPrestacion(id, data) {
 
 async function registrarPago(prestacionId, data) {
   try {
-    console.log('Enviando datos de pago:', { prestacionId, data });
-    
     const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos`, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
 
-    const responseText = await response.text();
-    console.log('Respuesta del servidor (texto):', responseText);
-
     if (!response.ok) {
-      console.log('Estado de la respuesta:', response.status);
-      console.log('Headers:', Object.fromEntries([...response.headers]));
-      throw new Error(`Error del servidor: ${response.status} - ${responseText}`);
+      throw new Error('Error al registrar el pago');
     }
 
-    let result;
-    try {
-      result = JSON.parse(responseText);
-    } catch (e) {
-      throw new Error(`Error al parsear la respuesta: ${responseText}`);
-    }
-
-    console.log('Pago registrado:', result);
-    return result;
+    return await response.json();
   } catch (error) {
-    console.error('Error detallado en registrarPago:', error);
+    console.error('Error al registrar pago:', error);
     throw error;
   }
 }
@@ -348,17 +331,15 @@ function renderizarPrestaciones(prestaciones) {
   const tbody = document.getElementById('prestacionesTableBody');
   tbody.innerHTML = prestaciones.map(p => {
     const totalPagos = (p.pagos || []).reduce((sum, pago) => sum + pago.monto, 0);
-    
-    // Obtener el nombre del tratamiento de forma segura
-    const nombreTratamiento = p.tratamientoId?.nombre || 'Sin tratamiento';
+    const saldoPrestacion = p.precio - totalPagos;
     
     return `
       <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700" data-id="${p._id}">
         <td class="px-4 py-2 text-gray-900 dark:text-gray-200">
-          ${nombreTratamiento}
+          ${p.tratamiento ? p.tratamiento.nombre : p.descripcion}
         </td>
         <td class="px-4 py-2 text-right text-gray-900 dark:text-gray-200">
-          ${formatearMoneda(p.precio || 0)}
+          ${formatearMoneda(p.precio)}
         </td>
         <td class="px-4 py-2 text-right">
           <div class="flex flex-col items-end">
@@ -514,20 +495,9 @@ window.editarPrestacionHandler = async function(id) {
     const modal = document.getElementById('editarPrestacionModal');
     const form = document.getElementById('editarPrestacionForm');
     
-    // Establecer los valores del formulario
     form.querySelector('input[name="prestacionId"]').value = prestacion._id;
-    const selectTratamiento = form.querySelector('select[name="tratamiento"]');
-    selectTratamiento.value = prestacion.tratamientoId._id; // Asegurar que usamos el _id del tratamiento
+    form.querySelector('select[name="tratamiento"]').value = prestacion.tratamientoId || '';
     form.querySelector('input[name="precio"]').value = prestacion.precio;
-
-    // Agregar el evento change al select para cuando cambie el tratamiento
-    selectTratamiento.addEventListener('change', (e) => {
-      const selectedOption = e.target.options[e.target.selectedIndex];
-      const precio = selectedOption.dataset.precio;
-      if (precio) {
-        form.querySelector('input[name="precio"]').value = precio;
-      }
-    });
 
     modal.classList.remove('hidden');
   } catch (error) {
@@ -567,134 +537,110 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Formulario de nueva prestación
-    // Formulario de nueva prestación
-    prestacionForm.onsubmit = async (e) => {
-  e.preventDefault();
-  const submitButton = prestacionForm.querySelector('button[type="submit"]');
-  const originalText = submitButton.textContent;
-  submitButton.disabled = true;
-  submitButton.textContent = 'Guardando...';
+  prestacionForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const submitButton = prestacionForm.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Guardando...';
 
-  try {
-    const paciente = await obtenerPacientePorDni();
-    const pacienteId = paciente._id || paciente.id;
-    
-    const formData = new FormData(prestacionForm);
-    const tratamientoId = formData.get('tratamiento');
-    
-    if (!tratamientoId) {
-      throw new Error('Debe seleccionar un tratamiento');
+    try {
+      const paciente = await obtenerPacientePorDni();
+      const pacienteId = paciente._id || paciente.id;
+      
+      const formData = new FormData(prestacionForm);
+      const prestacionData = {
+        pacienteId,
+        tratamientoId: formData.get('tratamiento'),
+        precio: parseFloat(formData.get('precio')),
+        pagos: []
+      };
+
+      await crearPrestacion(prestacionData);
+      await cargarPrestaciones();
+      prestacionModal.classList.add('hidden');
+      prestacionForm.reset();
+      
+      mostrarNotificacion('Prestación creada exitosamente', 'success');
+    } catch (error) {
+      console.error('Error al crear prestación:', error);
+      mostrarNotificacion(
+        'Error al crear la prestación: ' + (error.message || 'Error desconocido'),
+        'error'
+      );
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
     }
-
-    const prestacionData = {
-      pacienteId,
-      tratamientoId,
-      precio: parseFloat(formData.get('precio')),
-      pagos: []
-    };
-
-    console.log('Datos a enviar:', prestacionData);
-    await crearPrestacion(prestacionData);
-    await cargarPrestaciones();
-    prestacionModal.classList.add('hidden');
-    prestacionForm.reset();
-    
-    mostrarNotificacion('Prestación creada exitosamente', 'success');
-  } catch (error) {
-    console.error('Error al crear prestación:', error);
-    mostrarNotificacion(
-      'Error al crear la prestación: ' + (error.message || 'Error desconocido'),
-      'error'
-    );
-  } finally {
-    submitButton.disabled = false;
-    submitButton.textContent = originalText;
-  }
-};
+  };
 
   // Formulario de edición
   editarForm.onsubmit = async (e) => {
-  e.preventDefault();
-  const submitButton = editarForm.querySelector('button[type="submit"]');
-  const originalText = submitButton.textContent;
-  submitButton.disabled = true;
-  submitButton.textContent = 'Actualizando...';
+    e.preventDefault();
+    const submitButton = editarForm.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Actualizando...';
 
-  try {
-    const formData = new FormData(editarForm);
-    const prestacionId = formData.get('prestacionId');
-    const tratamientoId = formData.get('tratamiento');
+    try {
+      const formData = new FormData(editarForm);
+      const prestacionId = formData.get('prestacionId');
+      const prestacionData = {
+        tratamientoId: formData.get('tratamiento'),
+        precio: parseFloat(formData.get('precio'))
+      };
 
-    if (!tratamientoId) {
-      throw new Error('Debe seleccionar un tratamiento');
+      await actualizarPrestacion(prestacionId, prestacionData);
+      await cargarPrestaciones();
+      editarModal.classList.add('hidden');
+      editarForm.reset();
+      
+      mostrarNotificacion('Prestación actualizada exitosamente', 'success');
+    } catch (error) {
+      console.error('Error al actualizar prestación:', error);
+      mostrarNotificacion(
+        'Error al actualizar la prestación: ' + (error.message || 'Error desconocido'),
+        'error'
+      );
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
     }
-
-    const prestacionData = {
-      tratamientoId,
-      precio: parseFloat(formData.get('precio'))
-    };
-
-    console.log('Datos a actualizar:', prestacionData);
-    await actualizarPrestacion(prestacionId, prestacionData);
-    await cargarPrestaciones();
-    editarModal.classList.add('hidden');
-    editarForm.reset();
-    
-    mostrarNotificacion('Prestación actualizada exitosamente', 'success');
-  } catch (error) {
-    console.error('Error al actualizar prestación:', error);
-    mostrarNotificacion(
-      'Error al actualizar la prestación: ' + (error.message || 'Error desconocido'),
-      'error'
-    );
-  } finally {
-    submitButton.disabled = false;
-    submitButton.textContent = originalText;
-  }
-};
+  };
 
   // Formulario de pago
   pagoForm.onsubmit = async (e) => {
-  e.preventDefault();
-  const submitButton = pagoForm.querySelector('button[type="submit"]');
-  const originalText = submitButton.textContent;
-  submitButton.disabled = true;
-  submitButton.textContent = 'Registrando...';
+    e.preventDefault();
+    const submitButton = pagoForm.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Registrando...';
 
-  try {
-    const formData = new FormData(pagoForm);
-    const prestacionId = formData.get('prestacionId');
-    
-    if (!prestacionId) {
-      throw new Error('No se encontró el ID de la prestación');
+    try {
+      const formData = new FormData(pagoForm);
+      const prestacionId = formData.get('prestacionId');
+      const pagoData = {
+        monto: parseFloat(formData.get('montoPago')),
+        fecha: formData.get('fechaPago')
+      };
+
+      await registrarPago(prestacionId, pagoData);
+      await cargarPrestaciones();
+      pagoModal.classList.add('hidden');
+      pagoForm.reset();
+      
+      mostrarNotificacion('Pago registrado exitosamente', 'success');
+    } catch (error) {
+      console.error('Error al registrar pago:', error);
+      mostrarNotificacion(
+        'Error al registrar el pago: ' + (error.message || 'Error desconocido'),
+        'error'
+      );
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
     }
-
-    const pagoData = {
-      monto: parseFloat(formData.get('montoPago')),
-      fecha: formData.get('fechaPago')
-    };
-
-    console.log('Enviando datos de pago:', { prestacionId, pagoData });
-
-    const resultado = await registrarPago(prestacionId, pagoData);
-    console.log('Respuesta del registro de pago:', resultado);
-
-    await cargarPrestaciones();
-    pagoModal.classList.add('hidden');
-    pagoForm.reset();
-    
-    mostrarNotificacion('Pago registrado exitosamente', 'success');
-  } catch (error) {
-    console.error('Error detallado al registrar pago:', error);
-    mostrarNotificacion(
-      `Error al registrar el pago: ${error.message}`,
-      'error'
-    );
-  } finally {
-    submitButton.disabled = false;
-    submitButton.textContent = originalText;
-  }
-};
+  };
 
   // Manejadores para cerrar modales
   const modales = [
