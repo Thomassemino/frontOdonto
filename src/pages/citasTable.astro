@@ -10,40 +10,63 @@ interface Consulta {
     nombre: string;
   };
   medicoId: {
-    _id: string; 
+    _id: string;
     nombre: string;
     especialidad?: string;
   };
   motivo: string;
   tratamientos: string[];
-  estado: 'pendiente' | 'completada' | 'cancelada';
-}  
+  estado: "pendiente" | "completada" | "cancelada";
+}
 ---
 
 <LayoutProtected>
   <LayoutCommon>
-    <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 text-slate-800 dark:from-slate-900 dark:to-slate-800 dark:text-slate-100 lg:p-16">
+    <div
+      class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 text-slate-800 dark:from-slate-900 dark:to-slate-800 dark:text-slate-100 lg:p-16"
+    >
       <div class="mx-auto max-w-6xl">
         <!-- Header -->
-        <div class="mb-6 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-          <div class="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
-            <button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+        <div
+          class="mb-6 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
+        >
+          <div
+            class="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0"
+          >
+            <button
+              id="volverBtn"
+              class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            >
               ← Volver al inicio
             </button>
             <h1 class="text-2xl font-bold">Citas Odontológicas</h1>
           </div>
-          <button id="nuevaConsultaBtn" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          <button
+            id="nuevaConsultaBtn"
+            class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            <svg
+              class="mr-2 h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"></path>
             </svg>
             Nueva Cita
           </button>
         </div>
-  
+
         <!-- Filtros y Búsqueda -->
         <div class="mb-6 grid gap-4 md:grid-cols-3">
           <div class="space-y-2">
-            <label for="searchInput" class="block text-sm font-medium">Buscar</label>
+            <label for="searchInput" class="block text-sm font-medium"
+              >Buscar</label
+            >
             <input
               type="text"
               id="searchInput"
@@ -51,9 +74,11 @@ interface Consulta {
               class="w-full rounded-lg border border-gray-300 p-2.5 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             />
           </div>
-          
+
           <div class="space-y-2">
-            <label for="estadoFilter" class="block text-sm font-medium">Estado</label>
+            <label for="estadoFilter" class="block text-sm font-medium"
+              >Estado</label
+            >
             <select
               id="estadoFilter"
               class="w-full rounded-lg border border-gray-300 p-2.5 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -65,84 +90,176 @@ interface Consulta {
             </select>
           </div>
         </div>
-  
+
         <!-- Tabla de Consultas - Vista Desktop -->
-        <div class="hidden md:block overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <div
+          class="hidden md:block overflow-x-auto rounded-lg bg-white shadow-xl dark:bg-gray-800"
+        >
+          <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+          >
             <thead class="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Fecha</th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Hora</th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Paciente</th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Médico</th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Motivo</th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Estado</th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Acciones</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                  >Fecha</th
+                >
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                  >Hora</th
+                >
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                  >Paciente</th
+                >
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                  >Médico</th
+                >
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                  >Motivo</th
+                >
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                  >Estado</th
+                >
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                  >Acciones</th
+                >
               </tr>
             </thead>
-            <tbody id="consultasTableBodyDesktop" class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+            <tbody
+              id="consultasTableBodyDesktop"
+              class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800"
+            >
               <!-- Se llena dinámicamente -->
             </tbody>
           </table>
         </div>
-  
+
         <!-- Vista Mobile - Cards -->
         <div class="md:hidden space-y-4" id="consultasTableBodyMobile">
           <!-- Se llena dinámicamente -->
         </div>
       </div>
     </div>
-  
+
     <!-- Modal de Edición -->
     <div id="editModal" class="fixed inset-0 z-50 hidden">
       <div class="absolute inset-0 bg-black opacity-50"></div>
-      <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-2xl mx-auto mt-20">
+      <div
+        class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-2xl mx-auto mt-20"
+      >
         <div class="flex justify-between items-start mb-6">
-          <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Editar Cita</h3>
-          <button type="button" onclick="window.closeEditModal()" class="text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">
+            Editar Cita
+          </h3>
+          <button
+            type="button"
+            onclick="window.closeEditModal()"
+            class="text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-400"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>
-  
+
         <form id="editForm">
-          <input type="hidden" name="id">
-            
+          <input type="hidden" name="id" />
+
           <div class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="diaConsulta" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Día</label>
-                <input type="date" name="diaConsulta" required class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                <label
+                  for="diaConsulta"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >Día</label
+                >
+                <input
+                  type="date"
+                  name="diaConsulta"
+                  required
+                  class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
               </div>
               <div>
-                <label for="horaConsulta" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hora</label>
-                <input type="time" name="horaConsulta" required class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                <label
+                  for="horaConsulta"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >Hora</label
+                >
+                <input
+                  type="time"
+                  name="horaConsulta"
+                  required
+                  class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
               </div>
             </div>
-            
+
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="nombrePaciente" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Paciente</label>
-                <select name="nombrePaciente" required class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                <label
+                  for="nombrePaciente"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >Paciente</label
+                >
+                <select
+                  name="nombrePaciente"
+                  required
+                  class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                >
                   <option value="">Seleccione un paciente</option>
                 </select>
               </div>
               <div>
-                <label for="nombreMedico" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Médico</label>
-                <select name="nombreMedico" required class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                <label
+                  for="nombreMedico"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >Médico</label
+                >
+                <select
+                  name="nombreMedico"
+                  required
+                  class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                >
                   <option value="">Seleccione un médico</option>
                 </select>
               </div>
             </div>
-                
+
             <div>
-              <label for="problema" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Motivo</label>
-              <input type="text" name="problema" required class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+              <label
+                for="problema"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Motivo</label
+              >
+              <input
+                type="text"
+                name="problema"
+                required
+                class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              />
             </div>
-          
+
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tratamientos</label>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Tratamientos</label
+              >
               <div id="tratamientosEditContainer" class="mt-1">
                 <div class="flex items-center gap-2">
                   <select
@@ -153,7 +270,7 @@ interface Consulta {
                     <option value="">Seleccione un tratamiento</option>
                   </select>
                   <button
-                    type="button" 
+                    type="button"
                     id="addTratamientoEditBtn"
                     class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
@@ -163,7 +280,7 @@ interface Consulta {
               </div>
             </div>
           </div>
-            
+
           <div class="mt-6 flex justify-end">
             <button
               type="submit"
@@ -176,12 +293,10 @@ interface Consulta {
       </div>
     </div>
   </LayoutCommon>
-  </LayoutProtected>
-
-
+</LayoutProtected>
 
 <script>
-const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
+  const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
 
   interface Consulta {
     _id: string;
@@ -197,17 +312,20 @@ const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
     };
     motivo: string;
     tratamientos: string[];
-    estado: 'pendiente' | 'completada' | 'cancelada';
+    estado: "pendiente" | "completada" | "cancelada";
   }
 
   let consultas: Consulta[] = [];
   let consultasFiltradas: Consulta[] = [];
 
   // Funciones de utilidad
-  function showNotification(message: string, type: 'success' | 'error' = 'success') {
-    const notification = document.createElement('div');
+  function showNotification(
+    message: string,
+    type: "success" | "error" = "success"
+  ) {
+    const notification = document.createElement("div");
     notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${
-      type === 'success' ? 'bg-green-500' : 'bg-red-500'
+      type === "success" ? "bg-green-500" : "bg-red-500"
     }`;
     notification.textContent = message;
     document.body.appendChild(notification);
@@ -216,52 +334,57 @@ const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
 
   function getEstadoClase(estado: string): string {
     const clases = {
-      pendiente: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-			en_proceso: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      completada: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      pendiente:
+        "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      en_proceso:
+        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      completada:
+        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
     };
-    return clases[estado as keyof typeof clases] || '';
+    return clases[estado as keyof typeof clases] || "";
   }
 
   // Funciones principales
   async function cargarConsultas() {
     try {
       const response = await fetch(`${BASE_URL}/citas/todas`);
-      if (!response.ok) throw new Error('Error al obtener citas');
-      
+      if (!response.ok) throw new Error("Error al obtener citas");
+
       const data = await response.json();
-      console.log('Citas cargadas:', data);
+      console.log("Citas cargadas:", data);
 
       consultas = data;
       consultasFiltradas = [...consultas];
       renderizarTabla();
     } catch (error) {
-      console.error('Error:', error);
-      showNotification('Error al cargar las consultas', 'error');
+      console.error("Error:", error);
+      showNotification("Error al cargar las consultas", "error");
     }
   }
 
-	function renderizarTabla() {
-  const tbodyDesktop = document.getElementById('consultasTableBodyDesktop');
-  const containerMobile = document.getElementById('consultasTableBodyMobile');
-  
-  if (!tbodyDesktop || !containerMobile) return;
+  function renderizarTabla() {
+    const tbodyDesktop = document.getElementById("consultasTableBodyDesktop");
+    const containerMobile = document.getElementById("consultasTableBodyMobile");
 
-  tbodyDesktop.innerHTML = consultasFiltradas.map(consulta => `
+    if (!tbodyDesktop || !containerMobile) return;
+
+    tbodyDesktop.innerHTML = consultasFiltradas
+      .map(
+        (consulta) => `
     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
       <td class="whitespace-nowrap px-6 py-4">${new Date(consulta.fecha).toLocaleDateString()}</td>
-      <td class="whitespace-nowrap px-6 py-4">${new Date(consulta.fecha).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
-      <td class="whitespace-nowrap px-6 py-4">${consulta.pacienteId?.nombre || ''}</td>
-      <td class="whitespace-nowrap px-6 py-4">${consulta.medicoId?.nombre || ''}</td>
-      <td class="whitespace-nowrap px-6 py-4">${consulta.motivo || ''}</td>
+      <td class="whitespace-nowrap px-6 py-4">${new Date(consulta.fecha).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td>
+      <td class="whitespace-nowrap px-6 py-4">${consulta.pacienteId?.nombre || ""}</td>
+      <td class="whitespace-nowrap px-6 py-4">${consulta.medicoId?.nombre || ""}</td>
+      <td class="whitespace-nowrap px-6 py-4">${consulta.motivo || ""}</td>
       <td class="whitespace-nowrap px-6 py-4">
         <span class="rounded-full px-2 py-1 text-xs font-semibold ${getEstadoClase(consulta.estado)}">
-          ${consulta.estado || ''}
+          ${consulta.estado || ""}
         </span>
       </td>
       <td class="px-6 py-4">
         <div class="flex space-x-2">
-          <button onclick="window.openEditModal(${JSON.stringify(consulta).replace(/"/g, '&quot;')})"
+          <button onclick="window.openEditModal(${JSON.stringify(consulta).replace(/"/g, "&quot;")})"
                 class="p-2 text-blue-600 hover:text-blue-700 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -279,31 +402,35 @@ const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
         </div>
       </td>
     </tr>
-  `).join('');
+  `
+      )
+      .join("");
 
-  containerMobile.innerHTML = consultasFiltradas.map(consulta => `
+    containerMobile.innerHTML = consultasFiltradas
+      .map(
+        (consulta) => `
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-3">
       <div class="flex justify-between items-start">
         <div class="space-y-1">
           <div class="text-sm text-gray-500 dark:text-gray-400">
             ${new Date(consulta.fecha).toLocaleDateString()} - 
-            ${new Date(consulta.fecha).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+            ${new Date(consulta.fecha).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </div>
-          <div class="font-medium text-gray-900 dark:text-white">${consulta.pacienteId?.nombre || ''}</div>
-          <div class="text-sm text-gray-600 dark:text-gray-300">${consulta.medicoId?.nombre || ''}</div>
+          <div class="font-medium text-gray-900 dark:text-white">${consulta.pacienteId?.nombre || ""}</div>
+          <div class="text-sm text-gray-600 dark:text-gray-300">${consulta.medicoId?.nombre || ""}</div>
         </div>
         <span class="rounded-full px-2 py-1 text-xs font-semibold ${getEstadoClase(consulta.estado)}">
-          ${consulta.estado || ''}
+          ${consulta.estado || ""}
         </span>
       </div>
       
       <div class="text-sm">
         <span class="text-gray-500 dark:text-gray-400">Motivo:</span>
-        <p class="mt-1 text-gray-900 dark:text-white">${consulta.motivo || ''}</p>
+        <p class="mt-1 text-gray-900 dark:text-white">${consulta.motivo || ""}</p>
       </div>
 
       <div class="flex justify-end space-x-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-        <button onclick="window.openEditModal(${JSON.stringify(consulta).replace(/"/g, '&quot;')})"
+        <button onclick="window.openEditModal(${JSON.stringify(consulta).replace(/"/g, "&quot;")})"
               class="inline-flex items-center px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -322,18 +449,25 @@ const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
         </button>
       </div>
     </div>
-  `).join('');
-}
+  `
+      )
+      .join("");
+  }
 
   function filtrarConsultas() {
-    const searchTerm = (document.getElementById('searchInput') as HTMLInputElement)?.value.toLowerCase();
-    const estadoFilter = (document.getElementById('estadoFilter') as HTMLSelectElement)?.value;
+    const searchTerm = (
+      document.getElementById("searchInput") as HTMLInputElement
+    )?.value.toLowerCase();
+    const estadoFilter = (
+      document.getElementById("estadoFilter") as HTMLSelectElement
+    )?.value;
 
-    consultasFiltradas = consultas.filter(consulta => {
-      const cumpleBusqueda = !searchTerm || 
-        consulta.pacienteId?.nombre.toLowerCase().includes(searchTerm) || 
+    consultasFiltradas = consultas.filter((consulta) => {
+      const cumpleBusqueda =
+        !searchTerm ||
+        consulta.pacienteId?.nombre.toLowerCase().includes(searchTerm) ||
         consulta.medicoId?.nombre.toLowerCase().includes(searchTerm);
-      
+
       const cumpleEstado = !estadoFilter || consulta.estado === estadoFilter;
 
       return cumpleBusqueda && cumpleEstado;
@@ -343,179 +477,192 @@ const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
   }
 
   async function eliminarCita(id: string) {
-    if (!confirm('¿Está seguro que desea eliminar esta cita?')) return;
-    
+    if (!confirm("¿Está seguro que desea eliminar esta cita?")) return;
+
     try {
       const response = await fetch(`${BASE_URL}/citas/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
-          'Origin': 'http://localhost:4321'
-        }
+          "Content-Type": "application/json",
+          Origin: "http://localhost:4321",
+        },
       });
 
-      if (!response.ok) throw new Error('Error al eliminar la cita');
+      if (!response.ok) throw new Error("Error al eliminar la cita");
 
-      consultas = consultas.filter(consulta => consulta._id !== id);
-      consultasFiltradas = consultasFiltradas.filter(consulta => consulta._id !== id);
+      consultas = consultas.filter((consulta) => consulta._id !== id);
+      consultasFiltradas = consultasFiltradas.filter(
+        (consulta) => consulta._id !== id
+      );
       renderizarTabla();
-      showNotification('Cita eliminada exitosamente');
+      showNotification("Cita eliminada exitosamente");
     } catch (error) {
-      console.error('Error:', error);
-      showNotification('Error al eliminar la cita', 'error');
+      console.error("Error:", error);
+      showNotification("Error al eliminar la cita", "error");
     }
   }
 
   async function cargarTratamientoEdit(selectElement: HTMLSelectElement) {
-  try {
-    const response = await fetch(`${BASE_URL}/tratamientos`);
-    if (!response.ok) throw new Error('Error al cargar tratamientos');
+    try {
+      const response = await fetch(`${BASE_URL}/tratamientos`);
+      if (!response.ok) throw new Error("Error al cargar tratamientos");
 
-    const data = await response.json();
-    console.log('Tratamientos cargados:', data); // Debug
+      const data = await response.json();
+      console.log("Tratamientos cargados:", data); // Debug
 
-    selectElement.innerHTML = '<option value="">Seleccione un tratamiento</option>';
-    data.forEach((tratamiento: any) => {
-      const option = document.createElement('option');
-      option.value = tratamiento._id;
-      option.textContent = tratamiento.nombre || tratamiento.nombreTratamiento;
-			option.className = 'text-gray-900 dark:text-gray-100';
-      selectElement.appendChild(option);
-    });
-  } catch (error) {
-    console.error('Error al cargar tratamientos:', error);
-    showNotification('Error al cargar tratamientos', 'error');
+      selectElement.innerHTML =
+        '<option value="">Seleccione un tratamiento</option>';
+      data.forEach((tratamiento: any) => {
+        const option = document.createElement("option");
+        option.value = tratamiento._id;
+        option.textContent =
+          tratamiento.nombre || tratamiento.nombreTratamiento;
+        option.className = "text-gray-900 dark:text-gray-100";
+        selectElement.appendChild(option);
+      });
+    } catch (error) {
+      console.error("Error al cargar tratamientos:", error);
+      showNotification("Error al cargar tratamientos", "error");
+    }
   }
-}
 
   async function cargarMedicos() {
     try {
       const response = await fetch(`${BASE_URL}/medico`);
-      if (!response.ok) throw new Error('Error al cargar médicos');
+      if (!response.ok) throw new Error("Error al cargar médicos");
 
       const data = await response.json();
       const medicos = data.medicos;
-      const selectMedico = document.querySelector('select[name="nombreMedico"]');
+      const selectMedico = document.querySelector(
+        'select[name="nombreMedico"]'
+      );
 
       if (selectMedico) {
-        selectMedico.innerHTML = '<option value="">Seleccione un médico</option>';
+        selectMedico.innerHTML =
+          '<option value="">Seleccione un médico</option>';
         medicos.forEach((medico: any) => {
-          const option = document.createElement('option');
+          const option = document.createElement("option");
           option.value = medico._id;
           option.textContent = `${medico.nombre} - ${medico.especialidad}`;
           selectMedico.appendChild(option);
         });
       }
     } catch (error) {
-      console.error('Error:', error);
-      showNotification('Error al cargar médicos', 'error');
+      console.error("Error:", error);
+      showNotification("Error al cargar médicos", "error");
     }
   }
 
   async function cargarPacientes() {
     try {
       const response = await fetch(`${BASE_URL}/paciente`);
-      if (!response.ok) throw new Error('Error al cargar pacientes');
+      if (!response.ok) throw new Error("Error al cargar pacientes");
 
       const data = await response.json();
-      const selectPaciente = document.querySelector('select[name="nombrePaciente"]');
+      const selectPaciente = document.querySelector(
+        'select[name="nombrePaciente"]'
+      );
 
       if (selectPaciente) {
-        selectPaciente.innerHTML = '<option value="">Seleccione un paciente</option>';
+        selectPaciente.innerHTML =
+          '<option value="">Seleccione un paciente</option>';
         data.pacientes.forEach((paciente: any) => {
-          const option = document.createElement('option');
+          const option = document.createElement("option");
           option.value = paciente.id;
           option.textContent = `${paciente.nombre} - DNI: ${paciente.dni}`;
           selectPaciente.appendChild(option);
         });
       }
     } catch (error) {
-      console.error('Error:', error);
-      showNotification('Error al cargar pacientes', 'error');
+      console.error("Error:", error);
+      showNotification("Error al cargar pacientes", "error");
     }
   }
 
-	function setupTratamientosEdit() {
-  document.getElementById('addTratamientoEditBtn')?.addEventListener('click', () => {
-    const tratamientosContainer = document.getElementById('tratamientosEditContainer');
+  function setupTratamientosEdit() {
+    document
+      .getElementById("addTratamientoEditBtn")
+      ?.addEventListener("click", () => {
+        const tratamientosContainer = document.getElementById(
+          "tratamientosEditContainer"
+        );
 
-    const tratamientoGroup = document.createElement('div');
-    tratamientoGroup.classList.add('flex', 'items-center', 'gap-2', 'mt-2');
+        const tratamientoGroup = document.createElement("div");
+        tratamientoGroup.classList.add("flex", "items-center", "gap-2", "mt-2");
 
-    const select = document.createElement('select');
-    select.name = 'tratamientos[]';
-    select.required = true;
-		select.classList.add(
-      'w-full',
-      'rounded-md',
-      'border',
-      'border-gray-300',
-      'bg-white',
-      'p-2',
-      'text-gray-900',
-      'dark:text-gray-100',
-      'dark:border-gray-600',
-      'dark:bg-gray-700',
-      'focus:border-blue-500',
-      'focus:ring-blue-500'
-    );
+        const select = document.createElement("select");
+        select.name = "tratamientos[]";
+        select.required = true;
+        select.classList.add(
+          "w-full",
+          "rounded-md",
+          "border",
+          "border-gray-300",
+          "bg-white",
+          "p-2",
+          "text-gray-900",
+          "dark:text-gray-100",
+          "dark:border-gray-600",
+          "dark:bg-gray-700",
+          "focus:border-blue-500",
+          "focus:ring-blue-500"
+        );
 
-    const removeButton = document.createElement('button');
-    removeButton.type = 'button';
-    removeButton.classList.add(
-      'px-4',
-      'py-2',
-      'bg-red-600',
-      'text-white',
-      'rounded-md',
-      'hover:bg-red-700'
-    );
-    removeButton.textContent = '-';
-    removeButton.addEventListener('click', () => {
-      tratamientoGroup.remove();
-    });
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.classList.add(
+          "px-4",
+          "py-2",
+          "bg-red-600",
+          "text-white",
+          "rounded-md",
+          "hover:bg-red-700"
+        );
+        removeButton.textContent = "-";
+        removeButton.addEventListener("click", () => {
+          tratamientoGroup.remove();
+        });
 
-    tratamientoGroup.appendChild(select);
-    tratamientoGroup.appendChild(removeButton);
-    tratamientosContainer?.appendChild(tratamientoGroup);
+        tratamientoGroup.appendChild(select);
+        tratamientoGroup.appendChild(removeButton);
+        tratamientosContainer?.appendChild(tratamientoGroup);
 
-    cargarTratamientoEdit(select);
-  });
-}
+        cargarTratamientoEdit(select);
+      });
+  }
 
-	async function openEditModal(cita: any) {
-    console.log('Cita a editar:', cita);
-    
-    const modal = document.getElementById('editModal');
-    const form = document.getElementById('editForm') as HTMLFormElement;
-    
-    await Promise.all([
-      cargarMedicos(),
-      cargarPacientes()
-    ]);
-    
+  async function openEditModal(cita: any) {
+    console.log("Cita a editar:", cita);
+
+    const modal = document.getElementById("editModal");
+    const form = document.getElementById("editForm") as HTMLFormElement;
+
+    await Promise.all([cargarMedicos(), cargarPacientes()]);
+
     if (form) {
       try {
         const fecha = new Date(cita.fecha);
-        const dia = fecha.toISOString().split('T')[0];
-        const hora = fecha.toTimeString().slice(0,5);
-        
-        form.elements.namedItem('id').value = cita._id;
-        form.elements.namedItem('diaConsulta').value = dia;
-        form.elements.namedItem('horaConsulta').value = hora;
-        form.elements.namedItem('nombrePaciente').value = cita.pacienteId.id;
-        form.elements.namedItem('nombreMedico').value = cita.medicoId._id;
-        form.elements.namedItem('problema').value = cita.motivo;
+        const dia = fecha.toISOString().split("T")[0];
+        const hora = fecha.toTimeString().slice(0, 5);
+
+        form.elements.namedItem("id").value = cita._id;
+        form.elements.namedItem("diaConsulta").value = dia;
+        form.elements.namedItem("horaConsulta").value = hora;
+        form.elements.namedItem("nombrePaciente").value = cita.pacienteId.id;
+        form.elements.namedItem("nombreMedico").value = cita.medicoId._id;
+        form.elements.namedItem("problema").value = cita.motivo;
 
         // Limpiar tratamientos anteriores
-        const tratamientosContainer = document.getElementById('tratamientosEditContainer');
+        const tratamientosContainer = document.getElementById(
+          "tratamientosEditContainer"
+        );
         if (tratamientosContainer) {
-          tratamientosContainer.innerHTML = '';
+          tratamientosContainer.innerHTML = "";
         }
 
         // Crear primer grupo de tratamiento
-        const primerGrupo = document.createElement('div');
-        primerGrupo.classList.add('flex', 'items-center', 'gap-2');
+        const primerGrupo = document.createElement("div");
+        primerGrupo.classList.add("flex", "items-center", "gap-2");
         primerGrupo.innerHTML = `
            <select
     name="tratamientos[]"
@@ -533,58 +680,64 @@ const BASE_URL = import.meta.env.PUBLIC_BASE_URL;
           </button>
         `;
         tratamientosContainer?.appendChild(primerGrupo);
-        const primerSelect = primerGrupo.querySelector('select');
+        const primerSelect = primerGrupo.querySelector("select");
         if (primerSelect) {
           await cargarTratamientoEdit(primerSelect);
         }
 
         // Crear un select por cada tratamiento existente
         if (Array.isArray(cita.tratamientos) && cita.tratamientos.length > 0) {
-          console.log('Tratamientos a cargar:', cita.tratamientos);
-          
+          console.log("Tratamientos a cargar:", cita.tratamientos);
+
           for (const tratamiento of cita.tratamientos) {
-            const tratamientoId = typeof tratamiento === 'string' ? tratamiento : tratamiento._id;
+            const tratamientoId =
+              typeof tratamiento === "string" ? tratamiento : tratamiento._id;
             if (tratamientoId) {
               if (primerSelect && !primerSelect.value) {
                 // Usar el primer select si está vacío
                 primerSelect.value = tratamientoId;
               } else {
                 // Crear nuevo grupo de tratamiento
-                const tratamientoGroup = document.createElement('div');
-                tratamientoGroup.classList.add('flex', 'items-center', 'gap-2', 'mt-2');
+                const tratamientoGroup = document.createElement("div");
+                tratamientoGroup.classList.add(
+                  "flex",
+                  "items-center",
+                  "gap-2",
+                  "mt-2"
+                );
 
-								const select = document.createElement('select');
-select.name = 'tratamientos[]';
-select.required = true;
-select.classList.add(
-  'w-full',
-  'rounded-md',
-  'border',
-  'border-gray-300',
-  'bg-white',
-  'p-2',
-  'text-gray-900',
-  'dark:text-gray-100',
-  'dark:border-gray-600',
-  'dark:bg-gray-700',
-  'focus:border-blue-500',
-  'focus:ring-blue-500'
-);
+                const select = document.createElement("select");
+                select.name = "tratamientos[]";
+                select.required = true;
+                select.classList.add(
+                  "w-full",
+                  "rounded-md",
+                  "border",
+                  "border-gray-300",
+                  "bg-white",
+                  "p-2",
+                  "text-gray-900",
+                  "dark:text-gray-100",
+                  "dark:border-gray-600",
+                  "dark:bg-gray-700",
+                  "focus:border-blue-500",
+                  "focus:ring-blue-500"
+                );
                 await cargarTratamientoEdit(select);
                 select.value = tratamientoId;
 
-                const removeButton = document.createElement('button');
-                removeButton.type = 'button';
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
                 removeButton.classList.add(
-                  'px-4',
-                  'py-2',
-                  'bg-red-600',
-                  'text-white',
-                  'rounded-md',
-                  'hover:bg-red-700'
+                  "px-4",
+                  "py-2",
+                  "bg-red-600",
+                  "text-white",
+                  "rounded-md",
+                  "hover:bg-red-700"
                 );
-                removeButton.textContent = '-';
-                removeButton.addEventListener('click', () => {
+                removeButton.textContent = "-";
+                removeButton.addEventListener("click", () => {
                   tratamientoGroup.remove();
                 });
 
@@ -598,86 +751,96 @@ select.classList.add(
 
         // Reconfigurar el botón de agregar tratamiento
         setupTratamientosEdit();
-        modal?.classList.remove('hidden');
+        modal?.classList.remove("hidden");
       } catch (error) {
-        console.error('Error al cargar el formulario:', error);
-        showNotification('Error al cargar los datos de la cita', 'error');
+        console.error("Error al cargar el formulario:", error);
+        showNotification("Error al cargar los datos de la cita", "error");
       }
     }
   }
 
-	async function handleEditFormSubmit(e: SubmitEvent) {
-  e.preventDefault();
-  
-  try {
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    
-    // Obtener la cita actual para mantener su estado
-    const citaId = formData.get('id');
-    const citaActual = consultas.find(c => c._id === citaId);
-    
-    const tratamientosSelects = form.querySelectorAll('select[name="tratamientos[]"]');
-    const tratamientos = Array.from(tratamientosSelects)
-      .map((select: HTMLSelectElement) => select.value)
-      .filter(value => value !== '')
-      .map(id => ({ _id: id }));
-    
-    const citaData = {
-      _id: citaId,
-      fecha: new Date(`${formData.get('diaConsulta')}T${formData.get('horaConsulta')}`).toISOString(),
-      pacienteId: formData.get('nombrePaciente'),
-      medicoId: formData.get('nombreMedico'),
-      motivo: formData.get('problema'),
-      tratamientos: tratamientos,
-      estado: citaActual?.estado || 'pendiente' // Mantener el estado actual
-    };
+  async function handleEditFormSubmit(e: SubmitEvent) {
+    e.preventDefault();
 
-    if (!citaData.pacienteId || !citaData.medicoId || !citaData.motivo || !citaData.fecha) {
-      throw new Error('Todos los campos son requeridos');
+    try {
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+
+      // Obtener la cita actual para mantener su estado
+      const citaId = formData.get("id");
+      const citaActual = consultas.find((c) => c._id === citaId);
+
+      const tratamientosSelects = form.querySelectorAll(
+        'select[name="tratamientos[]"]'
+      );
+      const tratamientos = Array.from(tratamientosSelects)
+        .map((select: HTMLSelectElement) => select.value)
+        .filter((value) => value !== "")
+        .map((id) => ({ _id: id }));
+
+      const citaData = {
+        _id: citaId,
+        fecha: new Date(
+          `${formData.get("diaConsulta")}T${formData.get("horaConsulta")}`
+        ).toISOString(),
+        pacienteId: formData.get("nombrePaciente"),
+        medicoId: formData.get("nombreMedico"),
+        motivo: formData.get("problema"),
+        tratamientos: tratamientos,
+        estado: citaActual?.estado || "pendiente", // Mantener el estado actual
+      };
+
+      if (
+        !citaData.pacienteId ||
+        !citaData.medicoId ||
+        !citaData.motivo ||
+        !citaData.fecha
+      ) {
+        throw new Error("Todos los campos son requeridos");
+      }
+
+      const response = await fetch(`${BASE_URL}/citas/${citaData._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Origin: "http://localhost:4321",
+        },
+        body: JSON.stringify(citaData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al actualizar la cita");
+      }
+
+      await cargarConsultas();
+      closeEditModal();
+      showNotification("Cita actualizada exitosamente");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error: any) {
+      console.error("Error completo:", error);
+      showNotification(error.message || "Error al actualizar la cita", "error");
     }
-
-    const response = await fetch(`${BASE_URL}/citas/${citaData._id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Origin': 'http://localhost:4321'
-      },
-      body: JSON.stringify(citaData)
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al actualizar la cita');
-    }
-
-    await cargarConsultas();
-    closeEditModal();
-    showNotification('Cita actualizada exitosamente');
-    
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-
-  } catch (error: any) {
-    console.error('Error completo:', error);
-    showNotification(error.message || 'Error al actualizar la cita', 'error');
   }
-}
 
   function closeEditModal() {
-    const modal = document.getElementById('editModal');
-    const form = document.getElementById('editForm');
-    
-    modal?.classList.add('hidden');
+    const modal = document.getElementById("editModal");
+    const form = document.getElementById("editForm");
+
+    modal?.classList.add("hidden");
     form?.reset();
 
     // Limpiar los tratamientos
-    const tratamientosContainer = document.getElementById('tratamientosEditContainer');
-		if (tratamientosContainer) {
-    const nuevoGrupo = document.createElement('div');
-    nuevoGrupo.classList.add('flex', 'items-center', 'gap-2');
-    nuevoGrupo.innerHTML = `
+    const tratamientosContainer = document.getElementById(
+      "tratamientosEditContainer"
+    );
+    if (tratamientosContainer) {
+      const nuevoGrupo = document.createElement("div");
+      nuevoGrupo.classList.add("flex", "items-center", "gap-2");
+      nuevoGrupo.innerHTML = `
       <select
         name="tratamientos[]"
         required
@@ -694,33 +857,41 @@ select.classList.add(
         +
       </button>
     `;
-        tratamientosContainer.appendChild(nuevoGrupo);
-        cargarTratamientoEdit(nuevoGrupo.querySelector('select')!);
-        setupTratamientosEdit();
-      }
+      tratamientosContainer.appendChild(nuevoGrupo);
+      cargarTratamientoEdit(nuevoGrupo.querySelector("select")!);
+      setupTratamientosEdit();
     }
+  }
 
   function setupEventListeners() {
-    document.getElementById('searchInput')?.addEventListener('input', filtrarConsultas);
-    document.getElementById('estadoFilter')?.addEventListener('change', filtrarConsultas);
-    
-    document.getElementById('nuevaConsultaBtn')?.addEventListener('click', () => {
-      window.location.href = '/nueva-cita';
-    });
-    
-    document.getElementById('volverBtn')?.addEventListener('click', () => {
-      window.location.href = '/';
+    document
+      .getElementById("searchInput")
+      ?.addEventListener("input", filtrarConsultas);
+    document
+      .getElementById("estadoFilter")
+      ?.addEventListener("change", filtrarConsultas);
+
+    document
+      .getElementById("nuevaConsultaBtn")
+      ?.addEventListener("click", () => {
+        window.location.href = "/nueva-cita";
+      });
+
+    document.getElementById("volverBtn")?.addEventListener("click", () => {
+      window.location.href = "/";
     });
 
-    document.getElementById('editForm')?.addEventListener('submit', handleEditFormSubmit);
+    document
+      .getElementById("editForm")
+      ?.addEventListener("submit", handleEditFormSubmit);
 
     // Manejo del modal
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeEditModal();
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeEditModal();
     });
 
-    document.addEventListener('click', (e) => {
-      const modal = document.getElementById('editModal');
+    document.addEventListener("click", (e) => {
+      const modal = document.getElementById("editModal");
       if (e.target === modal) closeEditModal();
     });
   }
@@ -731,7 +902,7 @@ select.classList.add(
   window.closeEditModal = closeEditModal;
 
   // Inicializar
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     cargarConsultas();
     setupEventListeners();
     setupTratamientosEdit();
