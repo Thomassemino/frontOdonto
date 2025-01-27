@@ -331,15 +331,14 @@ function renderizarPrestaciones(prestaciones) {
   const tbody = document.getElementById('prestacionesTableBody');
   tbody.innerHTML = prestaciones.map(p => {
     const totalPagos = (p.pagos || []).reduce((sum, pago) => sum + pago.monto, 0);
-    const saldoPrestacion = p.precio - totalPagos;
     
     return `
       <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700" data-id="${p._id}">
         <td class="px-4 py-2 text-gray-900 dark:text-gray-200">
-          ${p.tratamiento ? p.tratamiento.nombre : p.descripcion}
+          ${p.tratamientoId?.nombre || 'Sin tratamiento'}
         </td>
         <td class="px-4 py-2 text-right text-gray-900 dark:text-gray-200">
-          ${formatearMoneda(p.precio)}
+          ${formatearMoneda(p.precio || 0)}
         </td>
         <td class="px-4 py-2 text-right">
           <div class="flex flex-col items-end">
@@ -495,8 +494,9 @@ window.editarPrestacionHandler = async function(id) {
     const modal = document.getElementById('editarPrestacionModal');
     const form = document.getElementById('editarPrestacionForm');
     
+    // Establecer los valores del formulario
     form.querySelector('input[name="prestacionId"]').value = prestacion._id;
-    form.querySelector('select[name="tratamiento"]').value = prestacion.tratamientoId || '';
+    form.querySelector('select[name="tratamiento"]').value = prestacion.tratamientoId._id; // Asegurar que usamos el _id del tratamiento
     form.querySelector('input[name="precio"]').value = prestacion.precio;
 
     modal.classList.remove('hidden');
@@ -538,41 +538,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Formulario de nueva prestación
   prestacionForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const submitButton = prestacionForm.querySelector('button[type="submit"]');
-    const originalText = submitButton.textContent;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Guardando...';
+  e.preventDefault();
+  const submitButton = prestacionForm.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = 'Guardando...';
 
-    try {
-      const paciente = await obtenerPacientePorDni();
-      const pacienteId = paciente._id || paciente.id;
-      
-      const formData = new FormData(prestacionForm);
-      const prestacionData = {
-        pacienteId,
-        tratamientoId: formData.get('tratamiento'),
-        precio: parseFloat(formData.get('precio')),
-        pagos: []
-      };
+  try {
+    const paciente = await obtenerPacientePorDni();
+    const pacienteId = paciente._id || paciente.id;
+    
+    const formData = new FormData(prestacionForm);
+    const tratamientoId = formData.get('tratamiento');
 
-      await crearPrestacion(prestacionData);
-      await cargarPrestaciones();
-      prestacionModal.classList.add('hidden');
-      prestacionForm.reset();
-      
-      mostrarNotificacion('Prestación creada exitosamente', 'success');
-    } catch (error) {
-      console.error('Error al crear prestación:', error);
-      mostrarNotificacion(
-        'Error al crear la prestación: ' + (error.message || 'Error desconocido'),
-        'error'
-      );
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = originalText;
+    if (!tratamientoId) {
+      throw new Error('Debe seleccionar un tratamiento');
     }
-  };
+
+    const prestacionData = {
+      pacienteId,
+      tratamientoId,
+      precio: parseFloat(formData.get('precio')),
+      pagos: []
+    };
+
+    console.log('Datos a enviar:', prestacionData);
+    await crearPrestacion(prestacionData);
+    await cargarPrestaciones();
+    prestacionModal.classList.add('hidden');
+    prestacionForm.reset();
+    
+    mostrarNotificacion('Prestación creada exitosamente', 'success');
+  } catch (error) {
+    console.error('Error al crear prestación:', error);
+    mostrarNotificacion(
+      'Error al crear la prestación: ' + (error.message || 'Error desconocido'),
+      'error'
+    );
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+  }
+};
 
   // Formulario de edición
   editarForm.onsubmit = async (e) => {
