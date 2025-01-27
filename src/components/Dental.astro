@@ -565,18 +565,28 @@ async function limpiarTodo() {
   }
 }
 
-function mostrarNotificacion(mensaje, tipo) {
-  const notificacion = document.getElementById('notification');
+function mostrarNotificacion(mensaje, tipo = 'success') {
+  const notificacionExistente = document.querySelector('.notificacion');
+  if (notificacionExistente) {
+    notificacionExistente.remove();
+  }
+
+  const notificacion = document.createElement('div');
+  notificacion.className = `notificacion fixed right-4 top-4 z-50 rounded-lg p-4 shadow-lg transition-opacity duration-300 ${
+    tipo === 'success' 
+      ? 'bg-green-500' 
+      : 'bg-red-500'
+  } text-white`;
   notificacion.textContent = mensaje;
-  notificacion.className = `px-4 py-2 rounded-md notification-animation ${
-    tipo === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-  }`;
-  notificacion.style.display = 'block';
+
+  document.body.appendChild(notificacion);
 
   setTimeout(() => {
-    notificacion.style.display = 'none';
+    notificacion.style.opacity = '0';
+    setTimeout(() => notificacion.remove(), 300);
   }, 3000);
 }
+
 
 function buscarTratamientos(query) {
   const contenedorHistorial = document.getElementById('treatment-history');

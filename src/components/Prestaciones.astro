@@ -68,6 +68,8 @@ console.log('DNI recibido en el componente:', dni);
             required
             min="0"
             step="0.01"
+            max="999999999999"
+            maxlength="12"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
           />
         </div>
@@ -116,6 +118,8 @@ console.log('DNI recibido en el componente:', dni);
             required
             min="0"
             step="0.01"
+            max="999999999999"
+            maxlength="12"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
           />
         </div>
@@ -443,22 +447,43 @@ document.addEventListener('DOMContentLoaded', () => {
   const editarModal = document.getElementById('editarPrestacionModal');
   const form = document.getElementById('prestacionForm');
   const editarForm = document.getElementById('editarPrestacionForm');
+  const cancelarBtn = document.getElementById('cancelarBtn');
+  const cancelarEditarBtn = document.getElementById('cancelarEditarBtn');
+  const nuevaPrestacionBtn = document.getElementById('nuevaPrestacionBtn');
 
-  // Manejadores para el modal de nueva prestación
-  document.getElementById('nuevaPrestacionBtn').onclick = () => {
+  if (!modal || !editarModal || !form || !editarForm || !cancelarBtn || !cancelarEditarBtn || !nuevaPrestacionBtn) {
+    console.error('No se encontraron elementos necesarios en el DOM');
+    return;
+  }
+
+  // Manejador para abrir modal de nueva prestación
+  nuevaPrestacionBtn.addEventListener('click', () => {
     modal.classList.remove('hidden');
-  };
+  });
 
-  document.getElementById('cancelarBtn').onclick = () => {
+  // Manejador para botón cancelar en modal de nueva prestación
+  cancelarBtn.addEventListener('click', () => {
     modal.classList.add('hidden');
     form.reset();
-  };
+  });
 
-  // Manejadores para el modal de edición
-  document.getElementById('cancelarEditarBtn').onclick = () => {
+  // Manejador para botón cancelar en modal de edición
+  cancelarEditarBtn.addEventListener('click', () => {
     editarModal.classList.add('hidden');
     editarForm.reset();
-  };
+  });
+
+  // Cerrar modales al hacer clic fuera
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      form.reset();
+    }
+    if (e.target === editarModal) {
+      editarModal.classList.add('hidden');
+      editarForm.reset();
+    }
+  });
 
   // Formulario de nueva prestación
   form.onsubmit = async (e) => {

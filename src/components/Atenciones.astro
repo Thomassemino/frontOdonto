@@ -47,8 +47,6 @@ const { dni } = Astro.props;
       <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Nueva Atención</h3>
       <form id="atencionForm" class="space-y-4">
         <input type="hidden" id="pacienteId" />
-        
-
 
         <!-- Selector de profesional -->
         <div>
@@ -181,15 +179,12 @@ const { dni } = Astro.props;
 </div>
 
 <script define:vars={{ dni }}>
-    const BASE_URL = "https://odontoback-production.up.railway.app/api";
-    console.log('Script iniciado con DNI:', dni);
-    
-    function formatFecha(fechaStr) {
-  const fecha = new Date(fechaStr);
-  
-  // Sumar 3 horas para ajustar a hora local de Argentina
-  fecha.setHours(fecha.getHours() + 3);
+const BASE_URL = "https://odontoback-production.up.railway.app/api";
 
+// Función para formatear fechas
+function formatFecha(fechaStr) {
+  const fecha = new Date(fechaStr);
+  fecha.setHours(fecha.getHours() + 3);
   return fecha.toLocaleString('es-AR', {
     year: 'numeric',
     month: '2-digit',
@@ -199,370 +194,305 @@ const { dni } = Astro.props;
   });
 }
 
-    function showNotification(message, type = 'success') {
-      console.log(`Mostrando notificación: ${message} (${type})`);
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg ${
-        type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-      }`;
-      
-      notification.classList.remove('hidden');
-      setTimeout(() => {
-        notification.classList.add('hidden');
-      }, 3000);
-    }
-    
-   async function cargarDatosIniciales() {
+// Función para mostrar notificaciones
+function showNotification(message, type = 'success') {
+  const notification = document.getElementById('notification');
+  notification.textContent = message;
+  notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg ${
+    type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+  }`;
+  
+  notification.classList.remove('hidden');
+  setTimeout(() => {
+    notification.classList.add('hidden');
+  }, 3000);
+}
+
+// Función para cargar datos iniciales
+async function cargarDatosIniciales() {
   try {
-    console.log('Iniciando carga de datos iniciales con DNI:', dni);
-    
     // Cargar datos del paciente
-    console.log('Intentando obtener datos del paciente...');
     const pacienteResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
-    console.log('Respuesta del servidor (paciente):', pacienteResponse);
-    
     if (!pacienteResponse.ok) {
-      const errorText = await pacienteResponse.text();
-      console.error('Error en respuesta del servidor (paciente):', errorText);
       throw new Error('Error al cargar datos del paciente');
     }
     
     const { paciente } = await pacienteResponse.json();
-    console.log('Datos del paciente recibidos:', paciente);
-    
     if (!paciente || !paciente.dni) {
-      console.error('Datos de paciente inválidos:', paciente);
       throw new Error('No se encontraron datos válidos del paciente');
     }
 
-    // Establecer datos del paciente en el formulario
-    const pacienteId = paciente._id || paciente.id; // Aceptamos ambos formatos de ID
+    const pacienteId = paciente._id || paciente.id;
     document.getElementById('pacienteId').value = pacienteId;
 
     // Cargar lista de médicos
-    console.log('Cargando lista de médicos...');
     const medicosResponse = await fetch(`${BASE_URL}/medico`);
-    console.log('Respuesta del servidor (médicos):', medicosResponse);
-    
     if (!medicosResponse.ok) {
-      const errorText = await medicosResponse.text();
-      console.error('Error en respuesta del servidor (médicos):', errorText);
       throw new Error('Error al cargar lista de médicos');
     }
     
     const { medicos } = await medicosResponse.json();
-    console.log('Datos de médicos recibidos:', medicos);
 
     // Poblar selectores de médicos
     const selectMedicos = document.getElementById('profesional');
     const selectMedicosEdit = document.getElementById('editProfesional');
     
     if (!selectMedicos || !selectMedicosEdit) {
-      console.error('No se encontraron los elementos select en el DOM');
       throw new Error('Error en la interfaz de usuario');
     }
 
     const medicosOptions = ['<option value="">Seleccione un profesional</option>']
-      .concat(medicos.map(medico => {
-        console.log('Procesando médico:', medico);
-        return `<option value="${medico.nombre}">${medico.nombre}</option>`;
-      }));
+      .concat(medicos.map(medico => 
+        `<option value="${medico.nombre}">${medico.nombre}</option>`
+      ));
     
     selectMedicos.innerHTML = medicosOptions.join('');
     selectMedicosEdit.innerHTML = medicosOptions.join('');
-    console.log('Selectores de médicos poblados');
 
     // Cargar tabla de atenciones
-    console.log('Iniciando carga de atenciones...');
     await cargarAtenciones(pacienteId);
   } catch (error) {
     console.error('Error en cargarDatosIniciales:', error);
     showNotification(error.message, 'error');
   }
 }
-    
+
+// Función para cargar atenciones
 async function cargarAtenciones(pacienteId) {
   try {
-    console.log('Cargando atenciones para pacienteId:', pacienteId);
     const response = await fetch(`${BASE_URL}/atenciones/todas/${pacienteId}`);
-    console.log('Respuesta del servidor (atenciones):', response);
-    
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error en respuesta de atenciones:', errorText);
       throw new Error('Error al cargar atenciones');
     }
     
     const atenciones = await response.json();
-    console.log('Atenciones recibidas:', atenciones);
-    
     const tableBody = document.getElementById('atencionesTableBody');
     if (!tableBody) {
-      console.error('No se encontró el elemento tableBody en el DOM');
       throw new Error('Error en la interfaz de usuario');
     }
 
-    // Ordenar atenciones de más antigua a más nueva
+    // Ordenar atenciones
     const atencionesOrdenadas = atenciones.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
-    tableBody.innerHTML = atencionesOrdenadas.map(atencion => {
-      console.log('Procesando atención para mostrar:', atencion);
-      return `
-        <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-          <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${formatFecha(atencion.fecha)}</td>
-          <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.profesional}</td>
-          <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.notaDelDia}</td>
-          <td class="px-4 py-2 text-right">
-            <div class="flex justify-end space-x-2">
-              <button 
-                onclick="editarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
-                class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              </button>
-              <button 
-                onclick="eliminarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
-                class="p-2 text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 6h18"/>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-    console.log('Tabla de atenciones actualizada');
+    tableBody.innerHTML = atencionesOrdenadas.map(atencion => `
+      <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+        <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${formatFecha(atencion.fecha)}</td>
+        <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.profesional}</td>
+        <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.notaDelDia}</td>
+        <td class="px-4 py-2 text-right">
+          <div class="flex justify-end space-x-2">
+            <button 
+              onclick="editarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
+              class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button 
+              onclick="eliminarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
+              class="p-2 text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
   } catch (error) {
     console.error('Error en cargarAtenciones:', error);
     showNotification(error.message, 'error');
   }
 }
-    
-    // Event Handlers
-    window.editarAtencionHandler = async function(pacienteId, fecha) {
-      try {
-        console.log('Iniciando edición de atención:', { pacienteId, fecha });
-        const response = await fetch(`${BASE_URL}/atenciones/unica/${pacienteId}/fecha/${fecha}`);
-        console.log('Respuesta del servidor (obtener atención):', response);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error al cargar atención para editar:', errorText);
-          throw new Error('Error al cargar la atención');
-        }
-        
-        const atencion = await response.json();
-        console.log('Datos de atención para editar:', atencion);
-        
-        // Rellenar el formulario con los datos existentes
-        document.getElementById('editPacienteId').value = pacienteId;
-        document.getElementById('editFechaOriginal').value = fecha;
-        document.getElementById('editProfesional').value = atencion.profesional;
-        document.getElementById('editFecha').value = new Date(atencion.fecha).toISOString().slice(0, 16);
-        document.getElementById('editNotaDelDia').value = atencion.notaDelDia;
-        
-        // Mostrar el modal
-        document.getElementById('editarAtencionModal').classList.remove('hidden');
-        console.log('Modal de edición abierto');
-      } catch (error) {
-        console.error('Error en editarAtencionHandler:', error);
-        showNotification(error.message, 'error');
-      }
-    };
-    
-    window.eliminarAtencionHandler = async function(pacienteId, fecha) {
-      if (!confirm('¿Está seguro de eliminar esta atención?')) return;
-      
-      try {
-        console.log('Iniciando eliminación de atención:', { pacienteId, fecha });
-        const response = await fetch(`${BASE_URL}/atenciones/delete-atencion/${pacienteId}/fecha/${fecha}`, {
-          method: 'DELETE'
-        });
-        console.log('Respuesta del servidor (eliminar):', response);
-    
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error al eliminar atención:', errorText);
-          throw new Error('Error al eliminar la atención');
-        }
-        
-        showNotification('Atención eliminada exitosamente');
-        await cargarAtenciones(pacienteId);
-      } catch (error) {
-        console.error('Error en eliminarAtencionHandler:', error);
-        showNotification(error.message, 'error');
-      }
-    };
-    
-    document.addEventListener('DOMContentLoaded', () => {
-  console.log('Inicializando componente de atenciones...');
-  const modal = document.getElementById('atencionModal');
-  const editarModal = document.getElementById('editarAtencionModal');
-  const form = document.getElementById('atencionForm');
-  const editarForm = document.getElementById('editarAtencionForm');
-  const cancelarBtn = document.getElementById('cancelarBtn');
-  const cancelarEditarBtn = document.getElementById('cancelarEditarBtn');
 
-  if (!modal || !editarModal || !form || !editarForm || !cancelarBtn || !cancelarEditarBtn) {
-    console.error('No se encontraron elementos necesarios en el DOM');
-    return;
+// Event Handlers
+window.editarAtencionHandler = async function(pacienteId, fecha) {
+  try {
+    const response = await fetch(`${BASE_URL}/atenciones/unica/${pacienteId}/fecha/${fecha}`);
+    if (!response.ok) {
+      throw new Error('Error al cargar la atención');
+    }
+    
+    const atencion = await response.json();
+    
+    // Rellenar el formulario con los datos existentes
+    document.getElementById('editPacienteId').value = pacienteId;
+    document.getElementById('editFechaOriginal').value = fecha;
+    document.getElementById('editProfesional').value = atencion.profesional;
+    document.getElementById('editFecha').value = new Date(atencion.fecha).toISOString().slice(0, 16);
+    document.getElementById('editNotaDelDia').value = atencion.notaDelDia;
+    
+    // Mostrar el modal
+    document.getElementById('editarAtencionModal').classList.remove('hidden');
+  } catch (error) {
+    console.error('Error en editarAtencionHandler:', error);
+    showNotification(error.message, 'error');
   }
-    
-      // Manejadores para el modal de nueva atención
-      document.getElementById('nuevaAtencionBtn').onclick = () => {
-        console.log('Abriendo modal de nueva atención');
-        modal.classList.remove('hidden');
-      };
-    
-      document.getElementById('cancelarBtn').onclick = () => {
-        console.log('Cerrando modal de nueva atención');
-        modal.classList.add('hidden');
-        form.reset();
-      };
-    
-      // Manejadores para el modal de edición
-      document.getElementById('cancelarEditarBtn').onclick = () => {
-  console.log('Cerrando modal de edición');
-  editarModal.classList.add('hidden');
-  editarForm.reset();
 };
+
+window.eliminarAtencionHandler = async function(pacienteId, fecha) {
+  if (!confirm('¿Está seguro de eliminar esta atención?')) return;
+  
+  try {
+    const response = await fetch(`${BASE_URL}/atenciones/delete-atencion/${pacienteId}/fecha/${fecha}`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al eliminar la atención');
+    }
     
-      // Formulario de nueva atención
-      form.onsubmit = async (e) => {
-        e.preventDefault();
-        console.log('Iniciando envío de nueva atención');
-        const submitButton = form.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = 'Guardando...';
+    showNotification('Atención eliminada exitosamente');
+    await cargarAtenciones(pacienteId);
+  } catch (error) {
+    console.error('Error en eliminarAtencionHandler:', error);
+    showNotification(error.message, 'error');
+  }
+};
+
+// Inicialización y eventos del DOM
+document.addEventListener('DOMContentLoaded', () => {
+  // Vincular eventos de manera más explícita
+  document.getElementById('cancelarBtn').addEventListener('click', (e) => {
+    document.getElementById('atencionModal').classList.add('hidden');
+    document.getElementById('atencionForm').reset();
+  });
+
+  document.getElementById('cancelarEditarBtn').addEventListener('click', (e) => {
+    document.getElementById('editarAtencionModal').classList.add('hidden');
+    document.getElementById('editarAtencionForm').reset();
+  });
+
+  // Cerrar modales al hacer clic fuera
+  window.addEventListener('click', (e) => {
+    const modal = document.getElementById('atencionModal');
+    const editModal = document.getElementById('editarAtencionModal');
     
-        try {
-          const formData = {
-            paciente: document.getElementById('pacienteId').value,
-            profesional: document.getElementById('profesional').value,
-            fecha: document.getElementById('fecha').value,
-            notaDelDia: document.getElementById('notaDelDia').value
-          };
-          console.log('Datos del formulario:', formData);
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      document.getElementById('atencionForm').reset();
+    }
     
-          const response = await fetch(`${BASE_URL}/atenciones/create`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-          });
-          console.log('Respuesta del servidor (crear):', response);
-    
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error al crear atención:', errorText);
-            throw new Error('Error al crear la atención');
-          }
-    
-          const responseData = await response.json();
-          console.log('Atención creada exitosamente:', responseData);
-          
-          showNotification('Atención creada exitosamente');
-          modal.classList.add('hidden');
-          form.reset();
-          await cargarAtenciones(formData.paciente);
-        } catch (error) {
-          console.error('Error en submit de nueva atención:', error);
-          showNotification(error.message, 'error');
-        } finally {
-          submitButton.disabled = false;
-          submitButton.textContent = 'Guardar';
-        }
+    if (e.target === editModal) {
+      editModal.classList.add('hidden');
+      document.getElementById('editarAtencionForm').reset();
+    }
+  });
+
+  // Cerrar modales con Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('atencionModal');
+      const editModal = document.getElementById('editarAtencionModal');
+      
+      modal.classList.add('hidden');
+      editModal.classList.add('hidden');
+      
+      document.getElementById('atencionForm').reset();
+      document.getElementById('editarAtencionForm').reset();
+    }
+  });
+
+  const nuevaAtencionBtn = document.getElementById('nuevaAtencionBtn');
+  if (nuevaAtencionBtn) {
+    nuevaAtencionBtn.addEventListener('click', () => {
+      document.getElementById('atencionModal').classList.remove('hidden');
+    });
+  }
+
+  // Manejo del formulario de nueva atención
+  const form = document.getElementById('atencionForm');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Guardando...';
+
+    try {
+      const formData = {
+        paciente: document.getElementById('pacienteId').value,
+        profesional: document.getElementById('profesional').value,
+        fecha: document.getElementById('fecha').value,
+        notaDelDia: document.getElementById('notaDelDia').value
       };
-    
-      // Formulario de edición
-      editarForm.onsubmit = async (e) => {
-        e.preventDefault();
-        console.log('Iniciando actualización de atención');
-        const submitButton = editarForm.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = 'Actualizando...';
-    
-        try {
-          const pacienteId = document.getElementById('editPacienteId').value;
-          const fechaOriginal = document.getElementById('editFechaOriginal').value;
-          
-          const formData = {
-            profesional: document.getElementById('editProfesional').value,
-            fecha: document.getElementById('editFecha').value,
-            notaDelDia: document.getElementById('editNotaDelDia').value
-          };
-          console.log('Datos de actualización:', { pacienteId, fechaOriginal, formData });
-    
-          const response = await fetch(`${BASE_URL}/atenciones/edit-atencion/${pacienteId}/fecha/${fechaOriginal}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-          });
-          console.log('Respuesta del servidor (actualizar):', response);
-    
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error al actualizar atención:', errorText);
-            throw new Error('Error al actualizar la atención');
-          }
-          
-          const responseData = await response.json();
-          console.log('Atención actualizada exitosamente:', responseData);
-          
-          showNotification('Atención actualizada exitosamente');
-          editarModal.classList.add('hidden');
-          editarForm.reset();
-          await cargarAtenciones(pacienteId);
-        } catch (error) {
-          console.error('Error en submit de edición:', error);
-          showNotification(error.message, 'error');
-        } finally {
-          submitButton.disabled = false;
-          submitButton.textContent = 'Actualizar';
-        }
-      };
-    
-      // Cerrar modales al hacer clic fuera
-      window.onclick = (e) => {
-        if (e.target === modal) {
-          console.log('Cerrando modal de nueva atención (clic fuera)');
-          modal.classList.add('hidden');
-          form.reset();
-        }
-        if (e.target === editarModal) {
-          console.log('Cerrando modal de edición (clic fuera)');
-          editarModal.classList.add('hidden');
-          editarForm.reset();
-        }
-      };
-    
-      // Cerrar modales con Escape
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          console.log('Cerrando modales (tecla Escape)');
-          modal.classList.add('hidden');
-          editarModal.classList.add('hidden');
-          form.reset();
-          editarForm.reset();
-        }
+
+      const response = await fetch(`${BASE_URL}/atenciones/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       });
-    
-      console.log('Iniciando carga de datos iniciales...');
-      cargarDatosIniciales();
-    });
-    
-    // Para el sistema de enrutamiento de Astro
-    document.addEventListener('astro:page-load', () => {
-      console.log('Evento astro:page-load detectado, recargando datos...');
-      cargarDatosIniciales();
-    });
-    </script>
+
+      if (!response.ok) {
+        throw new Error('Error al crear la atención');
+      }
+
+      showNotification('Atención creada exitosamente');
+      document.getElementById('atencionModal').classList.add('hidden');
+      form.reset();
+      await cargarAtenciones(formData.paciente);
+    } catch (error) {
+      console.error('Error en submit de nueva atención:', error);
+      showNotification(error.message, 'error');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Guardar';
+    }
+  });
+
+  // Manejo del formulario de edición
+  const editarForm = document.getElementById('editarAtencionForm');
+  editarForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitButton = editarForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Actualizando...';
+
+    try {
+      const pacienteId = document.getElementById('editPacienteId').value;
+      const fechaOriginal = document.getElementById('editFechaOriginal').value;
+      
+      const formData = {
+        profesional: document.getElementById('editProfesional').value,
+        fecha: document.getElementById('editFecha').value,
+        notaDelDia: document.getElementById('editNotaDelDia').value
+      };
+
+      const response = await fetch(`${BASE_URL}/atenciones/edit-atencion/${pacienteId}/fecha/${fechaOriginal}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar la atención');
+      }
+
+      showNotification('Atención actualizada exitosamente');
+      document.getElementById('editarAtencionModal').classList.add('hidden');
+      editarForm.reset();
+      await cargarAtenciones(pacienteId);
+    } catch (error) {
+      console.error('Error en submit de edición:', error);
+      showNotification(error.message, 'error');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Actualizar';
+    }
+  });
+
+  // Inicializar datos
+  cargarDatosIniciales();
+});
+
+// Evento para el sistema de enrutamiento de Astro
+document.addEventListener('astro:page-load', () => {
+  cargarDatosIniciales();
+});
+</script>
