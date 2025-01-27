@@ -8,9 +8,6 @@ interface ConsultaData {
   paso2: Record<string, any>;
   paso3: Record<string, any>;
 }
-
-// Obtener el ID de la cita de la URL
-const citaId = Astro.url.searchParams.get('id');
 ---
 
 <LayoutProtected>
@@ -23,168 +20,162 @@ const citaId = Astro.url.searchParams.get('id');
         </button>
       </div>
 
-      <!-- Contenedor principal -->
-      <div id="contenedorPrincipal">
-        <!-- Historia Clínica -->
-        <div id="historiaClinica" class="rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
-          <h2 class="text-xl font-bold mb-6">Historia Clínica</h2>
-          
-          <!-- Navegación entre pasos -->
-          <div class="mb-8 flex justify-between">
-            <button id="paso1Btn" class="paso-btn border-b-2 border-blue-600 px-4 py-2 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400">
-              Datos Personales
-            </button>
-            <button id="paso2Btn" class="paso-btn px-4 py-2 font-semibold text-gray-400">
-              Estado Actual
-            </button>
-            <button id="paso3Btn" class="paso-btn px-4 py-2 font-semibold text-gray-400">
-              Anotaciones Médicas
-            </button>
+      <div class="rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+        <!-- Navegación entre pasos -->
+        <div class="mb-8 flex justify-between">
+          <button id="paso1Btn" class="paso-btn border-b-2 border-blue-600 px-4 py-2 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400">
+            Datos Personales
+          </button>
+          <button id="paso2Btn" class="paso-btn px-4 py-2 font-semibold text-gray-400">
+            Estado Actual
+          </button>
+          <button id="paso3Btn" class="paso-btn px-4 py-2 font-semibold text-gray-400">
+            Anotaciones Médicas
+          </button>
+        </div>
+
+        <!-- Formulario Paso 1: Datos Personales -->
+        <form id="paso1" class="space-y-6">
+          <div class="space-y-4">
+            <div>
+              <label for="alergia" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Alergias
+              </label>
+              <textarea
+                id="alergia"
+                name="alergia"
+                rows="2"
+                maxlength="240"
+                class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              ></textarea>
+            </div>
+
+            <div>
+              <label for="padeceEnfermedad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                ¿Qué enfermedades padece?
+              </label>
+              <textarea
+                id="padeceEnfermedad"
+                name="padeceEnfermedad"
+                rows="2"
+                maxlength="240"
+                class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              ></textarea>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="esPacienteCardiaco"
+                name="esPacienteCardiaco"
+                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600"
+              />
+              <label for="esPacienteCardiaco" class="text-sm text-gray-700 dark:text-gray-300">
+                ¿Es paciente cardíaco?
+              </label>
+            </div>
           </div>
 
-          <!-- Formulario Paso 1: Datos Personales -->
-          <form id="paso1" class="space-y-6">
-            <div class="space-y-4">
-              <div>
-                <label for="alergia" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Alergias
-                </label>
-                <textarea
-                  id="alergia"
-                  name="alergia"
-                  rows="2"
-                  maxlength="240"
-                  class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
-                ></textarea>
-              </div>
+          <div class="flex justify-end space-x-4">
+            <button
+              type="button"
+              id="cancelarBtn"
+              class="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              id="siguiente1"
+              class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Siguiente
+            </button>
+          </div>
+        </form>
 
-              <div>
-                <label for="padeceEnfermedad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  ¿Qué enfermedades padece?
-                </label>
-                <textarea
-                  id="padeceEnfermedad"
-                  name="padeceEnfermedad"
-                  rows="2"
-                  maxlength="240"
-                  class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
-                ></textarea>
-              </div>
-
-              <div class="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="esPacienteCardiaco"
-                  name="esPacienteCardiaco"
-                  class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600"
-                />
-                <label for="esPacienteCardiaco" class="text-sm text-gray-700 dark:text-gray-300">
-                  ¿Es paciente cardíaco?
-                </label>
-              </div>
+        <!-- Formulario Paso 2: Estado Actual -->
+        <form id="paso2" class="hidden space-y-6">
+          <div class="space-y-4">
+            <div>
+              <label for="tomaMedicacion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                ¿Qué medicación toma actualmente?
+              </label>
+              <textarea
+                id="tomaMedicacion"
+                name="tomaMedicacion"
+                rows="2"
+                maxlength="240"
+                class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              ></textarea>
             </div>
 
-            <div class="flex justify-end space-x-4">
-              <button
-                type="button"
-                id="cancelarBtn"
-                class="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                id="siguiente1"
-                class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Siguiente
-              </button>
+            <div>
+              <label for="estadoActualBoca" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Estado actual de la boca
+              </label>
+              <textarea
+                id="estadoActualBoca"
+                name="estadoActualBoca"
+                rows="2"
+                maxlength="240"
+                class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              ></textarea>
             </div>
-          </form>
+          </div>
 
-          <!-- Formulario Paso 2: Estado Actual -->
-          <form id="paso2" class="hidden space-y-6">
-            <div class="space-y-4">
-              <div>
-                <label for="tomaMedicacion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  ¿Qué medicación toma actualmente?
-                </label>
-                <textarea
-                  id="tomaMedicacion"
-                  name="tomaMedicacion"
-                  rows="2"
-                  maxlength="240"
-                  class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
-                ></textarea>
-              </div>
+          <div class="flex justify-end space-x-4">
+            <button
+              type="button"
+              id="anterior2"
+              class="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            >
+              Anterior
+            </button>
+            <button
+              type="button"
+              id="siguiente2"
+              class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Siguiente
+            </button>
+          </div>
+        </form>
 
-              <div>
-                <label for="estadoActualBoca" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Estado actual de la boca
-                </label>
-                <textarea
-                  id="estadoActualBoca"
-                  name="estadoActualBoca"
-                  rows="2"
-                  maxlength="240"
-                  class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
-                ></textarea>
-              </div>
+        <!-- Formulario Paso 3: Anotaciones Médicas -->
+        <form id="paso3" class="hidden space-y-6">
+          <div class="space-y-4">
+            <div>
+              <label for="anotacionesMedico" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Anotaciones del Médico
+              </label>
+              <textarea
+                id="anotacionesMedico"
+                name="anotacionesMedico"
+                rows="4"
+                maxlength="240"
+                class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+              ></textarea>
             </div>
+          </div>
 
-            <div class="flex justify-end space-x-4">
-              <button
-                type="button"
-                id="anterior2"
-                class="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-              >
-                Anterior
-              </button>
-              <button
-                type="button"
-                id="siguiente2"
-                class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Siguiente
-              </button>
-            </div>
-          </form>
-
-          <!-- Formulario Paso 3: Anotaciones Médicas -->
-          <form id="paso3" class="hidden space-y-6">
-            <div class="space-y-4">
-              <div>
-                <label for="anotacionesMedico" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Anotaciones del Médico
-                </label>
-                <textarea
-                  id="anotacionesMedico"
-                  name="anotacionesMedico"
-                  rows="4"
-                  maxlength="240"
-                  class="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
-                ></textarea>
-              </div>
-            </div>
-
-            <div class="flex justify-end space-x-4">
-              <button
-                type="button"
-                id="anterior3"
-                class="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-              >
-                Anterior
-              </button>
-              <button
-                type="button"
-                id="guardar"
-                class="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-              >
-                Guardar y Finalizar
-              </button>
-            </div>
-          </form>
-        </div>
+          <div class="flex justify-end space-x-4">
+            <button
+              type="button"
+              id="anterior3"
+              class="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            >
+              Anterior
+            </button>
+            <button
+              type="button"
+              id="guardar"
+              class="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              Guardar Consulta
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -215,19 +206,13 @@ async function cargarDatosCita() {
             throw new Error('Error al cargar datos de la cita');
         }
 
-        const citaData = await response.json();
-        console.log('Datos de la cita:', citaData);
-
-        if (!citaData.pacienteId || !citaData.pacienteId.id) {
-            throw new Error('La cita no tiene información válida del paciente');
-        }
-
-        consultaData.citaInfo = citaData;
-        console.log('ConsultaData actualizada:', consultaData);
+        const cita = await response.json();
+        console.log('Datos de la cita cargados:', cita); // Para verificar la estructura
+        consultaData.citaInfo = cita;
 
     } catch (error) {
-        console.error('Error detallado en cargarDatosCita:', error);
-        alert('Error al cargar los datos de la consulta: ' + error.message);
+        console.error('Error al cargar datos de la cita:', error);
+        alert('Error al cargar los datos de la consulta');
     }
 }
 
@@ -267,35 +252,36 @@ function recolectarDatosPaso(numero) {
 
 async function guardarConsulta(e) {
     if (e) e.preventDefault();
-    
+    recolectarDatosPaso(1);
+    recolectarDatosPaso(2);
+    recolectarDatosPaso(3);
+
     try {
-        if (!consultaData.citaInfo) {
-            throw new Error('No hay datos de la cita cargados');
+        // Corregir la obtención del ID del paciente
+        let pacienteId;
+        if (typeof consultaData.citaInfo.pacienteId === 'object') {
+            pacienteId = consultaData.citaInfo.pacienteId.id;
+        } else {
+            pacienteId = consultaData.citaInfo.pacienteId;
         }
 
-        console.log('Datos de la cita:', consultaData.citaInfo);
-
-        recolectarDatosPaso(1);
-        recolectarDatosPaso(2);
-        recolectarDatosPaso(3);
-
-        const pacienteId = consultaData.citaInfo.pacienteId.id;
-        
+        // Verificar que tenemos un ID válido
         if (!pacienteId) {
             throw new Error('No se pudo obtener el ID del paciente');
         }
 
         const historiaClinicaData = {
+            pacienteId: pacienteId, // Ahora solo enviamos el ID
+            citaId: consultaData.id,
             alergia: consultaData.paso1.alergia || '',
             padeceEnfermedad: consultaData.paso1.padeceEnfermedad || '',
             esPacienteCardiaco: Boolean(consultaData.paso1.esPacienteCardiaco),
             tomaMedicacion: consultaData.paso2.tomaMedicacion || '',
             estadoActualBoca: consultaData.paso2.estadoActualBoca || '',
-            anotacionesMedico: consultaData.paso3.anotacionesMedico || '',
-            pacienteId: pacienteId
+            anotacionesMedico: consultaData.paso3.anotacionesMedico || ''
         };
 
-        console.log('Datos a enviar a la API:', historiaClinicaData);
+        console.log('Datos a enviar:', historiaClinicaData); // Para debugging
 
         const responseHistoriaClinica = await fetch(`${BASE_URL}/historiaClinica/create`, {
             method: 'POST',
@@ -306,17 +292,17 @@ async function guardarConsulta(e) {
         });
 
         if (!responseHistoriaClinica.ok) {
-            const errorText = await responseHistoriaClinica.text();
-            console.error('Error response:', errorText);
-            throw new Error('Error al guardar la historia clínica');
+            const errorData = await responseHistoriaClinica.json();
+            console.error('Error respuesta:', errorData);
+            throw new Error(errorData.message || 'Error al guardar la historia clínica');
         }
 
-        // Actualizamos el estado de la cita a completada
+        // Actualizar estado de la cita usando el mismo ID del paciente
         const citaUpdateData = {
             estado: 'completada',
             fecha: consultaData.citaInfo.fecha,
             medicoId: consultaData.citaInfo.medicoId._id || consultaData.citaInfo.medicoId,
-            pacienteId: consultaData.citaInfo.pacienteId.id || consultaData.citaInfo.pacienteId,
+            pacienteId: pacienteId // Usar el mismo ID corregido
         };
 
         const responseEstado = await fetch(`${BASE_URL}/citas/${consultaData.id}`, {
@@ -335,55 +321,48 @@ async function guardarConsulta(e) {
         window.location.href = '/';
 
     } catch (error) {
-        console.error('Error detallado en guardarConsulta:', error);
+        console.error('Error detallado:', error);
         alert('Error al guardar la consulta: ' + error.message);
     }
 }
 
 // Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    cargarDatosCita();
-    
-    // Botón volver
-    document.getElementById('volverBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (confirm('¿Está seguro que desea volver? Se perderán los cambios no guardados.')) {
-            window.location.href = '/';
-        }
-    });
-
-    // Botón cancelar
-    document.getElementById('cancelarBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (confirm('¿Está seguro que desea cancelar? Se perderán los cambios no guardados.')) {
-            window.location.href = '/';
-        }
-    });
-
-    // Navegación entre pasos
-    ['paso1Btn', 'paso2Btn', 'paso3Btn'].forEach((id, index) => {
-        document.getElementById(id)?.addEventListener('click', () => mostrarPaso(index + 1));
-    });
-
-    // Botones de navegación entre pasos
-    document.getElementById('siguiente1')?.addEventListener('click', () => {
-        recolectarDatosPaso(1);
-        mostrarPaso(2);
-    });
-
-    document.getElementById('anterior2')?.addEventListener('click', () => mostrarPaso(1));
-
-    document.getElementById('siguiente2')?.addEventListener('click', () => {
-        recolectarDatosPaso(2);
-        mostrarPaso(3);
-    });
-
-    document.getElementById('anterior3')?.addEventListener('click', () => mostrarPaso(2));
-
-    // Botón guardar historia clínica
-    document.getElementById('guardar')?.addEventListener('click', (e) => guardarConsulta(e));
+document.getElementById('volverBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/';
 });
 
-// Iniciamos mostrando el primer paso
+document.getElementById('cancelarBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (confirm('¿Está seguro que desea cancelar? Se perderán los cambios no guardados.')) {
+        window.location.href = '/';
+    }
+});
+
+['paso1Btn', 'paso2Btn', 'paso3Btn'].forEach((id, index) => {
+    document.getElementById(id)?.addEventListener('click', () => mostrarPaso(index + 1));
+});
+
+document.getElementById('siguiente1')?.addEventListener('click', () => {
+    recolectarDatosPaso(1);
+    mostrarPaso(2);
+});
+
+document.getElementById('anterior2')?.addEventListener('click', () => mostrarPaso(1));
+
+document.getElementById('siguiente2')?.addEventListener('click', () => {
+    recolectarDatosPaso(2);
+    mostrarPaso(3);
+});
+
+document.getElementById('anterior3')?.addEventListener('click', () => mostrarPaso(2));
+
+document.getElementById('guardar')?.addEventListener('click', (e) => guardarConsulta(e));
+
+document.addEventListener('DOMContentLoaded', () => {
+    cargarDatosCita();
+});
+
+// Inicializar mostrando el primer paso
 mostrarPaso(1);
 </script>
