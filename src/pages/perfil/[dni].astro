@@ -1,7 +1,9 @@
 ---
 import LayoutCommon from "../../app/LayoutCommon.astro";
 import LayoutProtected from "../../app/LayoutProtected.astro";
+import Atenciones from "../../components/Atenciones.astro";
 import Dental from "../../components/Dental.astro";
+import Prestaciones from "../../components/Prestaciones.astro";
 
 const { dni } = Astro.params;
 ---
@@ -39,6 +41,15 @@ const { dni } = Astro.params;
         <div class="mt-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-6 sm:p-6">
           <Dental dni={dni} />
         </div>
+
+        <div class="mt-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-6 sm:p-6">
+          <Prestaciones dni={dni} />
+        </div>
+
+        <div class="mt-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-6 sm:p-6">
+          <Atenciones dni={dni} />
+        </div>
+        
       </div>
     </div>
   </LayoutCommon>

@@ -1,0 +1,568 @@
+---
+interface Props {
+  dni: string;
+}
+
+const { dni } = Astro.props;
+console.log('DNI recibido en el componente:', dni);
+
+---
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">
+      Prestaciones
+    </h2>
+    <button
+      id="nuevaPrestacionBtn"
+      class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+    >
+      Nueva Prestación
+    </button>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+    <table class="w-full table-auto border-collapse">
+      <thead>
+        <tr class="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+          <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Descripción</th>
+          <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Precio</th>
+          <th class="px-4 py-2 text-center text-gray-700 dark:text-gray-200">Estado de Pago</th>
+          <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="prestacionesTableBody" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+      <tfoot>
+        <tr class="border-t-2 border-gray-200 font-semibold dark:border-gray-700">
+          <td class="px-4 py-2 text-right text-gray-700 dark:text-gray-200" colspan="3">Total Adeudado:</td>
+          <td id="totalAdeudado" class="px-4 py-2 text-right text-red-600 dark:text-red-400"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+    </ColapsoButton>
+
+  <!-- Modal Nueva Prestación -->
+  <div
+    id="prestacionModal"
+    class="fixed left-0 top-0 z-50 hidden h-full w-full bg-black bg-opacity-50"
+  >
+    <div class="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+      <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Nueva Prestación</h3>
+      <form id="prestacionForm" class="space-y-4">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Descripción</label>
+          <input
+            type="text"
+            name="descripcion"
+            required
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Precio</label>
+          <input
+            type="number"
+            name="precio"
+            required
+            min="0"
+            step="0.01"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
+          />
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button
+            type="button"
+            id="cancelarBtn"
+            class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Editar Prestación -->
+  <div
+    id="editarPrestacionModal"
+    class="fixed left-0 top-0 z-50 hidden h-full w-full bg-black bg-opacity-50"
+  >
+    <div class="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+      <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Editar Prestación</h3>
+      <form id="editarPrestacionForm" class="space-y-4">
+        <input type="hidden" name="prestacionId" />
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Descripción</label>
+          <input
+            type="text"
+            name="descripcion"
+            required
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Precio</label>
+          <input
+            type="number"
+            name="precio"
+            required
+            min="0"
+            step="0.01"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
+          />
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button
+            type="button"
+            id="cancelarEditarBtn"
+            class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+          >
+            Actualizar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ dni }}>
+const BASE_URL = "https://odontoback-production.up.railway.app/api";
+
+async function obtenerPacientePorDni() {
+  try {
+    console.log('Buscando paciente con DNI:', dni);
+    const response = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log('Respuesta del servidor:', data);
+    
+    if (!data || !data.paciente) {
+      throw new Error('No se encontraron datos del paciente');
+    }
+    
+    return data.paciente;
+  } catch (error) {
+    console.error('Error al obtener paciente:', error);
+    throw error;
+  }
+}
+
+async function obtenerPrestaciones(pacienteId) {
+  try {
+    console.log('Obteniendo prestaciones para pacienteId:', pacienteId);
+    const response = await fetch(`${BASE_URL}/prestaciones/paciente/${pacienteId}`);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al obtener prestaciones');
+    }
+
+    const data = await response.json();
+    console.log('Respuesta completa de prestaciones:', data);
+    return Array.isArray(data) ? data : (data.prestaciones || []);
+  } catch (error) {
+    console.error('Error en obtenerPrestaciones:', error);
+    return [];
+  }
+}
+
+async function crearPrestacion(data) {
+  try {
+    console.log('Enviando datos al servidor:', data);
+    const response = await fetch(`${BASE_URL}/prestaciones`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const responseText = await response.text();
+    console.log('Respuesta del servidor (texto):', responseText);
+
+    if (!response.ok) {
+      console.log('Estado de la respuesta:', response.status);
+      console.log('Headers:', Object.fromEntries([...response.headers]));
+      throw new Error(`Error del servidor: ${response.status} - ${responseText}`);
+    }
+
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (e) {
+      throw new Error(`Error al parsear la respuesta: ${responseText}`);
+    }
+
+    console.log('Respuesta del servidor (parseada):', result);
+    return result;
+  } catch (error) {
+    console.error('Error detallado en crearPrestacion:', error);
+    throw error;
+  }
+}
+
+async function actualizarPrestacion(id, data) {
+  try {
+    const response = await fetch(`${BASE_URL}/prestaciones/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al actualizar la prestación');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al actualizar prestación:', error);
+    throw error;
+  }
+}
+
+async function eliminarPrestacion(id) {
+  try {
+    const response = await fetch(`${BASE_URL}/prestaciones/${id}`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al eliminar la prestación');
+    }
+  } catch (error) {
+    console.error('Error al eliminar prestación:', error);
+    throw error;
+  }
+}
+
+function calcularTotalAdeudado(prestaciones) {
+  return prestaciones
+    .filter(p => !p.pagado)
+    .reduce((total, p) => total + p.precio, 0);
+}
+
+function renderizarPrestaciones(prestaciones) {
+  const tbody = document.getElementById('prestacionesTableBody');
+  tbody.innerHTML = prestaciones.map(p => `
+    <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700" data-id="${p._id}">
+      <td class="px-4 py-2 text-gray-900 dark:text-gray-200">${p.descripcion}</td>
+      <td class="px-4 py-2 text-right text-gray-900 dark:text-gray-200">${p.precio.toFixed(2)}</td>
+      <td class="px-4 py-2 text-center">
+        <input 
+          type="checkbox" 
+          ${p.pagado ? 'checked' : ''} 
+          class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800"
+          onchange="togglePago('${p._id}', this.checked)"
+        />
+      </td>
+      <td class="px-4 py-2 text-right">
+        <div class="flex justify-end space-x-2">
+          <button 
+            onclick="editarPrestacionHandler('${p._id}')"
+            class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button 
+            onclick="eliminarPrestacionHandler('${p._id}')"
+            class="p-2 text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  
+  const total = calcularTotalAdeudado(prestaciones);
+  document.getElementById('totalAdeudado').textContent = `${total.toFixed(2)}`;
+}
+
+function mostrarNotificacion(mensaje, tipo = 'success') {
+  const notificacionExistente = document.querySelector('.notificacion');
+  if (notificacionExistente) {
+    notificacionExistente.remove();
+  }
+
+  const notificacion = document.createElement('div');
+  notificacion.className = `notificacion fixed right-4 top-4 z-50 rounded-lg p-4 shadow-lg transition-opacity duration-300 ${
+    tipo === 'success' 
+      ? 'bg-green-500 dark:bg-green-600' 
+      : 'bg-red-500 dark:bg-red-600'
+  } text-white`;
+  notificacion.textContent = mensaje;
+
+  document.body.appendChild(notificacion);
+
+  setTimeout(() => {
+    notificacion.style.opacity = '0';
+    setTimeout(() => notificacion.remove(), 300);
+  }, 3000);
+}
+
+async function cargarPrestaciones() {
+  try {
+    if (!dni) {
+      throw new Error('DNI no proporcionado');
+    }
+
+    const paciente = await obtenerPacientePorDni();
+    console.log('Paciente encontrado:', paciente);
+
+    const pacienteId = paciente._id || paciente.id;
+    
+    if (!pacienteId) {
+      throw new Error('No se pudo obtener el ID del paciente');
+    }
+
+    console.log('ID del paciente:', pacienteId);
+
+    const response = await obtenerPrestaciones(pacienteId);
+    console.log('Prestaciones obtenidas:', response);
+
+    const prestaciones = Array.isArray(response) ? response : [];
+    renderizarPrestaciones(prestaciones);
+  } catch (error) {
+    console.error('Error al cargar prestaciones:', error);
+    document.getElementById('prestacionesTableBody').innerHTML = `
+      <tr>
+        <td colspan="4" class="px-4 py-2 text-center text-red-600 dark:text-red-400">
+          Error al cargar los datos: ${error.message}
+        </td>
+      </tr>
+    `;
+  }
+}
+
+// Event Handlers
+window.togglePago = async function(id, pagado) {
+  try {
+    await actualizarPrestacion(id, { pagado });
+    mostrarNotificacion(
+      pagado ? 'Prestación marcada como pagada' : 'Prestación marcada como no pagada', 
+      'success'
+    );
+    await cargarPrestaciones();
+  } catch (error) {
+    console.error('Error al actualizar pago:', error);
+    mostrarNotificacion('Error al actualizar el estado de pago', 'error');
+  }
+};
+
+window.eliminarPrestacionHandler = async function(id) {
+  if (confirm('¿Está seguro de eliminar esta prestación?')) {
+    try {
+      await eliminarPrestacion(id);
+      mostrarNotificacion('Prestación eliminada correctamente', 'success');
+      await cargarPrestaciones();
+    } catch (error) {
+      console.error('Error al eliminar prestación:', error);
+      mostrarNotificacion('Error al eliminar la prestación', 'error');
+    }
+  }
+};
+
+window.editarPrestacionHandler = async function(id) {
+  try {
+    // Obtener el paciente y verificar su ID
+    const paciente = await obtenerPacientePorDni();
+    if (!paciente || (!paciente._id && !paciente.id)) {
+      throw new Error('No se pudo obtener el ID del paciente');
+    }
+
+    // Asegurarnos de usar el ID correcto del paciente
+    const pacienteId = paciente._id || paciente.id;
+    console.log('ID del paciente para obtener prestaciones:', pacienteId);
+
+    // Obtener las prestaciones con el ID del paciente
+    const prestaciones = await obtenerPrestaciones(pacienteId);
+    console.log('Prestaciones obtenidas:', prestaciones);
+
+    // Buscar la prestación específica
+    const prestacion = prestaciones.find(p => p._id === id);
+    console.log('Prestación encontrada:', prestacion);
+
+    if (!prestacion) {
+      throw new Error('No se encontró la prestación');
+    }
+
+    // Obtener referencias a los elementos del formulario
+    const modal = document.getElementById('editarPrestacionModal');
+    const form = document.getElementById('editarPrestacionForm');
+    
+    // Rellenar el formulario con los datos actuales
+    const prestacionIdInput = form.querySelector('input[name="prestacionId"]');
+    const descripcionInput = form.querySelector('input[name="descripcion"]');
+    const precioInput = form.querySelector('input[name="precio"]');
+
+    if (!prestacionIdInput || !descripcionInput || !precioInput) {
+      throw new Error('No se encontraron todos los campos del formulario');
+    }
+
+    prestacionIdInput.value = prestacion._id;
+    descripcionInput.value = prestacion.descripcion;
+    precioInput.value = prestacion.precio;
+
+    // Mostrar el modal
+    modal.classList.remove('hidden');
+  } catch (error) {
+    console.error('Error al abrir el modal de edición:', error);
+    mostrarNotificacion(
+      `Error al cargar los datos de la prestación: ${error.message}`, 
+      'error'
+    );
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('prestacionModal');
+  const editarModal = document.getElementById('editarPrestacionModal');
+  const form = document.getElementById('prestacionForm');
+  const editarForm = document.getElementById('editarPrestacionForm');
+
+  // Manejadores para el modal de nueva prestación
+  document.getElementById('nuevaPrestacionBtn').onclick = () => {
+    modal.classList.remove('hidden');
+  };
+
+  document.getElementById('cancelarBtn').onclick = () => {
+    modal.classList.add('hidden');
+    form.reset();
+  };
+
+  // Manejadores para el modal de edición
+  document.getElementById('cancelarEditarBtn').onclick = () => {
+    editarModal.classList.add('hidden');
+    editarForm.reset();
+  };
+
+  // Formulario de nueva prestación
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Guardando...';
+
+    try {
+      const paciente = await obtenerPacientePorDni();
+      const pacienteId = paciente._id || paciente.id;
+      
+      if (!pacienteId) {
+        throw new Error('No se pudo obtener el ID del paciente');
+      }
+
+      const formData = new FormData(form);
+      const prestacionData = {
+        pacienteId: pacienteId,
+        descripcion: formData.get('descripcion'),
+        precio: parseFloat(formData.get('precio')),
+        pagado: false
+      };
+
+      console.log('Intentando crear prestación con datos:', prestacionData);
+      const nuevaPrestacion = await crearPrestacion(prestacionData);
+      console.log('Prestación creada:', nuevaPrestacion);
+      
+      await cargarPrestaciones();
+      modal.classList.add('hidden');
+      form.reset();
+      
+      mostrarNotificacion('Prestación creada exitosamente', 'success');
+    } catch (error) {
+      console.error('Error completo al crear prestación:', error);
+      mostrarNotificacion(
+        'Error al crear la prestación: ' + (error.message || 'Error desconocido'),
+        'error'
+      );
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    }
+  };
+
+  // Formulario de edición
+  editarForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const submitButton = editarForm.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Actualizando...';
+
+    try {
+      const formData = new FormData(editarForm);
+      const prestacionId = formData.get('prestacionId');
+      const prestacionData = {
+        descripcion: formData.get('descripcion'),
+        precio: parseFloat(formData.get('precio'))
+      };
+
+      await actualizarPrestacion(prestacionId, prestacionData);
+      await cargarPrestaciones();
+      editarModal.classList.add('hidden');
+      editarForm.reset();
+      
+      mostrarNotificacion('Prestación actualizada exitosamente', 'success');
+    } catch (error) {
+      console.error('Error al actualizar prestación:', error);
+      mostrarNotificacion(
+        'Error al actualizar la prestación: ' + (error.message || 'Error desconocido'),
+        'error'
+      );
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    }
+  };
+
+  // Cerrar modales al hacer clic fuera
+  window.onclick = (e) => {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      form.reset();
+    }
+    if (e.target === editarModal) {
+      editarModal.classList.add('hidden');
+      editarForm.reset();
+    }
+  };
+
+  // Cerrar modales con Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      modal.classList.add('hidden');
+      editarModal.classList.add('hidden');
+      form.reset();
+      editarForm.reset();
+    }
+  });
+
+  cargarPrestaciones();
+});
+
+document.addEventListener('astro:page-load', cargarPrestaciones);
+</script>
