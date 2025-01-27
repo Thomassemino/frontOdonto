@@ -66,16 +66,16 @@ import LayoutProtected from "../app/LayoutProtected.astro";
           <table
             class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
           >
-          <thead class="bg-gray-50 dark:bg-gray-700">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">DNI</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Nombre Completo</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Email</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Número de Celular</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Perfil</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Acciones</th>
-            </tr>
-          </thead>
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">DNI</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Nombre Completo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Email</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Número de Celular</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Perfil</th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Acciones</th>
+              </tr>
+            </thead>
             <tbody
               id="pacientesTableBodyDesktop"
               class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800"
@@ -308,7 +308,8 @@ import LayoutProtected from "../app/LayoutProtected.astro";
           <div class="flex justify-end space-x-4 pt-4">
             <button
               type="button"
-              class="close-create-modal px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200"
+              class="close-create-modal px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-700
+              dark:text-gray-300 dark:hover:text-gray-200"
             >
               Cancelar
             </button>
@@ -320,210 +321,6 @@ import LayoutProtected from "../app/LayoutProtected.astro";
             </button>
           </div>
         </form>
-      </div>
-    </div>
-
-    <div
-      id="historiaClinicaModal"
-      class="fixed inset-0 flex items-center justify-center z-50 hidden"
-    >
-      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-      <div
-        class="relative bg-slate-50 dark:bg-slate-800 rounded-xl shadow-2xl p-4 sm:p-6 md:p-8 w-[95%] sm:w-[85%] md:w-3/4 max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-slate-700 mx-4"
-      >
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Historia Clínica
-          </h2>
-          <button
-            class="close-hc-modal p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-          >
-            <div class="flex items-center justify-center w-full h-full">
-              <svg
-                class="w-6 h-6 text-slate-600 dark:text-slate-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </div>
-          </button>
-        </div>
-
-        <div id="historiaClinicaContent" class="space-y-8">
-          <div
-            class="bg-white dark:bg-slate-900 rounded-lg p-6 shadow-sm border border-slate-200 dark:border-slate-700"
-          >
-            <h3
-              class="text-xl font-semibold mb-4 text-slate-900 dark:text-slate-100"
-            >
-              Datos Personales Médicos
-            </h3>
-            <div
-              class="grid grid-cols-2 gap-6 text-slate-700 dark:text-slate-300"
-            >
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Enfermedades:</span
-                >
-                <span id="hc-enfermedades"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Tratamiento Actual:</span
-                >
-                <span id="hc-tratamientoActual"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Medicamentos:</span
-                >
-                <span id="hc-medicamentos"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Enfermedad Infecto-Infecciosa:</span
-                >
-                <span id="hc-enfInfectoInfecciosa"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Fuma:</span
-                >
-                <span id="hc-fuma"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Embarazo:</span
-                >
-                <span id="hc-embarazo"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Alergias:</span
-                >
-                <span id="hc-alergias"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Diabetes:</span
-                >
-                <span id="hc-diabetes"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Motivo de Consulta:</span
-                >
-                <span id="hc-motivoConsulta"></span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="bg-white dark:bg-slate-900 rounded-lg p-6 shadow-sm border border-slate-200 dark:border-slate-700"
-          >
-            <h3
-              class="text-xl font-semibold mb-4 text-slate-900 dark:text-slate-100"
-            >
-              Antecedentes Médicos Odontológicos
-            </h3>
-            <div
-              class="grid grid-cols-2 gap-6 text-slate-700 dark:text-slate-300"
-            >
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Consultó Odontólogo:</span
-                >
-                <span id="hc-consultoOdontologo"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Tratamiento Odontológico:</span
-                >
-                <span id="hc-tratamientoOdontologico"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Dolor:</span
-                >
-                <span id="hc-dolor"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Fractura de Diente:</span
-                >
-                <span id="hc-fracturaDiente"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Dificultad para Masticar:</span
-                >
-                <span id="hc-dificultadMasticar"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Dificultad para Abrir la Boca:</span
-                >
-                <span id="hc-dificultadAbrirBoca"></span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="bg-white dark:bg-slate-900 rounded-lg p-6 shadow-sm border border-slate-200 dark:border-slate-700"
-          >
-            <h3
-              class="text-xl font-semibold mb-4 text-slate-900 dark:text-slate-100"
-            >
-              Estado Actual
-            </h3>
-            <div
-              class="grid grid-cols-2 gap-6 text-slate-700 dark:text-slate-300"
-            >
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Anormalidad en Boca:</span
-                >
-                <span id="hc-anormalidadBoca"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Sangrado de Encías:</span
-                >
-                <span id="hc-sangradoEncias"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Hinchazón en la Cara:</span
-                >
-                <span id="hc-hinchazonCara"></span>
-              </div>
-              <div>
-                <span class="font-medium text-slate-900 dark:text-slate-100"
-                  >Higiene Bucal:</span
-                >
-                <span id="hc-higieneBucal"></span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="bg-white dark:bg-slate-900 rounded-lg p-6 shadow-sm border border-slate-200 dark:border-slate-700"
-          >
-            <h3
-              class="text-xl font-semibold mb-4 text-slate-900 dark:text-slate-100"
-            >
-              Aclaraciones Finales del Médico
-            </h3>
-            <p id="hc-aclaraciones" class="text-slate-700 dark:text-slate-300">
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   </LayoutCommon>
@@ -754,142 +551,6 @@ import LayoutProtected from "../app/LayoutProtected.astro";
     setupEventListeners();
   }
 
-  // Historia Clínica
-  window.mostrarHistoriaClinica = async function (historiaClinicaId) {
-    try {
-      const hcResponse = await fetch(
-        `${BASE_URL}/historiaClinica/getHc/${historiaClinicaId}`
-      );
-      if (!hcResponse.ok) {
-        throw new Error("Error al obtener la historia clínica");
-      }
-
-      const hcData = await hcResponse.json();
-      if (!hcData || !hcData.historiaClinica) {
-        showNotification("No se encontró la historia clínica", "error");
-        return;
-      }
-
-      const hc = hcData.historiaClinica;
-      const formatBoolean = (value) => (value ? "Sí" : "No");
-
-      // Función helper para actualizar campos
-      const updateField = (id, value, defaultValue = "No especificado") => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.textContent = value ?? defaultValue;
-        }
-      };
-
-      // Actualizar datos personales médicos
-      updateField("hc-enfermedades", hc.datosPersonalesMedicos?.enfermedades);
-      updateField(
-        "hc-tratamientoActual",
-        hc.datosPersonalesMedicos?.tratamientoActual
-      );
-      updateField(
-        "hc-medicamentos",
-        hc.datosPersonalesMedicos?.medicamentosRegulares
-      );
-      updateField(
-        "hc-enfInfectoInfecciosa",
-        hc.datosPersonalesMedicos?.enfermedadInfectoInfecciosa
-      );
-      updateField("hc-fuma", formatBoolean(hc.datosPersonalesMedicos?.fuma));
-      updateField(
-        "hc-embarazo",
-        formatBoolean(hc.datosPersonalesMedicos?.embarazo)
-      );
-      updateField("hc-alergias", hc.datosPersonalesMedicos?.alergias);
-      updateField(
-        "hc-diabetes",
-        formatBoolean(hc.datosPersonalesMedicos?.diabetes)
-      );
-      updateField(
-        "hc-motivoConsulta",
-        hc.datosPersonalesMedicos?.motivoConsulta
-      );
-
-      // Actualizar antecedentes
-      updateField(
-        "hc-consultoOdontologo",
-        formatBoolean(hc.antecedentesMedicosOdontologicos?.consultoOdontologo)
-      );
-      updateField(
-        "hc-tratamientoOdontologico",
-        hc.antecedentesMedicosOdontologicos?.tratamientoOdontologico
-          ?.descripcion
-      );
-      updateField(
-        "hc-dolor",
-        formatearDolor(hc.antecedentesMedicosOdontologicos?.dolor)
-      );
-      updateField(
-        "hc-fracturaDiente",
-        hc.antecedentesMedicosOdontologicos?.fracturaDiente
-      );
-      updateField(
-        "hc-dificultadMasticar",
-        formatBoolean(hc.antecedentesMedicosOdontologicos?.dificultadMasticar)
-      );
-      updateField(
-        "hc-dificultadAbrirBoca",
-        formatBoolean(hc.antecedentesMedicosOdontologicos?.dificultadAbrirBoca)
-      );
-
-      // Actualizar estado actual
-      updateField("hc-anormalidadBoca", hc.estadoActual?.anormalidadBoca);
-      updateField(
-        "hc-sangradoEncias",
-        formatBoolean(hc.estadoActual?.sangradoEncias)
-      );
-      updateField(
-        "hc-hinchazonCara",
-        formatBoolean(hc.estadoActual?.hinchazonCara)
-      );
-      updateField("hc-higieneBucal", hc.estadoActual?.higieneBucal);
-      updateField("hc-aclaraciones", hc.aclaracionesFinalesMedico);
-
-      document
-        .getElementById("historiaClinicaModal")
-        .classList.remove("hidden");
-    } catch (error) {
-      console.error("Error completo:", error);
-      showNotification("Error al cargar la historia clínica", "error");
-    }
-  };
-
-  // Utilidades
-  const formatearDolor = (dolorStr) => {
-    try {
-      const dolor = JSON.parse(dolorStr);
-      const parts = [];
-
-      if (dolor.rango) parts.push(`Intensidad: ${dolor.rango}`);
-      if (dolor.tipo) parts.push(`Tipo: ${dolor.tipo}`);
-
-      if (dolor.caracteristicas && dolor.caracteristicas.length > 0) {
-        parts.push(`Características: ${dolor.caracteristicas.join(", ")}`);
-      }
-
-      if (dolor.sensibilidad && dolor.sensibilidad.length > 0) {
-        parts.push(`Sensibilidad: ${dolor.sensibilidad.join(", ")}`);
-      }
-
-      if (dolor.localizacion) {
-        const localizacion = dolor.localizacion
-          .replace(/([A-Z])/g, " $1")
-          .toLowerCase()
-          .replace(/^./, (str) => str.toUpperCase());
-        parts.push(`Localización: ${localizacion}`);
-      }
-
-      return parts.join(". ");
-    } catch (e) {
-      return dolorStr || "No especificado";
-    }
-  };
-
   // Manejadores de Modales
   const openEditModal = async (patient) => {
     state.modals.edit.selectedPatient = {
@@ -949,7 +610,7 @@ import LayoutProtected from "../app/LayoutProtected.astro";
       direccion: "",
       obraSocial: "No especificada",
       ultCons: new Date(),
-      tratamientoMedico: "No",
+      tratamientoMedico : "No",
       tomaMedicamentos: "No",
       alergias: "",
       embarazada: false,
@@ -1123,7 +784,6 @@ import LayoutProtected from "../app/LayoutProtected.astro";
     document.addEventListener("click", (e) => {
       // Use closest() to find the nearest matching element, even if you clicked inside the button
       const closeCreateModalButton = e.target.closest(".close-create-modal");
-      const closeHcModalButton = e.target.closest(".close-hc-modal");
 
       if (closeCreateModalButton) {
         if (closeCreateModalButton.closest("#editModal")) {
@@ -1133,21 +793,12 @@ import LayoutProtected from "../app/LayoutProtected.astro";
           closeCreateModal();
         }
       }
-
-      if (closeHcModalButton) {
-        document
-          .getElementById("historiaClinicaModal")
-          ?.classList.add("hidden");
-      }
     });
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeEditModal();
         closeCreateModal();
-        document
-          .getElementById("historiaClinicaModal")
-          ?.classList.add("hidden");
       }
     });
 

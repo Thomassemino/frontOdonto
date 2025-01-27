@@ -48,18 +48,7 @@ const { dni } = Astro.props;
       <form id="atencionForm" class="space-y-4">
         <input type="hidden" id="pacienteId" />
         
-        <!-- Campo de paciente (autocompletado) -->
-        <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-            Paciente
-          </label>
-          <input
-            type="text"
-            id="pacienteNombre"
-            readonly
-            class="w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-          />
-        </div>
+
 
         <!-- Selector de profesional -->
         <div>
@@ -196,16 +185,20 @@ const { dni } = Astro.props;
     console.log('Script iniciado con DNI:', dni);
     
     function formatFecha(fechaStr) {
-      const fecha = new Date(fechaStr);
-      return fecha.toLocaleString('es-AR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
-    
+  const fecha = new Date(fechaStr);
+  
+  // Sumar 3 horas para ajustar a hora local de Argentina
+  fecha.setHours(fecha.getHours() + 3);
+
+  return fecha.toLocaleString('es-AR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
     function showNotification(message, type = 'success') {
       console.log(`Mostrando notificación: ${message} (${type})`);
       const notification = document.getElementById('notification');
@@ -246,8 +239,6 @@ const { dni } = Astro.props;
     // Establecer datos del paciente en el formulario
     const pacienteId = paciente._id || paciente.id; // Aceptamos ambos formatos de ID
     document.getElementById('pacienteId').value = pacienteId;
-    document.getElementById('pacienteNombre').value = paciente.nombre;
-    console.log('Datos del paciente establecidos en el formulario:', { pacienteId, nombre: paciente.nombre });
 
     // Cargar lista de médicos
     console.log('Cargando lista de médicos...');
@@ -291,73 +282,71 @@ const { dni } = Astro.props;
   }
 }
     
-    async function cargarAtenciones(pacienteId) {
-      try {
-        console.log('Cargando atenciones para pacienteId:', pacienteId);
-        const response = await fetch(`${BASE_URL}/atenciones/todas/${pacienteId}`);
-        console.log('Respuesta del servidor (atenciones):', response);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error en respuesta de atenciones:', errorText);
-          throw new Error('Error al cargar atenciones');
-        }
-        
-        const atenciones = await response.json();
-        console.log('Atenciones recibidas:', atenciones);
-        
-        const tableBody = document.getElementById('atencionesTableBody');
-        if (!tableBody) {
-          console.error('No se encontró el elemento tableBody en el DOM');
-          throw new Error('Error en la interfaz de usuario');
-        }
+async function cargarAtenciones(pacienteId) {
+  try {
+    console.log('Cargando atenciones para pacienteId:', pacienteId);
+    const response = await fetch(`${BASE_URL}/atenciones/todas/${pacienteId}`);
+    console.log('Respuesta del servidor (atenciones):', response);
     
-        if (!Array.isArray(atenciones)) {
-          console.error('La respuesta de atenciones no es un array:', atenciones);
-          throw new Error('Formato de respuesta inválido');
-        }
-    
-        tableBody.innerHTML = atenciones.map(atencion => {
-          console.log('Procesando atención para mostrar:', atencion);
-          return `
-            <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-              <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${formatFecha(atencion.fecha)}</td>
-              <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.profesional}</td>
-              <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.notaDelDia}</td>
-              <td class="px-4 py-2 text-right">
-                <div class="flex justify-end space-x-2">
-                  <button 
-                    onclick="editarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
-                    class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
-                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                    </svg>
-                  </button>
-                  <button 
-                    onclick="eliminarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
-                    class="p-2 text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
-                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 6h18"/>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-                      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-        console.log('Tabla de atenciones actualizada');
-      } catch (error) {
-        console.error('Error en cargarAtenciones:', error);
-        showNotification(error.message, 'error');
-      }
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error en respuesta de atenciones:', errorText);
+      throw new Error('Error al cargar atenciones');
     }
+    
+    const atenciones = await response.json();
+    console.log('Atenciones recibidas:', atenciones);
+    
+    const tableBody = document.getElementById('atencionesTableBody');
+    if (!tableBody) {
+      console.error('No se encontró el elemento tableBody en el DOM');
+      throw new Error('Error en la interfaz de usuario');
+    }
+
+    // Ordenar atenciones de más antigua a más nueva
+    const atencionesOrdenadas = atenciones.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+    tableBody.innerHTML = atencionesOrdenadas.map(atencion => {
+      console.log('Procesando atención para mostrar:', atencion);
+      return `
+        <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+          <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${formatFecha(atencion.fecha)}</td>
+          <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.profesional}</td>
+          <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.notaDelDia}</td>
+          <td class="px-4 py-2 text-right">
+            <div class="flex justify-end space-x-2">
+              <button 
+                onclick="editarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
+                class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button 
+                onclick="eliminarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
+                class="p-2 text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+    console.log('Tabla de atenciones actualizada');
+  } catch (error) {
+    console.error('Error en cargarAtenciones:', error);
+    showNotification(error.message, 'error');
+  }
+}
     
     // Event Handlers
     window.editarAtencionHandler = async function(pacienteId, fecha) {
@@ -416,16 +405,18 @@ const { dni } = Astro.props;
     };
     
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('Inicializando componente de atenciones...');
-      const modal = document.getElementById('atencionModal');
-      const editarModal = document.getElementById('editarAtencionModal');
-      const form = document.getElementById('atencionForm');
-      const editarForm = document.getElementById('editarAtencionForm');
-    
-      if (!modal || !editarModal || !form || !editarForm) {
-        console.error('No se encontraron elementos necesarios en el DOM');
-        return;
-      }
+  console.log('Inicializando componente de atenciones...');
+  const modal = document.getElementById('atencionModal');
+  const editarModal = document.getElementById('editarAtencionModal');
+  const form = document.getElementById('atencionForm');
+  const editarForm = document.getElementById('editarAtencionForm');
+  const cancelarBtn = document.getElementById('cancelarBtn');
+  const cancelarEditarBtn = document.getElementById('cancelarEditarBtn');
+
+  if (!modal || !editarModal || !form || !editarForm || !cancelarBtn || !cancelarEditarBtn) {
+    console.error('No se encontraron elementos necesarios en el DOM');
+    return;
+  }
     
       // Manejadores para el modal de nueva atención
       document.getElementById('nuevaAtencionBtn').onclick = () => {
@@ -441,10 +432,10 @@ const { dni } = Astro.props;
     
       // Manejadores para el modal de edición
       document.getElementById('cancelarEditarBtn').onclick = () => {
-        console.log('Cerrando modal de edición');
-        editarModal.classList.add('hidden');
-        editarForm.reset();
-      };
+  console.log('Cerrando modal de edición');
+  editarModal.classList.add('hidden');
+  editarForm.reset();
+};
     
       // Formulario de nueva atención
       form.onsubmit = async (e) => {

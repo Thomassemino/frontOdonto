@@ -120,45 +120,19 @@ function renderizarHistoriaClinica(hc) {
   container.innerHTML = `
     <div class="space-y-6">
       <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
-        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Datos Personales Médicos</h3>
+        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Historia Clínica</h3>
         <div class="grid gap-4 sm:grid-cols-2">
-          ${renderizarCampo('Enfermedades', hc.datosPersonalesMedicos?.enfermedades)}
-          ${renderizarCampo('Tratamiento Actual', hc.datosPersonalesMedicos?.tratamientoActual)}
-          ${renderizarCampo('Medicamentos', hc.datosPersonalesMedicos?.medicamentosRegulares)}
-          ${renderizarCampo('Enfermedad Infecto-Infecciosa', hc.datosPersonalesMedicos?.enfermedadInfectoInfecciosa)}
-          ${renderizarCampo('Alergias', hc.datosPersonalesMedicos?.alergias)}
-          ${renderizarCampo('Diabetes', hc.datosPersonalesMedicos?.diabetes ? 'Sí' : 'No')}
-          ${renderizarCampo('Fuma', hc.datosPersonalesMedicos?.fuma ? 'Sí' : 'No')}
-          ${renderizarCampo('Embarazo', hc.datosPersonalesMedicos?.embarazo ? 'Sí' : 'No')}
-          ${renderizarCampo('Motivo de Consulta', hc.datosPersonalesMedicos?.motivoConsulta)}
+          ${renderizarCampo('Alergias', hc.alergia)}
+          ${renderizarCampo('Padece Enfermedad', hc.padeceEnfermedad)}
+          ${renderizarCampo('Paciente Cardíaco', hc.esPacienteCardiaco ? 'Sí' : 'No')}
+          ${renderizarCampo('Medicación', hc.tomaMedicacion)}
+          ${renderizarCampo('Estado Actual de la Boca', hc.estadoActualBoca)}
         </div>
       </section>
 
       <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
-        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Antecedentes Médicos Odontológicos</h3>
-        <div class="grid gap-4 sm:grid-cols-2">
-          ${renderizarCampo('Consultó Odontólogo', hc.antecedentesMedicosOdontologicos?.consultoOdontologo ? 'Sí' : 'No')}
-          ${renderizarCampo('Tratamiento Odontológico', hc.antecedentesMedicosOdontologicos?.tratamientoOdontologico?.descripcion)}
-          ${renderizarCampo('Dolor', formatearDolor(hc.antecedentesMedicosOdontologicos?.dolor))}
-          ${renderizarCampo('Fractura de Diente', hc.antecedentesMedicosOdontologicos?.fracturaDiente)}
-          ${renderizarCampo('Dificultad para Masticar', hc.antecedentesMedicosOdontologicos?.dificultadMasticar ? 'Sí' : 'No')}
-          ${renderizarCampo('Dificultad para Abrir la Boca', hc.antecedentesMedicosOdontologicos?.dificultadAbrirBoca ? 'Sí' : 'No')}
-        </div>
-      </section>
-
-      <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
-        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Estado Actual</h3>
-        <div class="grid gap-4 sm:grid-cols-2">
-          ${renderizarCampo('Anormalidad en Boca', hc.estadoActual?.anormalidadBoca)}
-          ${renderizarCampo('Sangrado de Encías', hc.estadoActual?.sangradoEncias ? 'Sí' : 'No')}
-          ${renderizarCampo('Hinchazón en la Cara', hc.estadoActual?.hinchazonCara ? 'Sí' : 'No')}
-          ${renderizarCampo('Higiene Bucal', hc.estadoActual?.higieneBucal)}
-        </div>
-      </section>
-
-      <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
-        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Aclaraciones Finales del Médico</h3>
-        <p class="text-gray-700 dark:text-gray-300">${hc.aclaracionesFinalesMedico || 'Sin aclaraciones'}</p>
+        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Anotaciones del Médico</h3>
+        <p class="text-gray-700 dark:text-gray-300">${hc.anotacionesMedico || 'Sin anotaciones'}</p>
       </section>
     </div>
   `;
