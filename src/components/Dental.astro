@@ -4,6 +4,11 @@ const TEETH = {
   inferior: [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]
 };
 
+const PRIMARY_TEETH = {
+  superior: ['55','54','53','52','51','61','62','63','64','65'],
+  inferior: ['85','84','83','82','81','71','72','73','74','75']
+};
+
 const TREATMENTS = {
   "Caries": { icon: "🔵" },
   "Arreglo": { icon: "🔴" },
@@ -23,9 +28,10 @@ const { dni } = Astro.props;
 const BASE_URL = "https://odontoback-production.up.railway.app/api";
 ---
 
-<div class="max-w-full mx-auto bg-gray-800">
-  <div class="bg-gray-800">
-    <h2 class="text-xl font-bold text-white mb-6">Odontograma Digital</h2>
+<div class="max-w-full mx-auto bg-gray-800 p-6">
+  <!-- Adult Odontogram -->
+  <div class="bg-gray-800 mb-12">
+    <h2 class="text-xl font-bold text-white mb-6">Odontograma Digital Adulto</h2>
 
     <!-- Treatment Legend -->
     <div class="flex flex-wrap gap-4 mb-8 p-4 bg-gray-700 rounded-lg">
@@ -37,8 +43,6 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
         </div>
       ))}
     </div>
-
-  </ColapsoButton>
 
     <!-- Superior Teeth -->
     <div class="mb-12">
@@ -93,8 +97,80 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
         ))}
       </div>
     </div>
+  </div>
 
-    <!-- Control Panel -->
+ <!-- Pediatric Odontogram -->
+<div class="bg-gray-800 mt-12 p-6 rounded-lg border-t-2 border-gray-700">
+  <h2 class="text-xl font-bold text-white mb-6">Odontograma Pediátrico</h2>
+
+  <!-- Superior Primary Teeth -->
+  <div class="mb-12">
+    <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Superior - Dientes Temporales</h3>
+    <div class="grid grid-cols-16 gap-2">
+      <!-- Espaciadores izquierdos -->
+      <div class="col-span-3"></div>
+      
+      {PRIMARY_TEETH.superior.map((tooth) => (
+        <div class="tooth-container group" data-tooth={tooth}>
+          <div class="aspect-square relative transform transition-transform hover:scale-110">
+            <div class="tooth-parts">
+              <div class="absolute inset-[25%] bg-gray-700 border-2 border-gray-500 rounded tooth-part" 
+                   data-surface="central"></div>
+              <div class="absolute top-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
+                   data-surface="superior"></div>
+              <div class="absolute bottom-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
+                   data-surface="inferior"></div>
+              <div class="absolute top-[25%] bottom-[25%] left-0 w-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
+                   data-surface="izquierda"></div>
+              <div class="absolute top-[25%] bottom-[25%] right-0 w-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
+                   data-surface="derecha"></div>
+            </div>
+            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-medium text-gray-300
+                       opacity-0 group-hover:opacity-100 transition-opacity">{tooth}</span>
+          </div>
+        </div>
+      ))}
+      
+      <!-- Espaciadores derechos -->
+      <div class="col-span-3"></div>
+    </div>
+  </div>
+
+  <!-- Inferior Primary Teeth -->
+  <div class="mb-12">
+    <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Inferior - Dientes Temporales</h3>
+    <div class="grid grid-cols-16 gap-2">
+      <!-- Espaciadores izquierdos -->
+      <div class="col-span-3"></div>
+      
+      {PRIMARY_TEETH.inferior.map((tooth) => (
+        <div class="tooth-container group" data-tooth={tooth}>
+          <div class="aspect-square relative transform transition-transform hover:scale-110">
+            <div class="tooth-parts">
+              <div class="absolute inset-[25%] bg-gray-700 border-2 border-gray-500 rounded tooth-part" 
+                   data-surface="central"></div>
+              <div class="absolute top-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
+                   data-surface="superior"></div>
+              <div class="absolute bottom-0 left-[25%] right-[25%] h-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
+                   data-surface="inferior"></div>
+              <div class="absolute top-[25%] bottom-[25%] left-0 w-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
+                   data-surface="izquierda"></div>
+              <div class="absolute top-[25%] bottom-[25%] right-0 w-[25%] bg-gray-700 border-2 border-gray-500 tooth-part" 
+                   data-surface="derecha"></div>
+            </div>
+            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-medium text-gray-300
+                       opacity-0 group-hover:opacity-100 transition-opacity">{tooth}</span>
+          </div>
+        </div>
+      ))}
+      
+      <!-- Espaciadores derechos -->
+      <div class="col-span-3"></div>
+    </div>
+  </div>
+
+  <!-- Control Panel -->
+  <div class="mt-8">
     <div class="grid md:grid-cols-3 gap-4 mb-4">
       <div>
         <label class="block text-sm font-medium text-gray-300 mb-1">Tratamiento</label>
@@ -135,21 +211,20 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
         </button>
       </div>
     </div>
+  </div>
 
-    <!-- Treatment History -->
-    <div class="mt-8">
-      <h3 class="text-lg font-medium text-white mb-4">Historial de Tratamientos</h3>
-      <!-- Search -->
-      <div class="mb-4">
-        <input type="text" 
-          id="search-input" 
-          placeholder="Buscar por número de diente o tratamiento..." 
-          class="w-2/4 rounded-md border-gray-600 bg-gray-700 text-white px-4 py-2"
-        />
-      </div>
-      <div id="treatment-history" class="space-y-2">
-        <!-- Treatments will be added here dynamically -->
-      </div>
+  <!-- Treatment History -->
+  <div class="mt-8">
+    <h3 class="text-lg font-medium text-white mb-4">Historial de Tratamientos</h3>
+    <div class="mb-4">
+      <input type="text" 
+        id="search-input" 
+        placeholder="Buscar por número de diente o tratamiento..." 
+        class="w-2/4 rounded-md border-gray-600 bg-gray-700 text-white px-4 py-2"
+      />
+    </div>
+    <div id="treatment-history" class="space-y-2">
+      <!-- Treatments will be added here dynamically -->
     </div>
   </div>
 </div>
@@ -225,8 +300,9 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
 }
 </style>
 
-<script type="module" define:vars={{ dni, TREATMENTS, BASE_URL }}>
+<script define:vars={{ dni, TREATMENTS, BASE_URL }}>
 let idPacienteDeApi = null;
+let primaryTeethSelected = false;
 
 function cargarTratamientosPendientes() {
   return JSON.parse(localStorage.getItem('tratamientosPendientes') || '[]');
@@ -311,6 +387,10 @@ function seleccionarParteDiente(diente, superficie, elemento) {
   }
 
   const tratamientosPendientes = cargarTratamientosPendientes();
+  
+  // Asegurarse de que diente sea string y verificar si es temporal
+  const numDiente = diente.toString();
+  const isPrimary = ['5','6','7','8'].includes(numDiente.charAt(0));
 
   if (tratamiento === 'Extracción') {
     const elementoDiente = elemento.closest('.tooth-container');
@@ -320,20 +400,22 @@ function seleccionarParteDiente(diente, superficie, elemento) {
     });
 
     tratamientosPendientes.push({
-      numeroDiente: diente,
+      numeroDiente: numDiente,
       superficie: 'completo',
       tratamiento,
-      origen
+      origen,
+      isPrimary
     });
   } else {
     elemento.classList.add('selected');
     actualizarVisualTratamiento(elemento, tratamiento, origen);
     
     tratamientosPendientes.push({
-      numeroDiente: diente,
+      numeroDiente: numDiente,
       superficie,
       tratamiento,
-      origen
+      origen,
+      isPrimary
     });
   }
   
@@ -413,10 +495,15 @@ function agregarTratamientoAlHistorial(diente, fecha, id) {
   registroTratamiento.dataset.fecha = new Date(fecha).getTime();
   registroTratamiento.dataset.searchContent = `${diente.numeroDiente} ${diente.tratamiento}`.toLowerCase();
   
+  // Convertir numeroDiente a string si es necesario y verificar si es temporal
+  const numDiente = diente.numeroDiente.toString();
+  const isPrimary = diente.isPrimary || ['5','6','7','8'].includes(numDiente.charAt(0));
+  const dentitionType = isPrimary ? '(Temporal)' : '(Permanente)';
+  
   registroTratamiento.innerHTML = `
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="font-medium text-white">Diente ${diente.numeroDiente}</span>
+        <span class="font-medium text-white">Diente ${numDiente} ${dentitionType}</span>
         <span class="text-lg">${tratamiento?.icon}</span>
         <span class="${diente.origen === 'propio' ? 'text-red-400' : 'text-blue-400'} text-sm">
           ${diente.origen === 'propio' ? 'Este estudio' : 'Otro estudio'}
@@ -466,12 +553,15 @@ async function guardarTratamiento() {
   try {
     const notas = document.getElementById('notes').value;
     const datosDientes = tratamientosPendientes.map(t => ({
-      numeroDiente: t.numeroDiente,
+      numeroDiente: t.numeroDiente.toString(), // Aseguramos que sea string
       superficie: t.superficie,
       tratamiento: t.tratamiento,
       origen: t.origen,
-      notas
+      notas,
+      isPrimary: t.isPrimary || ['5','6','7','8'].includes(t.numeroDiente.toString().charAt(0))
     }));
+
+    console.log('Datos a enviar:', JSON.stringify(datosDientes, null, 2)); // Para debug
 
     const respuesta = await fetch(`${BASE_URL}/odontograma`, {
       method: 'POST',
@@ -482,7 +572,10 @@ async function guardarTratamiento() {
       })
     });
 
-    if (!respuesta.ok) throw new Error('Error al guardar');
+    if (!respuesta.ok) {
+      const error = await respuesta.text();
+      throw new Error(error || 'Error al guardar');
+    }
     
     const datosGuardados = await respuesta.json();
     
@@ -502,8 +595,8 @@ async function guardarTratamiento() {
     
     mostrarNotificacion('Tratamientos guardados exitosamente', 'success');
   } catch (error) {
-    console.error('Error al guardar tratamientos:', error);
-    mostrarNotificacion('Error al guardar los tratamientos', 'error');
+    console.error('Error detallado:', error);
+    mostrarNotificacion(`Error al guardar los tratamientos: ${error.message}`, 'error');
   } finally {
     botonGuardar.disabled = false;
     botonGuardar.innerHTML = 'Guardar';
@@ -586,7 +679,6 @@ function mostrarNotificacion(mensaje, tipo = 'success') {
     setTimeout(() => notificacion.remove(), 300);
   }, 3000);
 }
-
 
 function buscarTratamientos(query) {
   const contenedorHistorial = document.getElementById('treatment-history');

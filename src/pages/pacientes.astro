@@ -160,7 +160,6 @@ import LayoutProtected from "../app/LayoutProtected.astro";
               <input
                 type="email"
                 name="mail"
-                required
                 placeholder="ejemplo@correo.com"
                 class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
               />
@@ -346,9 +345,11 @@ import LayoutProtected from "../app/LayoutProtected.astro";
 
     if (!patient.nombre.trim()) errors.push("El nombre es requerido");
     if (!dniRegex.test(patient.dni)) errors.push("DNI inválido (8 números)");
-    if (!emailRegex.test(patient.mail)) errors.push("Email inválido");
     if (!phoneRegex.test(patient.telefono))
       errors.push("Teléfono inválido (6 a 14 dígitos)");
+    if (patient.mail && patient.mail.trim() && !emailRegex.test(patient.mail.trim())) {
+      errors.push("Formato de email inválido");
+    }
 
     return errors;
   };
