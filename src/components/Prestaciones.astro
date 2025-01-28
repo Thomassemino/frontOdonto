@@ -1,43 +1,101 @@
 ---
+import ColapsoButton from './ColapsoButton.astro';
+
 interface Props {
   dni: string;
 }
 
 const { dni } = Astro.props;
-console.log('DNI recibido en el componente:', dni);
 ---
 
+<!-- Estructura principal -->
 <div class="space-y-6">
+  <!-- Header con botones principales -->
   <div class="flex items-center justify-between">
     <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">
       Prestaciones
     </h2>
-    <button
-      id="nuevaPrestacionBtn"
-      class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-    >
-      Nueva Prestación
-    </button>
+    <div class="flex space-x-3">
+      <button
+        id="historialBtn"
+        class="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+      >
+        Historial de Prestaciones
+      </button>
+      <button
+        id="agregarPagoBtn"
+        class="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
+      >
+        Agregar Pago
+      </button>
+      <button
+        id="nuevaPrestacionBtn"
+        class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+      >
+        Nueva Prestación
+      </button>
+    </div>
+
   </div>
 
+  <!-- Tabla principal de prestaciones -->
   <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
     <table class="w-full table-auto border-collapse">
       <thead>
         <tr class="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
-          <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Descripción</th>
-          <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Precio</th>
-          <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Pagos Realizados</th>
+          <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Tratamiento</th>
+          <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Precio Total</th>
+          <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Total Pagado</th>
+          <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Saldo Pendiente</th>
+          <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Últimos Pagos</th>
           <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Acciones</th>
         </tr>
       </thead>
       <tbody id="prestacionesTableBody" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
       <tfoot>
         <tr class="border-t-2 border-gray-200 font-semibold dark:border-gray-700">
-          <td class="px-4 py-2 text-right text-gray-700 dark:text-gray-200" colspan="3">Total Adeudado:</td>
+          <td class="px-4 py-2 text-right text-gray-700 dark:text-gray-200" colspan="5">Total Adeudado:</td>
           <td id="totalAdeudado" class="px-4 py-2 text-right"></td>
         </tr>
       </tfoot>
     </table>
+  </div>
+
+  <!-- Modal Historial -->
+  <div
+    id="historialModal"
+    class="fixed left-0 top-0 z-50 hidden h-full w-full overflow-auto bg-black bg-opacity-50"
+  >
+    <div class="absolute left-1/2 top-10 w-full max-w-5xl -translate-x-1/2 rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+      <div class="mb-4 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Historial de Prestaciones</h3>
+        <button
+          id="cerrarHistorialBtn"
+          class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full table-auto border-collapse">
+          <thead>
+            <tr class="border-b border-gray-200 bg-gray-50 text-sm dark:border-gray-700 dark:bg-gray-800">
+              <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Fecha</th>
+              <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Tipo</th>
+              <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Tratamiento</th>
+              <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Monto</th>
+              <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Usuario</th>
+              <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Detalles</th>
+            </tr>
+          </thead>
+          <tbody id="historialTableBody" class="divide-y divide-gray-200 text-sm dark:divide-gray-700">
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- Modal Nueva Prestación -->
@@ -66,8 +124,6 @@ console.log('DNI recibido en el componente:', dni);
             required
             min="0"
             step="0.01"
-            max="999999999999"
-            maxlength="12"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
           />
         </div>
@@ -117,8 +173,6 @@ console.log('DNI recibido en el componente:', dni);
             required
             min="0"
             step="0.01"
-            max="999999999999"
-            maxlength="12"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
           />
         </div>
@@ -141,15 +195,26 @@ console.log('DNI recibido en el componente:', dni);
     </div>
   </div>
 
-  <!-- Modal Registrar Pago -->
+  <!-- Modal Pago -->
   <div
     id="pagoModal"
     class="fixed left-0 top-0 z-50 hidden h-full w-full bg-black bg-opacity-50"
   >
     <div class="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
-      <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Registrar Pago</h3>
+      <h3 id="pagoModalTitle" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Registrar Pago</h3>
       <form id="pagoForm" class="space-y-4">
         <input type="hidden" name="prestacionId" />
+        <input type="hidden" name="pagoId" />
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Prestación</label>
+          <select
+            name="prestacionSelect"
+            required
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
+          >
+            <option value="">Seleccione una prestación</option>
+          </select>
+        </div>
         <div>
           <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Monto del Pago</label>
           <input
@@ -164,7 +229,7 @@ console.log('DNI recibido en el componente:', dni);
         <div>
           <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Fecha del Pago</label>
           <input
-            type="date"
+            type="datetime-local"
             name="fechaPago"
             required
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500"
@@ -182,7 +247,7 @@ console.log('DNI recibido en el componente:', dni);
             type="submit"
             class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
           >
-            Registrar Pago
+            Guardar
           </button>
         </div>
       </form>
@@ -191,250 +256,210 @@ console.log('DNI recibido en el componente:', dni);
 </div>
 
 <script define:vars={{ dni }}>
-const BASE_URL = "https://odontoback-production.up.railway.app/api";
-
-async function obtenerTratamientos() {
-  try {
-    const response = await fetch(`${BASE_URL}/tratamientos`);
-    if (!response.ok) {
-      throw new Error('Error al obtener tratamientos');
+  // ====================================
+  // CONFIGURACIÓN
+  // ====================================
+  const BASE_URL = "https://odontoback-production.up.railway.app/api";
+  
+  // ====================================
+  // FUNCIONES DE API
+  // ====================================
+  async function obtenerTratamientos() {
+    try {
+      const response = await fetch(`${BASE_URL}/tratamientos`);
+      if (!response.ok) throw new Error('Error al obtener tratamientos');
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('Error al obtener tratamientos:', error);
+      return [];
     }
-    const data = await response.json();
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error('Error al obtener tratamientos:', error);
-    return [];
   }
-}
-
-async function obtenerPacientePorDni() {
+  
+  async function obtenerPacientePorDni() {
   try {
     console.log('Buscando paciente con DNI:', dni);
     const response = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
     const data = await response.json();
+    console.log('Datos del paciente:', data);
+    
+    // Verificar si tenemos datos del paciente
     if (!data || !data.paciente) {
       throw new Error('No se encontraron datos del paciente');
     }
-    return data.paciente;
+
+    // Asegurarnos de que tenemos el ID del paciente
+    const pacienteId = data.paciente._id || data.paciente.id;
+    if (!pacienteId) {
+      throw new Error('El paciente no tiene un ID válido');
+    }
+
+    return {
+      ...data.paciente,
+      _id: pacienteId // Asegurarnos de que siempre usamos _id
+    };
   } catch (error) {
     console.error('Error al obtener paciente:', error);
     throw error;
   }
 }
-
+  
 async function obtenerPrestaciones(pacienteId) {
   try {
+    if (!pacienteId) {
+      throw new Error('ID de paciente no proporcionado');
+    }
+    
     console.log('Obteniendo prestaciones para pacienteId:', pacienteId);
     const response = await fetch(`${BASE_URL}/prestaciones/paciente/${pacienteId}`);
+    
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || 'Error al obtener prestaciones');
     }
+    
     const data = await response.json();
-    return Array.isArray(data) ? data : (data.prestaciones || []);
+    console.log('Prestaciones obtenidas:', data);
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error en obtenerPrestaciones:', error);
-    return [];
+    throw error;
   }
 }
-
+  
 async function crearPrestacion(data) {
   try {
+    // Asegurarnos de que estamos usando el campo correcto para el ID del paciente
+    const prestacionData = {
+      ...data,
+      pacienteId: data.pacienteId // Debe ser el _id del paciente
+    };
+
     const response = await fetch(`${BASE_URL}/prestaciones`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(prestacionData)
     });
-
-    if (!response.ok) {
-      throw new Error('Error al crear la prestación');
-    }
-
+    if (!response.ok) throw new Error('Error al crear la prestación');
     return await response.json();
   } catch (error) {
     console.error('Error al crear prestación:', error);
     throw error;
   }
 }
-
-async function actualizarPrestacion(id, data) {
-  try {
-    const response = await fetch(`${BASE_URL}/prestaciones/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al actualizar la prestación');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error al actualizar prestación:', error);
-    throw error;
-  }
-}
-
-async function registrarPago(prestacionId, data) {
-  try {
-    const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al registrar el pago');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error al registrar pago:', error);
-    throw error;
-  }
-}
-
-async function eliminarPrestacion(id) {
-  try {
-    const response = await fetch(`${BASE_URL}/prestaciones/${id}`, {
-      method: 'DELETE'
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al eliminar la prestación');
-    }
-  } catch (error) {
-    console.error('Error al eliminar prestación:', error);
-    throw error;
-  }
-}
-
-function calcularTotalAdeudado(prestaciones) {
-  return prestaciones.reduce((total, p) => {
-    const totalPagos = (p.pagos || []).reduce((sum, pago) => sum + pago.monto, 0);
-    return total + (p.precio - totalPagos);
-  }, 0);
-}
-
-function formatearMoneda(valor) {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS'
-  }).format(valor);
-}
-
-function renderizarPrestaciones(prestaciones) {
-  const tbody = document.getElementById('prestacionesTableBody');
-  tbody.innerHTML = prestaciones.map(p => {
-    const totalPagos = (p.pagos || []).reduce((sum, pago) => sum + pago.monto, 0);
-    
-    return `
-      <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700" data-id="${p._id}">
-        <td class="px-4 py-2 text-gray-900 dark:text-gray-200">
-          ${p.tratamientoId?.nombre || 'Sin tratamiento'}
-        </td>
-        <td class="px-4 py-2 text-right text-gray-900 dark:text-gray-200">
-          ${formatearMoneda(p.precio || 0)}
-        </td>
-        <td class="px-4 py-2 text-right">
-          <div class="flex flex-col items-end">
-            <span class="text-gray-900 dark:text-gray-200">${formatearMoneda(totalPagos)}</span>
-            <button 
-              onclick="registrarPagoHandler('${p._id}')"
-              class="mt-1 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
-            >
-              Agregar pago
-            </button>
-          </div>
-        </td>
-        <td class="px-4 py-2 text-right">
-          <div class="flex justify-end space-x-2">
-            <button 
-              onclick="editarPrestacionHandler('${p._id}')"
-              class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-            </button>
-            <button 
-              onclick="eliminarPrestacionHandler('${p._id}')"
-              class="p-2 text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 6h18"/>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-              </svg>
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
   
-  const total = calcularTotalAdeudado(prestaciones);
-  const totalElement = document.getElementById('totalAdeudado');
-  totalElement.textContent = formatearMoneda(total);
-  totalElement.className = `px-4 py-2 text-right ${total < 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`;
-}
-
-function mostrarNotificacion(mensaje, tipo = 'success') {
-  const notificacionExistente = document.querySelector('.notificacion');
-  if (notificacionExistente) {
-    notificacionExistente.remove();
+  async function actualizarPrestacion(id, data) {
+    try {
+      const response = await fetch(`${BASE_URL}/prestaciones/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Error al actualizar la prestación');
+      return await response.json();
+    } catch (error) {
+      console.error('Error al actualizar prestación:', error);
+      throw error;
+    }
+  }
+  
+  async function eliminarPrestacion(id) {
+    try {
+      const response = await fetch(`${BASE_URL}/prestaciones/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ odontologoId: localStorage.getItem('userId') || 'Sistema' })
+      });
+      if (!response.ok) throw new Error('Error al eliminar la prestación');
+    } catch (error) {
+      console.error('Error al eliminar prestación:', error);
+      throw error;
+    }
+  }
+  
+  async function registrarPago(prestacionId, data) {
+    try {
+      const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Error al registrar el pago');
+      return await response.json();
+    } catch (error) {
+      console.error('Error al registrar pago:', error);
+      throw error;
+    }
+  }
+  
+  async function editarPago(prestacionId, pagoId, data) {
+    try {
+      const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos/${pagoId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Error al editar el pago');
+      return await response.json();
+    } catch (error) {
+      console.error('Error al editar pago:', error);
+      throw error;
+    }
+  }
+  
+  // ====================================
+  // FUNCIONES DE UTILIDAD
+  // ====================================
+  function formatearMoneda(valor) {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(valor);
+  }
+  
+  function formatearFechaHora(fecha) {
+    return new Date(fecha).toLocaleString('es-AR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+  
+  function calcularTotalAdeudado(prestaciones) {
+    return prestaciones.reduce((total, p) => {
+      const totalPagos = (p.pagos || []).reduce((sum, pago) => 
+        pago.eliminado ? sum : sum + pago.monto, 0
+      );
+      return total + (p.precio - totalPagos);
+    }, 0);
+  }
+  
+  function mostrarNotificacion(mensaje, tipo = 'success') {
+    const notificacionExistente = document.querySelector('.notificacion');
+    if (notificacionExistente) {
+      notificacionExistente.remove();
+    }
+  
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion fixed right-4 top-4 z-50 rounded-lg p-4 shadow-lg transition-opacity duration-300 ${
+      tipo === 'success' ? 'bg-green-500 dark:bg-green-600' : 'bg-red-500 dark:bg-red-600'
+    } text-white`;
+    notificacion.textContent = mensaje;
+  
+    document.body.appendChild(notificacion);
+  
+    setTimeout(() => {
+      notificacion.style.opacity = '0';
+      setTimeout(() => notificacion.remove(), 300);
+    }, 3000);
   }
 
-  const notificacion = document.createElement('div');
-  notificacion.className = `notificacion fixed right-4 top-4 z-50 rounded-lg p-4 shadow-lg transition-opacity duration-300 ${
-    tipo === 'success' 
-      ? 'bg-green-500 dark:bg-green-600' 
-      : 'bg-red-500 dark:bg-red-600'
-  } text-white`;
-  notificacion.textContent = mensaje;
-
-  document.body.appendChild(notificacion);
-
-  setTimeout(() => {
-    notificacion.style.opacity = '0';
-    setTimeout(() => notificacion.remove(), 300);
-  }, 3000);
-}
-
-async function cargarPrestaciones() {
-  try {
-    if (!dni) {
-      throw new Error('DNI no proporcionado');
-    }
-
-    const paciente = await obtenerPacientePorDni();
-    const pacienteId = paciente._id || paciente.id;
-    
-    if (!pacienteId) {
-      throw new Error('No se pudo obtener el ID del paciente');
-    }
-
-    const prestaciones = await obtenerPrestaciones(pacienteId);
-    renderizarPrestaciones(prestaciones);
-  } catch (error) {
-    console.error('Error al cargar prestaciones:', error);
-    document.getElementById('prestacionesTableBody').innerHTML = `
-      <tr>
-        <td colspan="4" class="px-4 py-2 text-center text-red-600 dark:text-red-400">
-          Error al cargar los datos: ${error.message}
-        </td>
-      </tr>
-    `;
-  }
-}
-
+// ====================================
+// FUNCIONES DE CARGA DE DATOS
+// ====================================
 async function cargarTratamientos() {
   try {
     const tratamientos = await obtenerTratamientos();
@@ -453,18 +478,262 @@ async function cargarTratamientos() {
   }
 }
 
-window.registrarPagoHandler = function(prestacionId) {
-  const modal = document.getElementById('pagoModal');
-  const form = document.getElementById('pagoForm');
-  const prestacionIdInput = form.querySelector('input[name="prestacionId"]');
-  
-  prestacionIdInput.value = prestacionId;
-  modal.classList.remove('hidden');
+async function cargarPrestaciones() {
+  try {
+    if (!dni) {
+      throw new Error('DNI no proporcionado');
+    }
 
-  // Establecer la fecha actual por defecto
-  const fechaInput = form.querySelector('input[name="fechaPago"]');
-  const today = new Date().toISOString().split('T')[0];
-  fechaInput.value = today;
+    const paciente = await obtenerPacientePorDni();
+    const prestaciones = await obtenerPrestaciones(paciente._id);
+    renderizarPrestaciones(prestaciones);
+  } catch (error) {
+    console.error('Error al cargar prestaciones:', error);
+    document.getElementById('prestacionesTableBody').innerHTML = `
+      <tr>
+        <td colspan="6" class="px-4 py-2 text-center text-red-600 dark:text-red-400">
+          Error al cargar los datos: ${error.message}
+        </td>
+      </tr>
+    `;
+  }
+}
+
+// ====================================
+// FUNCIONES DE RENDERIZADO
+// ====================================
+function generarHistorial(prestaciones) {
+  const historial = [];
+  
+  prestaciones.forEach(prestacion => {
+    // Registro de creación de prestación...
+    historial.push({
+      fecha: prestacion.createdAt,
+      tipo: 'Creación',
+      tratamiento: prestacion.tratamientoId?.nombre,
+      monto: prestacion.precio,
+      usuario: prestacion.creadoPor || 'Sistema',
+      detalles: `Creación de prestación: ${prestacion.tratamientoId?.nombre}`
+    });
+
+    // Registro de pagos y sus modificaciones
+    prestacion.pagos.forEach(pago => {
+      // Registro del pago
+      historial.push({
+        fecha: pago.fecha,
+        tipo: 'Pago',
+        tratamiento: prestacion.tratamientoId?.nombre,
+        monto: pago.monto,
+        usuario: pago.odontologoId || 'Sistema',
+        detalles: `Pago registrado para ${prestacion.tratamientoId?.nombre}`
+      });
+
+      // Si el pago fue editado
+      if (pago.editadoPor) {
+  historial.push({
+    fecha: pago.fechaEdicion,
+    tipo: 'Edición de Pago',
+    tratamiento: prestacion.tratamientoId?.nombre,
+    monto: pago.monto,
+    usuario: pago.editadoPor,
+    detalles: `Pago editado en ${prestacion.tratamientoId?.nombre}`
+  });
+}
+
+      // Si el pago fue eliminado
+      if (pago.eliminadoPor) {
+  historial.push({
+    fecha: pago.fechaEliminacion,
+    tipo: 'Eliminación de Pago',
+    tratamiento: prestacion.tratamientoId?.nombre,
+    monto: pago.monto,
+    usuario: pago.eliminadoPor,
+    detalles: `Pago eliminado en ${prestacion.tratamientoId?.nombre}`
+  });
+}
+    });
+
+    // Otras modificaciones de la prestación...
+  });
+
+  return historial.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+}
+
+function renderizarHistorial(historial) {
+  const tbody = document.getElementById('historialTableBody');
+  
+  tbody.innerHTML = historial.map(item => `
+    <tr class="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700">
+      <td class="px-4 py-2 text-gray-900 dark:text-gray-200">
+        ${formatearFechaHora(item.fecha)}
+      </td>
+      <td class="px-4 py-2">
+        <span class="rounded-full px-2 py-1 text-xs font-semibold ${
+          item.tipo === 'Pago' 
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+            : item.tipo === 'Modificación'
+            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+            : item.tipo === 'Eliminación'
+            ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+        }">
+          ${item.tipo}
+        </span>
+      </td>
+      <td class="px-4 py-2 text-gray-900 dark:text-gray-200">
+        ${item.tratamiento || 'N/A'}
+      </td>
+      <td class="px-4 py-2 text-right text-gray-900 dark:text-gray-200">
+        ${formatearMoneda(item.monto)}
+      </td>
+      <td class="px-4 py-2 text-gray-900 dark:text-gray-200">
+        ${item.usuario}
+      </td>
+      <td class="px-4 py-2 text-gray-600 dark:text-gray-400">
+        ${item.detalles}
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderizarPagos(pagos, prestacionId) {
+  return pagos
+    .filter(pago => !pago.eliminado)
+    .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+    .slice(0, 2)
+    .map(pago => `
+      <div class="mb-1 rounded bg-green-50 p-2 text-sm dark:bg-green-900/20">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600 dark:text-gray-300">
+            ${formatearFechaHora(pago.fecha)} - ${formatearMoneda(pago.monto)}
+          </span>
+          <div class="flex space-x-2">
+            <button
+              onclick="editarPagoHandler('${prestacionId}', '${pago._id}')"
+              class="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+              title="Editar pago"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button
+              onclick="eliminarPagoHandler('${prestacionId}', '${pago._id}')"
+              class="text-red-600 hover:text-red-700 dark:text-red-400"
+              title="Eliminar pago"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          Registrado por: ${pago.odontologoId || 'Sistema'}
+          ${pago.editadoPor ? ` - Editado por: ${pago.editadoPor}` : ''}
+        </div>
+      </div>
+    `).join('');
+}
+
+function renderizarPrestaciones(prestaciones) {
+  const tbody = document.getElementById('prestacionesTableBody');
+  const pagoSelect = document.querySelector('select[name="prestacionSelect"]');
+  
+  // Actualizar el select de prestaciones
+  pagoSelect.innerHTML = '<option value="">Seleccione una prestación</option>' + 
+    prestaciones
+      .filter(p => !p.eliminado)
+      .map(p => `
+        <option value="${p._id}">${p.tratamientoId?.nombre || 'Sin tratamiento'} - ${formatearMoneda(p.precio)}</option>
+      `).join('');
+
+  tbody.innerHTML = prestaciones
+    .filter(p => !p.eliminado)
+    .map(p => {
+      const totalPagado = (p.pagos || [])
+        .filter(pago => !pago.eliminado)
+        .reduce((sum, pago) => sum + pago.monto, 0);
+      const saldoPendiente = p.precio - totalPagado;
+    
+      // Mostrar solo los últimos 2 pagos activos
+      const ultimosPagos = (p.pagos || [])
+  .filter(pago => !pago.eliminado)
+  .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+  .slice(0, 2)
+  .map(pago => `
+    <div class="mb-1 rounded bg-green-50 p-1 text-sm dark:bg-green-900/20">
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600 dark:text-gray-300">
+          ${formatearFechaHora(pago.fecha)} - ${formatearMoneda(pago.monto)}
+        </span>
+        <div class="flex space-x-2">
+          <button
+            onclick="editarPagoHandler('${prestacion._id}', '${pago._id}')"
+            class="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+            title="Editar pago"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button
+            onclick="eliminarPagoHandler('${prestacion._id}', '${pago._id}')"
+            class="text-red-600 hover:text-red-700 dark:text-red-400"
+            title="Eliminar pago"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="text-xs text-gray-500 dark:text-gray-400">
+        Por: ${pago.odontologoId || 'Sistema'}
+        ${pago.editadoPor ? ` - Editado por: ${pago.editadoPor}` : ''}
+      </div>
+    </div>
+  `).join('');
+  
+  const total = calcularTotalAdeudado(prestaciones);
+  const totalElement = document.getElementById('totalAdeudado');
+  totalElement.textContent = formatearMoneda(total);
+  totalElement.className = `px-4 py-2 text-right ${total < 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`;
+}
+
+// ====================================
+// EVENT HANDLERS GLOBALES
+// ====================================
+window.editarPrestacionHandler = async function(id) {
+  try {
+    const paciente = await obtenerPacientePorDni();
+    const prestaciones = await obtenerPrestaciones(paciente._id);
+    const prestacion = prestaciones.find(p => p._id === id);
+
+    if (!prestacion) throw new Error('No se encontró la prestación');
+
+    const modal = document.getElementById('editarPrestacionModal');
+    const form = document.getElementById('editarPrestacionForm');
+    
+    form.querySelector('input[name="prestacionId"]').value = prestacion._id;
+    form.querySelector('select[name="tratamiento"]').value = prestacion.tratamientoId._id;
+    form.querySelector('input[name="precio"]').value = prestacion.precio;
+
+    modal.classList.remove('hidden');
+  } catch (error) {
+    console.error('Error al abrir el modal de edición:', error);
+    mostrarNotificacion('Error al cargar los datos de la prestación', 'error');
+  }
 };
 
 window.eliminarPrestacionHandler = async function(id) {
@@ -480,225 +749,318 @@ window.eliminarPrestacionHandler = async function(id) {
   }
 };
 
-window.editarPrestacionHandler = async function(id) {
+// Hacer funciones disponibles globalmente
+window.cargarTratamientos = cargarTratamientos;
+window.cargarPrestaciones = cargarPrestaciones;
+
+// ====================================
+// HANDLERS DE PAGOS
+// ====================================
+window.editarPagoHandler = async function(prestacionId, pagoId) {
   try {
-    const paciente = await obtenerPacientePorDni();
-    const pacienteId = paciente._id || paciente.id;
-    const prestaciones = await obtenerPrestaciones(pacienteId);
-    const prestacion = prestaciones.find(p => p._id === id);
-
-    if (!prestacion) {
-      throw new Error('No se encontró la prestación');
-    }
-
-    const modal = document.getElementById('editarPrestacionModal');
-    const form = document.getElementById('editarPrestacionForm');
+    const modal = document.getElementById('pagoModal');
+    const form = document.getElementById('pagoForm');
+    const titulo = document.getElementById('pagoModalTitle');
     
-    // Establecer los valores del formulario
-    form.querySelector('input[name="prestacionId"]').value = prestacion._id;
-    form.querySelector('select[name="tratamiento"]').value = prestacion.tratamientoId._id; // Asegurar que usamos el _id del tratamiento
-    form.querySelector('input[name="precio"]').value = prestacion.precio;
+    const paciente = await obtenerPacientePorDni();
+    const prestaciones = await obtenerPrestaciones(paciente._id);
+    const prestacion = prestaciones.find(p => p._id === prestacionId);
+    const pago = prestacion.pagos.find(p => p._id === pagoId);
 
+    titulo.textContent = 'Editar Pago';
+    form.querySelector('input[name="prestacionId"]').value = prestacionId;
+    form.querySelector('input[name="pagoId"]').value = pagoId;
+    form.querySelector('select[name="prestacionSelect"]').value = prestacionId;
+    form.querySelector('input[name="montoPago"]').value = pago.monto;
+    
+    const fecha = new Date(pago.fecha);
+    fecha.setMinutes(fecha.getMinutes() - fecha.getTimezoneOffset());
+    form.querySelector('input[name="fechaPago"]').value = fecha.toISOString().slice(0, 16);
+    
     modal.classList.remove('hidden');
   } catch (error) {
-    console.error('Error al abrir el modal de edición:', error);
-    mostrarNotificacion(
-      `Error al cargar los datos de la prestación: ${error.message}`, 
-      'error'
-    );
+    console.error('Error al cargar datos del pago:', error);
+    mostrarNotificacion('Error al cargar los datos del pago', 'error');
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  const prestacionModal = document.getElementById('prestacionModal');
-  const editarModal = document.getElementById('editarPrestacionModal');
-  const pagoModal = document.getElementById('pagoModal');
-  const prestacionForm = document.getElementById('prestacionForm');
-  const editarForm = document.getElementById('editarPrestacionForm');
-  const pagoForm = document.getElementById('pagoForm');
-  const nuevaPrestacionBtn = document.getElementById('nuevaPrestacionBtn');
+window.eliminarPagoHandler = async function(prestacionId, pagoId) {
+  if (confirm('¿Está seguro de eliminar este pago?')) {
+    try {
+      const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos/${pagoId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eliminadoPor: localStorage.getItem('userId') || 'Sistema',
+          fechaEliminacion: new Date()
+        })
+      });
 
-  // Event listeners para tratamientos
-  const tratamientoSelects = document.querySelectorAll('select[name="tratamiento"]');
-  tratamientoSelects.forEach(select => {
-    select.addEventListener('change', (e) => {
-      const selectedOption = e.target.options[e.target.selectedIndex];
-      const precio = selectedOption.dataset.precio;
-      if (precio) {
-        const form = e.target.closest('form');
-        form.querySelector('input[name="precio"]').value = precio;
+      if (!response.ok) throw new Error('Error al eliminar el pago');
+
+      await cargarPrestaciones();
+      mostrarNotificacion('Pago eliminado correctamente', 'success');
+    } catch (error) {
+      console.error('Error al eliminar pago:', error);
+      mostrarNotificacion('Error al eliminar el pago', 'error');
+    }
+  }
+};
+
+// ====================================
+// INICIALIZACIÓN Y MANEJO DE EVENTOS
+// ====================================
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const prestacionModal = document.getElementById('prestacionModal');
+    const editarModal = document.getElementById('editarPrestacionModal');
+    const pagoModal = document.getElementById('pagoModal');
+    const historialModal = document.getElementById('historialModal');
+    const prestacionForm = document.getElementById('prestacionForm');
+    const editarForm = document.getElementById('editarPrestacionForm');
+    const pagoForm = document.getElementById('pagoForm');
+
+    // Manejador del historial
+    document.getElementById('historialBtn').addEventListener('click', async () => {
+      try {
+        const paciente = await obtenerPacientePorDni();
+        const prestaciones = await obtenerPrestaciones(paciente._id);
+        const historial = generarHistorial(prestaciones);
+        renderizarHistorial(historial);
+        historialModal.classList.remove('hidden');
+      } catch (error) {
+        console.error('Error al cargar historial:', error);
+        mostrarNotificacion('Error al cargar el historial', 'error');
       }
     });
-  });
 
-  // Manejador para nueva prestación
-  nuevaPrestacionBtn.addEventListener('click', () => {
-    prestacionModal.classList.remove('hidden');
-  });
+    document.getElementById('cerrarHistorialBtn').addEventListener('click', () => {
+      historialModal.classList.add('hidden');
+    });
 
-  // Formulario de nueva prestación
-  prestacionForm.onsubmit = async (e) => {
+    // Event listeners para tratamientos
+    document.querySelectorAll('select[name="tratamiento"]').forEach(select => {
+      select.addEventListener('change', (e) => {
+        const selectedOption = e.target.options[e.target.selectedIndex];
+        const precio = selectedOption.dataset.precio;
+        if (precio) {
+          const form = e.target.closest('form');
+          form.querySelector('input[name="precio"]').value = precio;
+        }
+      });
+    });
+
+    // Manejadores de botones principales
+    document.getElementById('nuevaPrestacionBtn').addEventListener('click', () => {
+      prestacionForm.reset();
+      prestacionModal.classList.remove('hidden');
+    });
+
+    document.getElementById('agregarPagoBtn').addEventListener('click', () => {
+      const form = document.getElementById('pagoForm');
+      const titulo = document.getElementById('pagoModalTitle');
+      
+      form.reset();
+      titulo.textContent = 'Registrar Pago';
+      form.querySelector('input[name="pagoId"]').value = '';
+      
+      // Establecer fecha y hora actual
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      form.querySelector('input[name="fechaPago"]').value = now.toISOString().slice(0, 16);
+      
+      pagoModal.classList.remove('hidden');
+    });
+
+    // Formulario de nueva prestación
+    prestacionForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitButton = prestacionForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      const originalText = submitButton.textContent;
+      submitButton.textContent = 'Guardando...';
+
+      try {
+        const paciente = await obtenerPacientePorDni();
+        const formData = new FormData(prestacionForm);
+        
+        const prestacionData = {
+          pacienteId: paciente.id,
+          tratamientoId: formData.get('tratamiento'),
+          precio: parseFloat(formData.get('precio')),
+          pagos: [],
+          creadoPor: localStorage.getItem('userId') || 'Sistema'
+        };
+
+        await crearPrestacion(prestacionData);
+        await cargarPrestaciones();
+        prestacionModal.classList.add('hidden');
+        prestacionForm.reset();
+        mostrarNotificacion('Prestación creada exitosamente', 'success');
+      } catch (error) {
+        console.error('Error al crear prestación:', error);
+        mostrarNotificacion('Error al crear la prestación', 'error');
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
+      }
+    });
+
+    // Formulario de edición de prestación
+    editarForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitButton = editarForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      const originalText = submitButton.textContent;
+      submitButton.textContent = 'Actualizando...';
+
+      try {
+        const formData = new FormData(editarForm);
+        const prestacionId = formData.get('prestacionId');
+        const prestacionData = {
+          tratamientoId: formData.get('tratamiento'),
+          precio: parseFloat(formData.get('precio')),
+          modificadoPor: localStorage.getItem('userId') || 'Sistema',
+          fechaModificacion: new Date()
+        };
+
+        await actualizarPrestacion(prestacionId, prestacionData);
+        await cargarPrestaciones();
+        editarModal.classList.add('hidden');
+        editarForm.reset();
+        mostrarNotificacion('Prestación actualizada exitosamente', 'success');
+      } catch (error) {
+        console.error('Error al actualizar prestación:', error);
+        mostrarNotificacion('Error al actualizar la prestación', 'error');
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
+      }
+    });
+
+    // Formulario de pago
+    pagoForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const submitButton = prestacionForm.querySelector('button[type="submit"]');
-  const originalText = submitButton.textContent;
+  const submitButton = pagoForm.querySelector('button[type="submit"]');
   submitButton.disabled = true;
+  const originalText = submitButton.textContent;
   submitButton.textContent = 'Guardando...';
 
   try {
-    const paciente = await obtenerPacientePorDni();
-    const pacienteId = paciente._id || paciente.id;
+    const formData = new FormData(pagoForm);
+    const prestacionId = formData.get('prestacionSelect');
+    const pagoId = formData.get('pagoId');
     
-    const formData = new FormData(prestacionForm);
-    const tratamientoId = formData.get('tratamiento');
-
-    if (!tratamientoId) {
-      throw new Error('Debe seleccionar un tratamiento');
-    }
-
-    const prestacionData = {
-      pacienteId,
-      tratamientoId,
-      precio: parseFloat(formData.get('precio')),
-      pagos: []
+    const pagoData = {
+      monto: parseFloat(formData.get('montoPago')),
+      fecha: formData.get('fechaPago'),
+      odontologoId: localStorage.getItem('userId') || 'Sistema'
     };
 
-    console.log('Datos a enviar:', prestacionData);
-    await crearPrestacion(prestacionData);
+    if (pagoId) {
+      // Si estamos editando un pago existente
+      const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos/${pagoId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...pagoData,
+          editadoPor: localStorage.getItem('userId'),
+          fechaEdicion: new Date()
+        })
+      });
+
+      if (!response.ok) throw new Error('Error al editar el pago');
+    } else {
+      // Si estamos creando un nuevo pago
+      const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pagoData)
+      });
+
+      if (!response.ok) throw new Error('Error al registrar el pago');
+    }
+
     await cargarPrestaciones();
-    prestacionModal.classList.add('hidden');
-    prestacionForm.reset();
-    
-    mostrarNotificacion('Prestación creada exitosamente', 'success');
-  } catch (error) {
-    console.error('Error al crear prestación:', error);
+    pagoModal.classList.add('hidden');
+    pagoForm.reset();
     mostrarNotificacion(
-      'Error al crear la prestación: ' + (error.message || 'Error desconocido'),
-      'error'
+      `Pago ${pagoId ? 'actualizado' : 'registrado'} exitosamente`, 
+      'success'
     );
+  } catch (error) {
+    console.error('Error al procesar pago:', error);
+    mostrarNotificacion('Error al procesar el pago', 'error');
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = originalText;
   }
-};
-
-  // Formulario de edición
-  editarForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const submitButton = editarForm.querySelector('button[type="submit"]');
-    const originalText = submitButton.textContent;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Actualizando...';
-
-    try {
-      const formData = new FormData(editarForm);
-      const prestacionId = formData.get('prestacionId');
-      const prestacionData = {
-        tratamientoId: formData.get('tratamiento'),
-        precio: parseFloat(formData.get('precio'))
-      };
-
-      await actualizarPrestacion(prestacionId, prestacionData);
-      await cargarPrestaciones();
-      editarModal.classList.add('hidden');
-      editarForm.reset();
-      
-      mostrarNotificacion('Prestación actualizada exitosamente', 'success');
-    } catch (error) {
-      console.error('Error al actualizar prestación:', error);
-      mostrarNotificacion(
-        'Error al actualizar la prestación: ' + (error.message || 'Error desconocido'),
-        'error'
-      );
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = originalText;
-    }
-  };
-
-  // Formulario de pago
-  pagoForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const submitButton = pagoForm.querySelector('button[type="submit"]');
-    const originalText = submitButton.textContent;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Registrando...';
-
-    try {
-      const formData = new FormData(pagoForm);
-      const prestacionId = formData.get('prestacionId');
-      const pagoData = {
-        monto: parseFloat(formData.get('montoPago')),
-        fecha: formData.get('fechaPago')
-      };
-
-      await registrarPago(prestacionId, pagoData);
-      await cargarPrestaciones();
-      pagoModal.classList.add('hidden');
-      pagoForm.reset();
-      
-      mostrarNotificacion('Pago registrado exitosamente', 'success');
-    } catch (error) {
-      console.error('Error al registrar pago:', error);
-      mostrarNotificacion(
-        'Error al registrar el pago: ' + (error.message || 'Error desconocido'),
-        'error'
-      );
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = originalText;
-    }
-  };
-
-  // Manejadores para cerrar modales
-  const modales = [
-    { modal: prestacionModal, form: prestacionForm },
-    { modal: editarModal, form: editarForm },
-    { modal: pagoModal, form: pagoForm}
-  ];
-
-  // Botones cancelar
-  document.getElementById('cancelarBtn').addEventListener('click', () => {
-    prestacionModal.classList.add('hidden');
-    prestacionForm.reset();
-  });
-
-  document.getElementById('cancelarEditarBtn').addEventListener('click', () => {
-    editarModal.classList.add('hidden');
-    editarForm.reset();
-  });
-
-  document.getElementById('cancelarPagoBtn').addEventListener('click', () => {
-    pagoModal.classList.add('hidden');
-    pagoForm.reset();
-  });
-
-  // Cerrar modales al hacer clic fuera
-  window.addEventListener('click', (e) => {
-    modales.forEach(({ modal, form }) => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
-        form.reset();
-      }
-    });
-  });
-
-  // Cerrar modales con Escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      modales.forEach(({ modal, form }) => {
-        modal.classList.add('hidden');
-        form.reset();
-      });
-    }
-  });
-
-  // Cargar datos iniciales
-  cargarTratamientos();
-  cargarPrestaciones();
 });
 
-document.addEventListener('astro:page-load', () => {
-  cargarTratamientos();
-  cargarPrestaciones();
+// Manejadores para cerrar modales
+document.getElementById('cancelarBtn').addEventListener('click', () => {
+      prestacionModal.classList.add('hidden');
+      prestacionForm.reset();
+    });
+
+    document.getElementById('cancelarEditarBtn').addEventListener('click', () => {
+      editarModal.classList.add('hidden');
+      editarForm.reset();
+    });
+
+    document.getElementById('cancelarPagoBtn').addEventListener('click', () => {
+      pagoModal.classList.add('hidden');
+      pagoForm.reset();
+    });
+
+    // Cerrar modales al hacer clic fuera o con Escape
+    const modales = [
+      { modal: prestacionModal, form: prestacionForm },
+      { modal: editarModal, form: editarForm },
+      { modal: pagoModal, form: pagoForm },
+      { modal: historialModal }
+    ];
+
+    window.addEventListener('click', (e) => {
+      modales.forEach(({ modal, form }) => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          if (form) form.reset();
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        modales.forEach(({ modal, form }) => {
+          modal.classList.add('hidden');
+          if (form) form.reset();
+        });
+      }
+    });
+
+    // Cargar datos iniciales
+    await Promise.all([
+      cargarTratamientos(),
+      cargarPrestaciones()
+    ]);
+
+  } catch (error) {
+    console.error('Error en la inicialización:', error);
+    mostrarNotificacion('Error al inicializar el componente', 'error');
+  }
+});
+
+// Manejar recarga de página en Astro
+document.addEventListener('astro:page-load', async () => {
+  try {
+    await Promise.all([
+      cargarTratamientos(),
+      cargarPrestaciones()
+    ]);
+  } catch (error) {
+    console.error('Error al recargar datos:', error);
+    mostrarNotificacion('Error al recargar los datos', 'error');
+  }
 });
 </script>

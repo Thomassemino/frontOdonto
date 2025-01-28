@@ -44,7 +44,6 @@ import LayoutProtected from "../app/LayoutProtected.astro";
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Nombre</th>
                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Descripción</th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Monto</th>
                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Acciones</th>
               </tr>
             </thead>
@@ -92,17 +91,6 @@ import LayoutProtected from "../app/LayoutProtected.astro";
                         rows="3"
                         class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
               ></textarea>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Monto</label>
-              <input type="number" 
-                     name="monto" 
-                     required 
-                     min="0" 
-                     step="0.01"
-                     class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
-              />
             </div>
           </div>
 
@@ -154,18 +142,6 @@ import LayoutProtected from "../app/LayoutProtected.astro";
                         class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
               ></textarea>
             </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Monto</label>
-              <input type="number" 
-                     name="monto" 
-                     required 
-                     min="0" 
-                     step="0.01"
-                     placeholder="0.00"
-                     class="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
           </div>
 
           <div class="flex justify-end space-x-4 pt-4">
@@ -210,7 +186,6 @@ const validateTreatment = (treatment) => {
   const errors = [];
   if (!treatment.nombre.trim()) errors.push('El nombre es requerido');
   if (!treatment.descripcion.trim()) errors.push('La descripción es requerida');
-  if (treatment.monto < 0) errors.push('El monto no puede ser negativo');
   return errors;
 };
 
@@ -262,11 +237,10 @@ async function filtrarTratamientos() {
       ? data 
       : data.filter(tratamiento => 
           tratamiento.nombre.toLowerCase().includes(searchTerm) ||
-          tratamiento.descripcion.toLowerCase().includes(searchTerm) ||
-          tratamiento.monto?.toString().includes(searchTerm)
+          tratamiento.descripcion.toLowerCase().includes(searchTerm)
         );
 
-        renderizarVistas(tratamientosFiltrados);
+    renderizarVistas(tratamientosFiltrados);
   } catch (error) {
     console.error('Error al filtrar tratamientos:', error);
     showNotification('Error al filtrar los tratamientos', 'error');
@@ -284,11 +258,9 @@ function renderizarVistas(tratamientos) {
     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
         data-id="${row._id}"
         data-nombre="${row.nombre}"
-        data-descripcion="${row.descripcion}"
-        data-monto="${row.monto || 0}">
+        data-descripcion="${row.descripcion}">
       <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.nombre}</td>
       <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${row.descripcion}</td>
-      <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">$${row.monto || 0}</td>
       <td class="px-6 py-4">
         <div class="flex space-x-2">
           <button class="edit-button p-2 text-blue-600 hover:text-blue-700">
@@ -316,12 +288,10 @@ function renderizarVistas(tratamientos) {
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-3"
          data-id="${row._id}"
          data-nombre="${row.nombre}"
-         data-descripcion="${row.descripcion}"
-         data-monto="${row.monto || 0}">
+         data-descripcion="${row.descripcion}">
       <div class="flex justify-between items-start">
         <div class="space-y-1">
           <div class="font-medium text-gray-900 dark:text-white">${row.nombre}</div>
-          <div class="text-sm text-green-600 dark:text-green-400">$${row.monto || 0}</div>
         </div>
         <div class="flex space-x-2">
           <button class="edit-button p-2 text-blue-600 hover:text-blue-700">
@@ -363,7 +333,6 @@ function openEditModal(treatment) {
   if (form) {
     form.elements.nombre.value = treatment.nombre;
     form.elements.descripcion.value = treatment.descripcion;
-    form.elements.monto.value = treatment.monto || 0;
   }
 }
 
@@ -388,8 +357,7 @@ function closeCreateModal() {
 async function handleCreate(formData) {
   const treatment = {
     nombre: formData.get('nombre')?.toString().trim(),
-    descripcion: formData.get('descripcion')?.toString().trim(),
-    monto: parseFloat(formData.get('monto')?.toString() || '0')
+    descripcion: formData.get('descripcion')?.toString().trim()
   };
 
   const errors = validateTreatment(treatment);
@@ -419,8 +387,7 @@ async function handleEdit(formData) {
   const id = state.modals.edit.selectedTreatment.id;
   const treatment = {
     nombre: formData.get('nombre')?.toString().trim(),
-    descripcion: formData.get('descripcion')?.toString().trim(),
-    monto: parseFloat(formData.get('monto')?.toString() || '0')
+    descripcion: formData.get('descripcion')?.toString().trim()
   };
 
   const errors = validateTreatment(treatment);
@@ -447,7 +414,6 @@ async function handleEdit(formData) {
 }
 
 async function handleDelete(id, nombre) {
-
   const confirmDelete = window.confirm(`¿Está seguro que desea eliminar el tratamiento "${nombre}"?`);
 
   if (!confirmDelete) {
@@ -476,13 +442,10 @@ async function handleDelete(id, nombre) {
 
 // Event Listeners y Setup
 function setupEventListeners() {
-  // Remover event listeners existentes
   document.removeEventListener('click', handleButtonClick);
-  // Añadir nuevo event listener
   document.addEventListener('click', handleButtonClick);
 }
 
-// Función separada para manejar clicks
 async function handleButtonClick(e) {
   const editButton = e.target.closest('.edit-button');
   const deleteButton = e.target.closest('.delete-button');
@@ -493,8 +456,7 @@ async function handleButtonClick(e) {
       const treatment = {
         id: container.dataset.id,
         nombre: container.dataset.nombre,
-        descripcion: container.dataset.descripcion,
-        monto: parseFloat(container.dataset.monto || '0')
+        descripcion: container.dataset.descripcion
       };
       openEditModal(treatment);
     }
@@ -514,7 +476,6 @@ async function handleButtonClick(e) {
 document.addEventListener('DOMContentLoaded', () => {
   actualizarTabla();
 
-  // Event Listeners básicos
   document.getElementById('volverBtn')?.addEventListener('click', () => {
     window.location.href = '/';
   });
@@ -522,7 +483,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('searchInput')?.addEventListener('input', filtrarTratamientos);
   document.getElementById('createTreatmentButton')?.addEventListener('click', openCreateModal);
 
-  // Event Listeners para modales
   document.querySelectorAll('.close-modal').forEach(button => {
     button.addEventListener('click', () => {
       closeEditModal();
@@ -530,7 +490,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Event Listeners para formularios
   document.getElementById('createForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     try {

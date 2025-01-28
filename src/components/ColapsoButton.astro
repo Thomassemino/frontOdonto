@@ -27,10 +27,12 @@ const {
         aria-label="Toggle content"
       >
         <svg 
+          id="toggleIcon"
           class="w-6 h-6 transform transition-transform duration-200" 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
+          style={`transform: ${defaultExpanded ? '' : 'rotate(180deg)'}`}
         >
           <path 
             stroke-linecap="round" 
@@ -43,26 +45,31 @@ const {
     </div>
   </div>
 
-  <div id="collapsibleContent" class:list={["space-y-6", { "hidden": !defaultExpanded }]}>
+  <div 
+    id="collapsibleContent" 
+    class:list={[
+      "space-y-6", 
+      { "hidden": !defaultExpanded }
+    ]}
+  >
     <slot />
   </div>
 </div>
 
-<script>
+<script is:inline>
 document.addEventListener('DOMContentLoaded', () => {
   const toggleButton = document.getElementById('toggleButton');
   const content = document.getElementById('collapsibleContent');
-  const svg = toggleButton?.querySelector('svg');
+  const icon = document.getElementById('toggleIcon');
   
-  if (toggleButton && content && svg) {
-    // Establecer la rotación inicial si el contenido está oculto
-    if (content.classList.contains('hidden')) {
-      svg.style.transform = 'rotate(180deg)';
-    }
-
+  if (toggleButton && content && icon) {
     toggleButton.addEventListener('click', () => {
       content.classList.toggle('hidden');
-      svg.style.transform = content.classList.contains('hidden') ? 'rotate(180deg)' : '';
+      
+      // Rotar el ícono basado en el estado actual del contenido
+      icon.style.transform = content.classList.contains('hidden') 
+        ? 'rotate(180deg)' 
+        : '';
     });
   }
 });
