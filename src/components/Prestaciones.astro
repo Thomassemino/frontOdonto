@@ -392,21 +392,41 @@ async function crearPrestacion(data) {
       throw error;
     }
   }
+
+  async function obtenerNombreUsuario(id) {
+  if (!id || id === 'Sistema') return 'Sistema';
   
-  async function editarPago(prestacionId, pagoId, data) {
-    try {
-      const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos/${pagoId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) throw new Error('Error al editar el pago');
-      return await response.json();
-    } catch (error) {
-      console.error('Error al editar pago:', error);
-      throw error;
+  try {
+    // Primero intentamos buscar en médicos
+    const medicoResponse = await fetch(`${BASE_URL}/medico/findById/${id}`);
+    if (medicoResponse.ok) {
+      const medicoData = await medicoResponse.json();
+      if (medicoData && medicoData.nombre) {
+        return `${medicoData.nombre} (Médico)`;
+      }
     }
+
+    // Si no es médico, buscamos en secretarias
+    const secretariaResponse = await fetch(`${BASE_URL}/secretaria/buscarId/${id}`);
+    if (secretariaResponse.ok) {
+      const secretariaData = await secretariaResponse.json();
+      if (secretariaData && secretariaData.nombre) {
+        return `${secretariaData.nombre} (Secretaria)`;
+      }
+    }
+
+    return id;
+  } catch (error) {
+    console.error('Error al obtener nombre de usuario:', error);
+    return id;
   }
+}
+
+function renderizarInfoUsuario(usuario, tipo = '') {
+  if (!usuario || usuario === 'Sistema') return 'Sistema';
+  return `${usuario}${tipo ? ` (${tipo})` : ''}`;
+}
+
   
   // ====================================
   // FUNCIONES DE UTILIDAD
@@ -506,63 +526,105 @@ function generarHistorial(prestaciones) {
   const historial = [];
   
   prestaciones.forEach(prestacion => {
-    // Registro de creación de prestación...
-    historial.push({
-      fecha: prestacion.createdAt,
-      tipo: 'Creación',
-      tratamiento: prestacion.tratamientoId?.nombre,
-      monto: prestacion.precio,
-      usuario: prestacion.creadoPor || 'Sistema',
-      detalles: `Creación de prestación: ${prestacion.tratamientoId?.nombre}`
-    });
-
-    // Registro de pagos y sus modificaciones
-    prestacion.pagos.forEach(pago => {
-      // Registro del pago
+    // Registro de creación de prestación
+    if (prestacion.createdAt) {
       historial.push({
-        fecha: pago.fecha,
-        tipo: 'Pago',
+        fecha: prestacion.createdAt,
+        tipo: 'Creación',
         tratamiento: prestacion.tratamientoId?.nombre,
-        monto: pago.monto,
-        usuario: pago.odontologoId || 'Sistema',
-        detalles: `Pago registrado para ${prestacion.tratamientoId?.nombre}`
+        monto: prestacion.precio,
+        usuario: prestacion.creadoPor || 'Sistema',
+        detalles: `Creación de prestación: ${prestacion.tratamientoId?.nombre}`
       });
+    }
 
-      // Si el pago fue editado
-      if (pago.editadoPor) {
-  historial.push({
-    fecha: pago.fechaEdicion,
-    tipo: 'Edición de Pago',
-    tratamiento: prestacion.tratamientoId?.nombre,
-    monto: pago.monto,
-    usuario: pago.editadoPor,
-    detalles: `Pago editado en ${prestacion.tratamientoId?.nombre}`
+    // Registrar pagos
+    if (prestacion.pagos && Array.isArray(prestacion.pagos)) {
+      prestacion.pagos.forEach(pago => {
+        // Solo procesar pagos válidos
+        if (!pago || typeof pago !== 'object') return;
+
+        // Registro inicial del pago
+        if (!pago.eliminado) {
+          historial.push({
+            fecha: pago.fecha,
+            tipo: 'Pago',
+            tratamiento: prestacion.tratamientoId?.nombre,
+            monto: pago.monto,
+            usuario: pago.odontologoId || 'Sistema',
+            detalles: `Pago registrado: ${formatearMoneda(pago.monto)}`
+          });
+        }
+
+        // Registro de historial específico del pago
+        if (pago.historial && Array.isArray(pago.historial)) {
+          pago.historial.forEach(evento => {
+            historial.push({
+              fecha: evento.fecha,
+              tipo: evento.tipo,
+              tratamiento: prestacion.tratamientoId?.nombre,
+              monto: pago.monto,
+              usuario: evento.usuario || 'Sistema',
+              detalles: evento.detalle
+            });
+          });
+        }
+
+        // Eventos específicos
+        if (pago.editadoPor) {
+          historial.push({
+            fecha: pago.fechaEdicion || pago.fecha,
+            tipo: 'Edición de Pago',
+            tratamiento: prestacion.tratamientoId?.nombre,
+            monto: pago.monto,
+            usuario: pago.editadoPor,
+            detalles: `Pago editado: ${formatearMoneda(pago.monto)}`
+          });
+        }
+
+        if (pago.eliminado) {
+          historial.push({
+            fecha: pago.fechaEliminacion || new Date(),
+            tipo: 'Elimin de Pago',
+            tratamiento: prestacion.tratamientoId?.nombre,
+            monto: pago.monto,
+            usuario: pago.eliminadoPor || 'Sistema',
+            detalles: `Pago eliminado: ${formatearMoneda(pago.monto)}`
+          });
+        }
+      });
+    }
+
+    // Modificaciones de la prestación
+    if (prestacion.modificadoPor) {
+      historial.push({
+        fecha: prestacion.fechaModificacion || prestacion.updatedAt,
+        tipo: 'Modificación',
+        tratamiento: prestacion.tratamientoId?.nombre,
+        monto: prestacion.precio,
+        usuario: prestacion.modificadoPor,
+        detalles: `Prestación modificada: ${prestacion.tratamientoId?.nombre}`
+      });
+    }
   });
-}
 
-      // Si el pago fue eliminado
-      if (pago.eliminadoPor) {
-  historial.push({
-    fecha: pago.fechaEliminacion,
-    tipo: 'Eliminación de Pago',
-    tratamiento: prestacion.tratamientoId?.nombre,
-    monto: pago.monto,
-    usuario: pago.eliminadoPor,
-    detalles: `Pago eliminado en ${prestacion.tratamientoId?.nombre}`
-  });
-}
-    });
-
-    // Otras modificaciones de la prestación...
-  });
-
+  // Ordenar por fecha descendente (más reciente primero)
   return historial.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 }
 
-function renderizarHistorial(historial) {
+async function renderizarHistorial(historial) {
   const tbody = document.getElementById('historialTableBody');
   
-  tbody.innerHTML = historial.map(item => `
+  // Procesar cada item del historial para obtener los nombres de usuarios
+  const historialConNombres = await Promise.all(historial.map(async item => {
+    const usuario = await obtenerNombreUsuario(item.usuario);
+    return {
+      ...item,
+      nombreUsuario: renderizarInfoUsuario(usuario)
+    };
+  }));
+  
+  tbody.innerHTML = historialConNombres.map(item => `
     <tr class="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700">
       <td class="px-4 py-2 text-gray-900 dark:text-gray-200">
         ${formatearFechaHora(item.fecha)}
@@ -573,7 +635,7 @@ function renderizarHistorial(historial) {
             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
             : item.tipo === 'Modificación'
             ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-            : item.tipo === 'Eliminación'
+            : item.tipo === 'Elimin de Pago'
             ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
             : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
         }">
@@ -587,7 +649,7 @@ function renderizarHistorial(historial) {
         ${formatearMoneda(item.monto)}
       </td>
       <td class="px-4 py-2 text-gray-900 dark:text-gray-200">
-        ${item.usuario}
+        ${item.nombreUsuario}
       </td>
       <td class="px-4 py-2 text-gray-600 dark:text-gray-400">
         ${item.detalles}
@@ -596,52 +658,51 @@ function renderizarHistorial(historial) {
   `).join('');
 }
 
-function renderizarPagos(pagos, prestacionId) {
-  return pagos
-    .filter(pago => !pago.eliminado)
-    .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-    .slice(0, 2)
-    .map(pago => `
-      <div class="mb-1 rounded bg-green-50 p-2 text-sm dark:bg-green-900/20">
-        <div class="flex items-center justify-between">
-          <span class="text-gray-600 dark:text-gray-300">
-            ${formatearFechaHora(pago.fecha)} - ${formatearMoneda(pago.monto)}
-          </span>
-          <div class="flex space-x-2">
-            <button
-              onclick="editarPagoHandler('${prestacionId}', '${pago._id}')"
-              class="text-blue-600 hover:text-blue-700 dark:text-blue-400"
-              title="Editar pago"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-            </button>
-            <button
-              onclick="eliminarPagoHandler('${prestacionId}', '${pago._id}')"
-              class="text-red-600 hover:text-red-700 dark:text-red-400"
-              title="Eliminar pago"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 6h18"/>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">
-          Registrado por: ${pago.odontologoId || 'Sistema'}
-          ${pago.editadoPor ? ` - Editado por: ${pago.editadoPor}` : ''}
-        </div>
-      </div>
-    `).join('');
+async function obtenerNombreOdontologo(id) {
+  try {
+    const response = await fetch(`${BASE_URL}/medico/findById/${id}`);
+    if (!response.ok) throw new Error('Error al obtener odontólogo');
+    const data = await response.json();
+    return data.nombre || id; // Si no encuentra el nombre, devuelve el ID
+  } catch (error) {
+    console.error('Error al obtener nombre de odontólogo:', error);
+    return id; // En caso de error, devuelve el ID
+  }
 }
 
-function renderizarPrestaciones(prestaciones) {
+// Función para obtener el nombre del usuario
+async function obtenerNombreUsuario(id) {
+  if (!id || id === 'Sistema') return 'Sistema';
+  
+  try {
+    // Primero intentamos buscar en médicos
+    const medicoResponse = await fetch(`${BASE_URL}/medico/findById/${id}`);
+    if (medicoResponse.ok) {
+      const medicoData = await medicoResponse.json();
+      if (medicoData && medicoData.nombre) {
+        return `${medicoData.nombre} (Médico)`;
+      }
+    }
+
+    // Si no es médico, buscamos en secretarias
+    const secretariaResponse = await fetch(`${BASE_URL}/secretaria/buscarId/${id}`);
+    if (secretariaResponse.ok) {
+      const secretariaData = await secretariaResponse.json();
+      if (secretariaData && secretariaData.nombre) {
+        return `${secretariaData.nombre} (Secretaria)`;
+      }
+    }
+
+    // Si no se encuentra, devolvemos el ID
+    return id;
+  } catch (error) {
+    console.error('Error al obtener nombre de usuario:', error);
+    return id;
+  }
+}
+
+// Función principal de renderizado de prestaciones
+async function renderizarPrestaciones(prestaciones) {
   const tbody = document.getElementById('prestacionesTableBody');
   const pagoSelect = document.querySelector('select[name="prestacionSelect"]');
   
@@ -653,62 +714,131 @@ function renderizarPrestaciones(prestaciones) {
         <option value="${p._id}">${p.tratamientoId?.nombre || 'Sin tratamiento'} - ${formatearMoneda(p.precio)}</option>
       `).join('');
 
-  tbody.innerHTML = prestaciones
-    .filter(p => !p.eliminado)
-    .map(p => {
-      const totalPagado = (p.pagos || [])
-        .filter(pago => !pago.eliminado)
-        .reduce((sum, pago) => sum + pago.monto, 0);
-      const saldoPendiente = p.precio - totalPagado;
-    
-      // Mostrar solo los últimos 2 pagos activos
-      const ultimosPagos = (p.pagos || [])
-  .filter(pago => !pago.eliminado)
-  .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-  .slice(0, 2)
-  .map(pago => `
-    <div class="mb-1 rounded bg-green-50 p-1 text-sm dark:bg-green-900/20">
-      <div class="flex items-center justify-between">
-        <span class="text-gray-600 dark:text-gray-300">
-          ${formatearFechaHora(pago.fecha)} - ${formatearMoneda(pago.monto)}
-        </span>
-        <div class="flex space-x-2">
-          <button
-            onclick="editarPagoHandler('${prestacion._id}', '${pago._id}')"
-            class="text-blue-600 hover:text-blue-700 dark:text-blue-400"
-            title="Editar pago"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-          </button>
-          <button
-            onclick="eliminarPagoHandler('${prestacion._id}', '${pago._id}')"
-            class="text-red-600 hover:text-red-700 dark:text-red-400"
-            title="Eliminar pago"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 6h18"/>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div class="text-xs text-gray-500 dark:text-gray-400">
-        Por: ${pago.odontologoId || 'Sistema'}
-        ${pago.editadoPor ? ` - Editado por: ${pago.editadoPor}` : ''}
-      </div>
-    </div>
-  `).join('');
-  
-  const total = calcularTotalAdeudado(prestaciones);
-  const totalElement = document.getElementById('totalAdeudado');
-  totalElement.textContent = formatearMoneda(total);
-  totalElement.className = `px-4 py-2 text-right ${total < 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`;
+  // Renderizar cada prestación
+  const renderizarFilas = async () => {
+    const filas = await Promise.all(prestaciones
+      .filter(p => !p.eliminado)
+      .map(async p => {
+        const totalPagado = (p.pagos || [])
+          .filter(pago => !pago.eliminado)
+          .reduce((sum, pago) => sum + pago.monto, 0);
+        const saldoPendiente = p.precio - totalPagado;
+        
+        // Obtener el último pago activo
+        const ultimoPago = (p.pagos || [])
+          .filter(pago => !pago.eliminado)
+          .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
+
+        let infoPago = '<div class="px-4 py-2 text-gray-500 dark:text-gray-400">Sin pagos registrados</div>';
+        
+        if (ultimoPago) {
+          const nombreOdontologo = await obtenerNombreUsuario(ultimoPago.odontologoId);
+          let nombreEditor = '';
+          if (ultimoPago.editadoPor) {
+            nombreEditor = await obtenerNombreUsuario(ultimoPago.editadoPor);
+          }
+
+          infoPago = `
+            <div class="mb-1 rounded bg-green-50 p-2 text-sm dark:bg-green-900/20">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-600 dark:text-gray-300">
+                  ${formatearFechaHora(ultimoPago.fecha)} - ${formatearMoneda(ultimoPago.monto)}
+                </span>
+                <div class="flex space-x-2">
+                  <button
+                    onclick="editarPagoHandler('${p._id}', '${ultimoPago._id}')"
+                    class="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                    title="Editar pago"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <button
+                    onclick="eliminarPagoHandler('${p._id}', '${ultimoPago._id}')"
+                    class="text-red-600 hover:text-red-700 dark:text-red-400"
+                    title="Eliminar pago"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 6h18"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <div>Registrado por: ${nombreOdontologo}</div>
+                ${nombreEditor ? `<div class="mt-0.5">Editado por: ${nombreEditor}</div>` : ''}
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <td class="px-4 py-2 text-gray-900 dark:text-gray-200">
+              ${p.tratamientoId?.nombre || 'Sin tratamiento'}
+            </td>
+            <td class="px-4 py-2 text-right text-gray-900 dark:text-gray-200">
+              ${formatearMoneda(p.precio)}
+            </td>
+            <td class="px-4 py-2 text-right text-gray-900 dark:text-gray-200">
+              ${formatearMoneda(totalPagado)}
+            </td>
+            <td class="px-4 py-2 text-right ${saldoPendiente > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}">
+              ${formatearMoneda(saldoPendiente)}
+            </td>
+            <td class="w-1/3">
+              ${infoPago}
+            </td>
+            <td class="px-4 py-2">
+              <div class="flex justify-end space-x-2">
+                <button
+                  onclick="editarPrestacionHandler('${p._id}')"
+                  class="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                  title="Editar prestación"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+                <button
+                  onclick="eliminarPrestacionHandler('${p._id}')"
+                  class="text-red-600 hover:text-red-700 dark:text-red-400"
+                  title="Eliminar prestación"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" 
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }));
+
+    tbody.innerHTML = filas.join('');
+
+    const total = calcularTotalAdeudado(prestaciones);
+    const totalElement = document.getElementById('totalAdeudado');
+    totalElement.textContent = formatearMoneda(total);
+    totalElement.className = `px-4 py-2 text-right ${total > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`;
+  };
+
+  // Ejecutar el renderizado
+  renderizarFilas().catch(error => {
+    console.error('Error al renderizar prestaciones:', error);
+    mostrarNotificacion('Error al mostrar las prestaciones', 'error');
+  });
 }
 
 // ====================================
@@ -753,6 +883,7 @@ window.eliminarPrestacionHandler = async function(id) {
 window.cargarTratamientos = cargarTratamientos;
 window.cargarPrestaciones = cargarPrestaciones;
 
+
 // ====================================
 // HANDLERS DE PAGOS
 // ====================================
@@ -784,25 +915,43 @@ window.editarPagoHandler = async function(prestacionId, pagoId) {
   }
 };
 
+// Corrección del handler de eliminación de pago en el frontend
 window.eliminarPagoHandler = async function(prestacionId, pagoId) {
   if (confirm('¿Está seguro de eliminar este pago?')) {
     try {
+      const userId = localStorage.getItem('userId') || 'Sistema';
+      
       const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos/${pagoId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
-          eliminadoPor: localStorage.getItem('userId') || 'Sistema',
+          eliminadoPor: userId,
           fechaEliminacion: new Date()
         })
       });
 
-      if (!response.ok) throw new Error('Error al eliminar el pago');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al eliminar el pago');
+      }
 
+      // Recargar datos
       await cargarPrestaciones();
+      
+      // Actualizar historial si está visible
+      if (!document.getElementById('historialModal').classList.contains('hidden')) {
+        const paciente = await obtenerPacientePorDni();
+        const prestaciones = await obtenerPrestaciones(paciente._id);
+        const historial = generarHistorial(prestaciones);
+        await renderizarHistorial(historial);
+      }
+
       mostrarNotificacion('Pago eliminado correctamente', 'success');
     } catch (error) {
       console.error('Error al eliminar pago:', error);
-      mostrarNotificacion('Error al eliminar el pago', 'error');
+      mostrarNotificacion(error.message || 'Error al eliminar el pago', 'error');
     }
   }
 };
@@ -950,11 +1099,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formData = new FormData(pagoForm);
     const prestacionId = formData.get('prestacionSelect');
     const pagoId = formData.get('pagoId');
+    const userId = localStorage.getItem('userId') || 'Sistema';
+    
+    // Obtener la fecha del input y convertirla a un objeto Date
+    const fechaInput = formData.get('fechaPago');
+    const fecha = new Date(fechaInput);
     
     const pagoData = {
       monto: parseFloat(formData.get('montoPago')),
-      fecha: formData.get('fechaPago'),
-      odontologoId: localStorage.getItem('userId') || 'Sistema'
+      fecha: fecha.toISOString(), // Enviar la fecha en formato ISO
+      odontologoId: userId
     };
 
     if (pagoId) {
@@ -964,8 +1118,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...pagoData,
-          editadoPor: localStorage.getItem('userId'),
-          fechaEdicion: new Date()
+          editadoPor: userId,
+          fechaEdicion: new Date().toISOString()
         })
       });
 
@@ -975,13 +1129,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(pagoData)
+        body: JSON.stringify({
+          ...pagoData,
+          fechaCreacion: new Date().toISOString(),
+          creadoPor: userId,
+          estado: 'activo'
+        })
       });
 
       if (!response.ok) throw new Error('Error al registrar el pago');
     }
 
     await cargarPrestaciones();
+    
+    // Actualizar el historial si está visible
+    if (!document.getElementById('historialModal').classList.contains('hidden')) {
+      const paciente = await obtenerPacientePorDni();
+      const prestaciones = await obtenerPrestaciones(paciente._id);
+      const historial = generarHistorial(prestaciones);
+      await renderizarHistorial(historial);
+    }
+    
     pagoModal.classList.add('hidden');
     pagoForm.reset();
     mostrarNotificacion(
