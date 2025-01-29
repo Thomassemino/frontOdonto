@@ -6,242 +6,238 @@ interface Props {
 const { dni } = Astro.props;
 ---
 
-<div class="space-y-6 w-full px-3 sm:px-4 lg:px-6 max-w-7xl mx-auto">
-  <!-- Header con título y botón - Mejorado para mobile -->
-  <div class="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 xs:gap-4">
-    <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">
+<div class="space-y-6 w-full px-4 sm:px-6 lg:px-8">
+  <!-- Header con título y botón -->
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
+    <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">
       Atenciones
     </h2>
     <button
       id="nuevaAtencionBtn"
-      class="w-full xs:w-auto rounded-md bg-blue-600 px-4 py-2.5 text-sm sm:text-base text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+      class="w-full sm:w-auto rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
     >
       Nueva Atención
     </button>
   </div>
 
-  <!-- Tabla de Atenciones con mejor manejo de scroll -->
-  <div class="w-full -mx-3 sm:mx-0">
-    <div class="inline-block min-w-full align-middle">
-      <div class="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg shadow">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6">
-                  Fecha
-                </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-200">
-                  Profesional
-                </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-200">
-                  Notas
-                </th>
-                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                  <span class="sr-only">Acciones</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody id="atencionesTableBody" class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-              <!-- Las filas se agregarán dinámicamente -->
-            </tbody>
-          </table>
-        </div>
+  <!-- Vista de tabla para desktop -->
+  <div class="hidden md:block w-full">
+    <div class="inline-block min-w-full py-2 align-middle">
+      <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6">Fecha</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Profesional</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Notas</th>
+              <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <span class="sr-only">Acciones</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="atencionesTableBody" class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+            <!-- Las filas se agregarán dinámicamente -->
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- Modal Nueva Atención - Mejorado para mobile -->
+  <!-- Vista de tarjetas para móvil -->
+  <div class="md:hidden space-y-4" id="atencionesCardView">
+    <!-- Las tarjetas se agregarán dinámicamente -->
+  </div>
+
+  <!-- Modal Nueva Atención -->
   <div
     id="atencionModal"
-    class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6"
+    class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-20"
     role="dialog"
     aria-modal="true"
   >
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-    <div class="relative min-h-screen sm:min-h-0 flex items-center justify-center">
-      <div class="relative w-full max-w-lg transform overflow-hidden rounded-lg bg-white p-4 sm:p-6 shadow-xl transition-all dark:bg-gray-800">
-        <!-- Botón cerrar mejorado para mobile -->
+    <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 shadow-xl transition-all sm:w-full sm:max-w-lg sm:p-6 dark:bg-gray-800 mx-auto">
+      <div class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
         <button
           type="button"
           id="closeModalBtn"
-          class="absolute right-2 top-2 rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+          class="rounded-md bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           <span class="sr-only">Cerrar</span>
-          <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Nueva Atención</h3>
-        <form id="atencionForm" class="space-y-4">
-          <input type="hidden" id="pacienteId" />
-
-          <!-- Selector de profesional mejorado -->
-          <div class="space-y-1.5">
-            <label for="profesional" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Profesional
-            </label>
-            <select
-              id="profesional"
-              name="profesional"
-              required
-              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-            >
-              <option value="">Seleccione un profesional</option>
-            </select>
-          </div>
-
-          <!-- Campo de fecha mejorado -->
-          <div class="space-y-1.5">
-            <label for="fecha" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Fecha y Hora
-            </label>
-            <input
-              type="datetime-local"
-              id="fecha"
-              name="fecha"
-              required
-              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-            />
-          </div>
-
-          <!-- Campo de notas mejorado -->
-          <div class="space-y-1.5">
-            <label for="notaDelDia" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Notas
-            </label>
-            <textarea
-              id="notaDelDia"
-              name="notaDelDia"
-              required
-              rows="4"
-              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-            ></textarea>
-          </div>
-
-          <!-- Botones del modal mejorados -->
-          <div class="flex flex-col-reverse xs:flex-row justify-end gap-3 xs:gap-2 mt-6">
-            <button
-              type="button"
-              id="cancelarBtnA"
-              class="w-full xs:w-auto rounded-md border border-gray-300 bg-white px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="w-full xs:w-auto rounded-md bg-blue-600 px-4 py-2 text-sm sm:text-base text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-            >
-              Guardar
-            </button>
-          </div>
-        </form>
       </div>
+      
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Nueva Atención</h3>
+      <form id="atencionForm" class="space-y-4">
+        <input type="hidden" id="pacienteId" />
+
+        <!-- Selector de profesional -->
+        <div>
+          <label for="profesional" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Profesional
+          </label>
+          <select
+            id="profesional"
+            name="profesional"
+            required
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+          >
+            <option value="">Seleccione un profesional</option>
+          </select>
+        </div>
+
+        <!-- Campo de fecha -->
+        <div>
+          <label for="fecha" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Fecha y Hora
+          </label>
+          <input
+            type="datetime-local"
+            id="fecha"
+            name="fecha"
+            required
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+          />
+        </div>
+
+        <!-- Campo de notas -->
+        <div>
+          <label for="notaDelDia" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Notas
+          </label>
+          <textarea
+            id="notaDelDia"
+            name="notaDelDia"
+            required
+            rows="4"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+          ></textarea>
+        </div>
+
+        <!-- Botones del modal responsive -->
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-2 mt-6">
+          <button
+            type="button"
+            id="cancelarBtnA"
+            class="w-full sm:w-auto rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="w-full sm:w-auto rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Modal Editar Atención - Mejorado -->
+  <!-- Modal Editar Atención -->
   <div
     id="editarAtencionModal"
-    class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6"
+    class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-20"
     role="dialog"
     aria-modal="true"
   >
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-    <div class="relative min-h-screen sm:min-h-0 flex items-center justify-center">
-      <div class="relative w-full max-w-lg transform overflow-hidden rounded-lg bg-white p-4 sm:p-6 shadow-xl transition-all dark:bg-gray-800">
-        <!-- Botón cerrar mejorado -->
+    <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 shadow-xl transition-all sm:w-full sm:max-w-lg sm:p-6 dark:bg-gray-800 mx-auto">
+      <div class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
         <button
           type="button"
           id="closeEditModalBtn"
-          class="absolute right-2 top-2 rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+          class="rounded-md bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           <span class="sr-only">Cerrar</span>
-          <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Editar Atención</h3>
-        <form id="editarAtencionForm" class="space-y-4">
-          <input type="hidden" id="editPacienteId" />
-          <input type="hidden" id="editFechaOriginal" />
-          
-          <!-- Campos del formulario mejorados -->
-          <div class="space-y-1.5">
-            <label for="editProfesional" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Profesional
-            </label>
-            <select
-              id="editProfesional"
-              name="editProfesional"
-              required
-              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-            >
-            </select>
-          </div>
-
-          <div class="space-y-1.5">
-            <label for="editFecha" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Fecha y Hora
-            </label>
-            <input
-              type="datetime-local"
-              id="editFecha"
-              name="editFecha"
-              required
-              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-            />
-          </div>
-
-          <div class="space-y-1.5">
-            <label for="editNotaDelDia" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Notas
-            </label>
-            <textarea
-              id="editNotaDelDia"
-              name="editNotaDelDia"
-              required
-              rows="4"
-              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-            ></textarea>
-          </div>
-
-          <!-- Botones del modal mejorados -->
-          <div class="flex flex-col-reverse xs:flex-row justify-end gap-3 xs:gap-2 mt-6">
-            <button
-              type="button"
-              id="cancelarEditarBtnA"
-              class="w-full xs:w-auto rounded-md border border-gray-300 bg-white px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="w-full xs:w-auto rounded-md bg-blue-600 px-4 py-2 text-sm sm:text-base text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-            >
-              Actualizar
-            </button>
-          </div>
-        </form>
       </div>
+
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Editar Atención</h3>
+      <form id="editarAtencionForm" class="space-y-4">
+        <input type="hidden" id="editPacienteId" />
+        <input type="hidden" id="editFechaOriginal" />
+        
+        <!-- Selector de profesional -->
+        <div>
+          <label for="editProfesional" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Profesional
+          </label>
+          <select
+            id="editProfesional"
+            name="editProfesional"
+            required
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+          >
+          </select>
+        </div>
+
+        <!-- Campo de fecha -->
+        <div>
+          <label for="editFecha" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Fecha y Hora
+          </label>
+          <input
+            type="datetime-local"
+            id="editFecha"
+            name="editFecha"
+            required
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+          />
+        </div>
+
+        <!-- Campo de notas -->
+        <div>
+          <label for="editNotaDelDia" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Notas
+          </label>
+          <textarea
+            id="editNotaDelDia"
+            name="editNotaDelDia"
+            required
+            rows="4"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+          ></textarea>
+        </div>
+
+        <!-- Botones del modal responsive -->
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-2 mt-6">
+          <button
+            type="button"
+            id="cancelarEditarBtnA"
+            class="w-full sm:w-auto rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="w-full sm:w-auto rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+          >
+            Actualizar
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Notificación mejorada -->
+  <!-- Notificación responsive -->
   <div 
     id="notification" 
-    class="hidden fixed top-4 right-4 left-4 sm:left-auto z-50 max-w-sm mx-auto sm:mx-0"
-  >
-    <div class="rounded-lg p-4 shadow-lg text-sm sm:text-base"></div>
-  </div>
+    class="hidden fixed top-4 right-4 left-4 sm:left-auto p-4 rounded-md shadow-lg max-w-sm mx-auto sm:mx-0 z-50"
+    role="alert"
+  ></div>
 </div>
 
 <script define:vars={{ dni }}>
 const BASE_URL = "https://odontoback-production.up.railway.app/api";
 
-// Función para formatear fechas mejorada
+// Función para formatear fechas
 function formatFecha(fechaStr) {
   const fecha = new Date(fechaStr);
   fecha.setHours(fecha.getHours() + 3);
@@ -254,59 +250,30 @@ function formatFecha(fechaStr) {
   });
 }
 
-// Función para mostrar notificaciones mejorada
+// Función para mostrar notificaciones
 function showNotification(message, type = 'success') {
   const notification = document.getElementById('notification');
-  const notificationContent = notification.querySelector('div');
-  
-  notificationContent.textContent = message;
-  notificationContent.className = `rounded-lg p-4 shadow-lg text-sm sm:text-base ${
-    type === 'success' 
-      ? 'bg-green-500 text-white' 
-      : 'bg-red-500 text-white'
+  notification.textContent = message;
+  notification.className = `fixed top-4 right-4 left-4 sm:left-auto p-4 rounded-md shadow-lg max-w-sm mx-auto sm:mx-0 z-50 ${
+    type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
   }`;
   
   notification.classList.remove('hidden');
-  
-  // Animación suave
-  notification.style.opacity = '0';
-  notification.style.transform = 'translateY(-20px)';
-  notification.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
-  
   setTimeout(() => {
-    notification.style.opacity = '1';
-    notification.style.transform = 'translateY(0)';
-  }, 10);
-
-  setTimeout(() => {
-    notification.style.opacity = '0';
-    notification.style.transform = 'translateY(-20px)';
-    setTimeout(() => {
-      notification.classList.add('hidden');
-    }, 300);
+    notification.classList.add('hidden');
   }, 3000);
 }
 
-// Función para cargar datos iniciales mejorada
+// Función para cargar datos iniciales
 async function cargarDatosIniciales() {
   try {
-    const [pacienteResponse, medicosResponse] = await Promise.all([
-      fetch(`${BASE_URL}/paciente/findByDni/${dni}`),
-      fetch(`${BASE_URL}/medico`)
-    ]);
-
-    if (!pacienteResponse.ok || !medicosResponse.ok) {
-      throw new Error('Error al cargar datos iniciales');
+    // Cargar datos del paciente
+    const pacienteResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
+    if (!pacienteResponse.ok) {
+      throw new Error('Error al cargar datos del paciente');
     }
     
-    const [pacienteData, medicosData] = await Promise.all([
-      pacienteResponse.json(),
-      medicosResponse.json()
-    ]);
-
-    const { paciente } = pacienteData;
-    const { medicos } = medicosData;
-
+    const { paciente } = await pacienteResponse.json();
     if (!paciente || !paciente.dni) {
       throw new Error('No se encontraron datos válidos del paciente');
     }
@@ -314,7 +281,15 @@ async function cargarDatosIniciales() {
     const pacienteId = paciente._id || paciente.id;
     document.getElementById('pacienteId').value = pacienteId;
 
-    // Poblar selectores de médicos de forma optimizada
+    // Cargar lista de médicos
+    const medicosResponse = await fetch(`${BASE_URL}/medico`);
+    if (!medicosResponse.ok) {
+      throw new Error('Error al cargar lista de médicos');
+    }
+    
+    const { medicos } = await medicosResponse.json();
+
+    // Poblar selectores de médicos
     const selectMedicos = document.getElementById('profesional');
     const selectMedicosEdit = document.getElementById('editProfesional');
     
@@ -322,15 +297,13 @@ async function cargarDatosIniciales() {
       throw new Error('Error en la interfaz de usuario');
     }
 
-    const medicosOptions = medicos.map(medico => 
-      `<option value="${medico.nombre}">${medico.nombre}</option>`
-    );
+    const medicosOptions = ['<option value="">Seleccione un profesional</option>']
+      .concat(medicos.map(medico => 
+        `<option value="${medico.nombre}">${medico.nombre}</option>`
+      ));
     
-    const defaultOption = '<option value="">Seleccione un profesional</option>';
-    const optionsHTML = defaultOption + medicosOptions.join('');
-    
-    selectMedicos.innerHTML = optionsHTML;
-    selectMedicosEdit.innerHTML = optionsHTML;
+    selectMedicos.innerHTML = medicosOptions.join('');
+    selectMedicosEdit.innerHTML = medicosOptions.join('');
 
     // Cargar tabla de atenciones
     await cargarAtenciones(pacienteId);
@@ -340,7 +313,7 @@ async function cargarDatosIniciales() {
   }
 }
 
-// Función para cargar atenciones mejorada
+// Función para cargar atenciones
 async function cargarAtenciones(pacienteId) {
   try {
     const response = await fetch(`${BASE_URL}/atenciones/todas/${pacienteId}`);
@@ -350,33 +323,32 @@ async function cargarAtenciones(pacienteId) {
     
     const atenciones = await response.json();
     const tableBody = document.getElementById('atencionesTableBody');
-    if (!tableBody) {
+    const cardView = document.getElementById('atencionesCardView');
+    
+    if (!tableBody || !cardView) {
       throw new Error('Error en la interfaz de usuario');
     }
 
-    const atencionesOrdenadas = [...atenciones].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    const atencionesOrdenadas = atenciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
+    // Actualizar vista de tabla
     tableBody.innerHTML = atencionesOrdenadas.map(atencion => `
-      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-xs sm:text-sm text-gray-900 dark:text-gray-300 sm:pl-6">
-          ${formatFecha(atencion.fecha)}
-        </td>
-        <td class="whitespace-nowrap px-3 py-3 text-xs sm:text-sm text-gray-900 dark:text-gray-300">
-          ${atencion.profesional}
-        </td>
-        <td class="px-3 py-3 text-xs sm:text-sm text-gray-900 dark:text-gray-300">
-          <div class="max-w-[150px] xs:max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[500px] truncate">
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 dark:text-gray-300 sm:pl-6">${formatFecha(atencion.fecha)}</td>
+        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-300">${atencion.profesional}</td>
+        <td class="px-3 py-4 text-sm text-gray-900 dark:text-gray-300">
+          <div class="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg truncate">
             ${atencion.notaDelDia}
           </div>
         </td>
-        <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-xs sm:text-sm font-medium sm:pr-6">
+        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
           <div class="flex justify-end gap-2">
             <button 
               onclick="editarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
-              class="text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded-md p-1"
+              class="text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
               aria-label="Editar"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" 
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -384,10 +356,10 @@ async function cargarAtenciones(pacienteId) {
             </button>
             <button 
               onclick="eliminarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
-              class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded-md p-1"
+              class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
               aria-label="Eliminar"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" 
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 6h18"/>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
@@ -398,13 +370,57 @@ async function cargarAtenciones(pacienteId) {
         </td>
       </tr>
     `).join('');
+
+    // Actualizar vista de tarjetas para móvil
+    cardView.innerHTML = atencionesOrdenadas.map(atencion => `
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
+        <div class="flex justify-between items-start mb-3">
+          <div class="space-y-1">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              ${formatFecha(atencion.fecha)}
+            </p>
+            <p class="text-base font-semibold text-gray-900 dark:text-gray-100">
+              ${atencion.profesional}
+            </p>
+          </div>
+          <div class="flex gap-2">
+            <button 
+              onclick="editarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
+              class="text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400 p-1"
+              aria-label="Editar"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button 
+              onclick="eliminarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
+              class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400 p-1"
+              aria-label="Eliminar"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+          ${atencion.notaDelDia}
+        </div>
+      </div>
+    `).join('');
   } catch (error) {
     console.error('Error en cargarAtenciones:', error);
     showNotification(error.message, 'error');
   }
 }
 
-// Event Handlers mejorados
+// Event Handlers
 window.editarAtencionHandler = async function(pacienteId, fecha) {
   try {
     const response = await fetch(`${BASE_URL}/atenciones/unica/${pacienteId}/fecha/${fecha}`);
@@ -418,21 +434,11 @@ window.editarAtencionHandler = async function(pacienteId, fecha) {
     document.getElementById('editPacienteId').value = pacienteId;
     document.getElementById('editFechaOriginal').value = fecha;
     document.getElementById('editProfesional').value = atencion.profesional;
-    
-    // Formatear fecha para el input datetime-local
-    const fechaLocal = new Date(atencion.fecha);
-    fechaLocal.setMinutes(fechaLocal.getMinutes() - fechaLocal.getTimezoneOffset());
-    document.getElementById('editFecha').value = fechaLocal.toISOString().slice(0, 16);
-    
+    document.getElementById('editFecha').value = new Date(atencion.fecha).toISOString().slice(0, 16);
     document.getElementById('editNotaDelDia').value = atencion.notaDelDia;
     
-    // Mostrar el modal con animación
-    const modal = document.getElementById('editarAtencionModal');
-    modal.classList.remove('hidden');
-    modal.style.opacity = '0';
-    requestAnimationFrame(() => {
-      modal.style.opacity = '1';
-    });
+    // Mostrar el modal
+    document.getElementById('editarAtencionModal').classList.remove('hidden');
   } catch (error) {
     console.error('Error en editarAtencionHandler:', error);
     showNotification(error.message, 'error');
@@ -459,149 +465,142 @@ window.eliminarAtencionHandler = async function(pacienteId, fecha) {
   }
 };
 
-// Inicialización y eventos del DOM mejorados
+// Inicialización y eventos del DOM
 document.addEventListener('DOMContentLoaded', () => {
-  const atencionModal = document.getElementById('atencionModal');
-  const editarAtencionModal = document.getElementById('editarAtencionModal');
-  const atencionForm = document.getElementById('atencionForm');
-  const editarAtencionForm = document.getElementById('editarAtencionForm');
-
-  // Función para cerrar modal con animación
-  function closeModalWithAnimation(modal, form) {
-    modal.style.opacity = '0';
-    setTimeout(() => {
-      modal.classList.add('hidden');
-      form?.reset();
-    }, 300);
-  }
-
-  // Manejadores de eventos para cerrar modales
-  ['cancelarBtnA', 'closeModalBtn'].forEach(id => {
-    document.getElementById(id)?.addEventListener('click', () => {
-      closeModalWithAnimation(atencionModal, atencionForm);
-    });
-  });
-
-  ['cancelarEditarBtnA', 'closeEditModalBtn'].forEach(id => {
-    document.getElementById(id)?.addEventListener('click', () => {
-      closeModalWithAnimation(editarAtencionModal, editarAtencionForm);
-    });
+  const closeButtons = ['closeModalBtn', 'closeEditModalBtn', 'cancelarBtnA', 'cancelarEditarBtnA'];
+  
+  closeButtons.forEach(buttonId => {
+    const button = document.getElementById(buttonId);
+    if (button) {
+      button.addEventListener('click', () => {
+        document.getElementById('atencionModal').classList.add('hidden');
+        document.getElementById('editarAtencionModal').classList.add('hidden');
+        document.getElementById('atencionForm').reset();
+        document.getElementById('editarAtencionForm').reset();
+      });
+    }
   });
 
   // Cerrar modales al hacer clic fuera
   window.addEventListener('click', (e) => {
-    if (e.target === atencionModal) {
-      closeModalWithAnimation(atencionModal, atencionForm);
+    const modal = document.getElementById('atencionModal');
+    const editModal = document.getElementById('editarAtencionModal');
+    
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      document.getElementById('atencionForm').reset();
     }
-    if (e.target === editarAtencionModal) {
-      closeModalWithAnimation(editarAtencionModal, editarAtencionForm);
+    
+    if (e.target === editModal) {
+      editModal.classList.add('hidden');
+      document.getElementById('editarAtencionForm').reset();
     }
   });
 
   // Cerrar modales con Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      closeModalWithAnimation(atencionModal, atencionForm);
-      closeModalWithAnimation(editarAtencionModal, editarAtencionForm);
+      const modal = document.getElementById('atencionModal');
+      const editModal = document.getElementById('editarAtencionModal');
+      
+      modal.classList.add('hidden');
+      editModal.classList.add('hidden');
+      
+      document.getElementById('atencionForm').reset();
+      document.getElementById('editarAtencionForm').reset();
     }
   });
 
-  // Abrir modal nueva atención
-  document.getElementById('nuevaAtencionBtn')?.addEventListener('click', () => {
-    atencionModal.classList.remove('hidden');
-    atencionModal.style.opacity = '0';
-    requestAnimationFrame(() => {
-      atencionModal.style.opacity = '1';
+  const nuevaAtencionBtn = document.getElementById('nuevaAtencionBtn');
+  if (nuevaAtencionBtn) {
+    nuevaAtencionBtn.addEventListener('click', () => {
+      document.getElementById('atencionModal').classList.remove('hidden');
     });
-  });
+  }
 
   // Manejo del formulario de nueva atención
-  atencionForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const submitButton = atencionForm.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    submitButton.innerHTML = `
-      <svg class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Guardando...
-    `;
+  const form = document.getElementById('atencionForm');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = 'Guardando...';
 
-    try {
-      const formData = {
-        paciente: document.getElementById('pacienteId').value,
-        profesional: document.getElementById('profesional').value,
-        fecha: document.getElementById('fecha').value,
-        notaDelDia: document.getElementById('notaDelDia').value
-      };
+      try {
+        const formData = {
+          paciente: document.getElementById('pacienteId').value,
+          profesional: document.getElementById('profesional').value,
+          fecha: document.getElementById('fecha').value,
+          notaDelDia: document.getElementById('notaDelDia').value
+        };
 
-      const response = await fetch(`${BASE_URL}/atenciones/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+        const response = await fetch(`${BASE_URL}/atenciones/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
 
-      if (!response.ok) {
-        throw new Error('Error al crear la atención');
+        if (!response.ok) {
+          throw new Error('Error al crear la atención');
+        }
+
+        showNotification('Atención creada exitosamente');
+        document.getElementById('atencionModal').classList.add('hidden');
+        form.reset();
+        await cargarAtenciones(formData.paciente);
+      } catch (error) {
+        console.error('Error en submit de nueva atención:', error);
+        showNotification(error.message, 'error');
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Guardar';
       }
-
-      showNotification('Atención creada exitosamente');
-      closeModalWithAnimation(atencionModal, atencionForm);
-      await cargarAtenciones(formData.paciente);
-    } catch (error) {
-      console.error('Error en submit de nueva atención:', error);
-      showNotification(error.message, 'error');
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = 'Guardar';
-    }
-  });
+    });
+  }
 
   // Manejo del formulario de edición
-  editarAtencionForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const submitButton = editarAtencionForm.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    submitButton.innerHTML = `
-      <svg class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Actualizando...
-    `;
+  const editarForm = document.getElementById('editarAtencionForm');
+  if (editarForm) {
+    editarForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitButton = editarForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = 'Actualizando...';
 
-    try {
-      const pacienteId = document.getElementById('editPacienteId').value;
-      const fechaOriginal = document.getElementById('editFechaOriginal').value;
-      
-      const formData = {
-        profesional: document.getElementById('editProfesional').value,
-        fecha: document.getElementById('editFecha').value,
-        notaDelDia: document.getElementById('editNotaDelDia').value
-      };
+      try {
+        const pacienteId = document.getElementById('editPacienteId').value;
+        const fechaOriginal = document.getElementById('editFechaOriginal').value;
+        
+        const formData = {
+          profesional: document.getElementById('editProfesional').value,
+          fecha: document.getElementById('editFecha').value,
+          notaDelDia: document.getElementById('editNotaDelDia').value
+        };
 
-      const response = await fetch(`${BASE_URL}/atenciones/edit-atencion/${pacienteId}/fecha/${fechaOriginal}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+        const response = await fetch(`${BASE_URL}/atenciones/edit-atencion/${pacienteId}/fecha/${fechaOriginal}`, {
+          method: 'PUT',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify(formData)
+        });
 
-      if (!response.ok) {
-        throw new Error('Error al actualizar la atención');
+        if (!response.ok) {
+          throw new Error('Error al actualizar la atención');
+        }
+
+        showNotification('Atención actualizada exitosamente');
+        document.getElementById('editarAtencionModal').classList.add('hidden');
+        editarForm.reset();
+        await cargarAtenciones(pacienteId);
+      } catch (error) {
+        console.error('Error en submit de edición:', error);
+        showNotification(error.message, 'error');
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Actualizar';
       }
-
-      showNotification('Atención actualizada exitosamente');
-      closeModalWithAnimation(editarAtencionModal, editarAtencionForm);
-      await cargarAtenciones(pacienteId);
-    } catch (error) {
-      console.error('Error en submit de edición:', error);
-      showNotification(error.message, 'error');
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = 'Actualizar';
-    }
-  });
+    });
+  }
 
   // Inicializar datos
   cargarDatosIniciales();
@@ -610,5 +609,36 @@ document.addEventListener('DOMContentLoaded', () => {
 // Evento para el sistema de enrutamiento de Astro
 document.addEventListener('astro:page-load', () => {
   cargarDatosIniciales();
+});
+
+// Manejador para el botón de cerrar modal en móviles
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#closeModalBtn')) {
+    document.getElementById('atencionModal').classList.add('hidden');
+    document.getElementById('atencionForm').reset();
+  }
+  if (e.target.closest('#closeEditModalBtn')) {
+    document.getElementById('editarAtencionModal').classList.add('hidden');
+    document.getElementById('editarAtencionForm').reset();
+  }
+});
+
+// Manejador para ajustar la altura del textarea automáticamente
+const textareas = document.querySelectorAll('textarea');
+textareas.forEach(textarea => {
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+});
+
+// Función para manejar errores de red
+window.addEventListener('offline', () => {
+  showNotification('Se perdió la conexión a internet', 'error');
+});
+
+window.addEventListener('online', () => {
+  showNotification('Se restableció la conexión', 'success');
+  cargarDatosIniciales(); // Recargar datos cuando se recupere la conexión
 });
 </script>

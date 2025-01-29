@@ -1,27 +1,19 @@
 ---
+// Solo necesitamos los props que se pasan al componente
 const { class: clazz } = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Consultorio Odontológico</title>
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content="Sistema de Gestión Odontológica" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-		<!-- Preload de fuentes para mejor rendimiento -->
-		<link 
-			rel="preload" 
-			href="https://fonts.cdnfonts.com/css/inter" 
-			as="style"
-			onload="this.onload=null;this.rel='stylesheet'"
-		/>
-
 		<script is:inline>
-			// Dark mode logic
 			if (
 				localStorage.getItem('color-theme') === 'dark' ||
 				(!('color-theme' in localStorage) &&
@@ -36,20 +28,13 @@ const { class: clazz } = Astro.props;
 	<body
 		class:list={[
 			clazz,
-			'min-h-full w-full',
 			'bg-gray-50 dark:bg-gray-800',
 			'scrollbar scrollbar-w-3 scrollbar-thumb-rounded-[0.25rem]',
-			'scrollbar-track-slate-200 scrollbar-thumb-gray-400',
+			'scrollbar-track-slate-200  scrollbar-thumb-gray-400',
 			'dark:scrollbar-track-gray-900 dark:scrollbar-thumb-gray-700',
-			'flex flex-col',
-			'text-base sm:text-lg',
-			'antialiased',
-			'overflow-x-hidden'
 		]}
 	>
-		<div class="flex-grow flex flex-col min-h-0 w-full max-w-[100vw]">
-			<slot />
-		</div>
+		<slot />
 	</body>
 </html>
 
@@ -59,41 +44,4 @@ const { class: clazz } = Astro.props;
 
 <style is:global>
 	@import url('https://fonts.cdnfonts.com/css/inter');
-
-	/* Estilos base responsivos */
-	:root {
-		font-size: 16px;
-	}
-
-	@media (max-width: 640px) {
-		:root {
-			font-size: 14px;
-		}
-	}
-
-	/* Mejoras de rendimiento */
-	* {
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-	}
-
-	/* Prevenir desbordamiento horizontal */
-	html, body {
-		overflow-x: hidden;
-		max-width: 100vw;
-	}
-
-	/* Mejoras para dispositivos táctiles */
-	@media (hover: none) {
-		* {
-			cursor: default !important;
-		}
-	}
-
-	/* Ajustes para mejor legibilidad en móviles */
-	@media (max-width: 640px) {
-		input, select, textarea {
-			font-size: 16px !important;
-		}
-	}
 </style>
