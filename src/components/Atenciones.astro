@@ -1,5 +1,4 @@
 ---
-// TableAtenciones.astro
 interface Props {
   dni: string;
 }
@@ -7,54 +6,77 @@ interface Props {
 const { dni } = Astro.props;
 ---
 
-<div class="space-y-6">
+<div class="space-y-6 w-full px-4 sm:px-6 lg:px-8">
   <!-- Header con título y botón -->
-  <div class="flex items-center justify-between">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
     <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">
       Atenciones
     </h2>
     <button
       id="nuevaAtencionBtn"
-      class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+      class="w-full sm:w-auto rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
     >
       Nueva Atención
     </button>
   </div>
 
-  <!-- Tabla de Atenciones -->
-  <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-    <table class="w-full table-auto border-collapse">
-      <thead>
-        <tr class="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
-          <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Fecha</th>
-          <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Profesional</th>
-          <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-200">Notas</th>
-          <th class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="atencionesTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
-        <!-- Las filas se agregarán dinámicamente -->
-      </tbody>
-    </table>
+  <!-- Tabla de Atenciones con scroll horizontal en móvil -->
+  <div class="w-full -mx-4 sm:mx-0">
+    <div class="inline-block min-w-full py-2 align-middle">
+      <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6">Fecha</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Profesional</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Notas</th>
+              <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <span class="sr-only">Acciones</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="atencionesTableBody" class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+            <!-- Las filas se agregarán dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- Modal Nueva Atención -->
   <div
     id="atencionModal"
-    class="fixed left-0 top-0 z-50 hidden h-full w-full bg-black bg-opacity-50"
+    class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-20"
+    role="dialog"
+    aria-modal="true"
   >
-    <div class="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
-      <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Nueva Atención</h3>
+    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+    <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 shadow-xl transition-all sm:w-full sm:max-w-lg sm:p-6 dark:bg-gray-800 mx-auto">
+      <div class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
+        <button
+          type="button"
+          id="closeModalBtn"
+          class="rounded-md bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          <span class="sr-only">Cerrar</span>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Nueva Atención</h3>
       <form id="atencionForm" class="space-y-4">
         <input type="hidden" id="pacienteId" />
 
         <!-- Selector de profesional -->
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
+          <label for="profesional" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             Profesional
           </label>
           <select
             id="profesional"
+            name="profesional"
             required
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
           >
@@ -64,12 +86,13 @@ const { dni } = Astro.props;
 
         <!-- Campo de fecha -->
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
+          <label for="fecha" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             Fecha y Hora
           </label>
           <input
             type="datetime-local"
             id="fecha"
+            name="fecha"
             required
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
           />
@@ -77,29 +100,30 @@ const { dni } = Astro.props;
 
         <!-- Campo de notas -->
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
+          <label for="notaDelDia" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             Notas
           </label>
           <textarea
             id="notaDelDia"
+            name="notaDelDia"
             required
             rows="4"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
           ></textarea>
         </div>
 
-        <!-- Botones del modal -->
-        <div class="flex justify-end space-x-2">
+        <!-- Botones del modal responsive -->
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-2 mt-6">
           <button
             type="button"
             id="cancelarBtnA"
-            class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            class="w-full sm:w-auto rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            class="w-full sm:w-auto rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
           >
             Guardar
           </button>
@@ -111,61 +135,84 @@ const { dni } = Astro.props;
   <!-- Modal Editar Atención -->
   <div
     id="editarAtencionModal"
-    class="fixed left-0 top-0 z-50 hidden h-full w-full bg-black bg-opacity-50"
+    class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-20"
+    role="dialog"
+    aria-modal="true"
   >
-    <div class="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
-      <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Editar Atención</h3>
+    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+    <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 shadow-xl transition-all sm:w-full sm:max-w-lg sm:p-6 dark:bg-gray-800 mx-auto">
+      <div class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
+        <button
+          type="button"
+          id="closeEditModalBtn"
+          class="rounded-md bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          <span class="sr-only">Cerrar</span>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Editar Atención</h3>
       <form id="editarAtencionForm" class="space-y-4">
         <input type="hidden" id="editPacienteId" />
         <input type="hidden" id="editFechaOriginal" />
         
+        <!-- Selector de profesional -->
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
+          <label for="editProfesional" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             Profesional
           </label>
           <select
             id="editProfesional"
+            name="editProfesional"
             required
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
           >
           </select>
         </div>
 
+        <!-- Campo de fecha -->
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
+          <label for="editFecha" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             Fecha y Hora
           </label>
           <input
             type="datetime-local"
             id="editFecha"
+            name="editFecha"
             required
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
           />
         </div>
 
+        <!-- Campo de notas -->
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
+          <label for="editNotaDelDia" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             Notas
           </label>
           <textarea
             id="editNotaDelDia"
+            name="editNotaDelDia"
             required
             rows="4"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
           ></textarea>
         </div>
 
-        <div class="flex justify-end space-x-2">
+        <!-- Botones del modal responsive -->
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-2 mt-6">
           <button
             type="button"
             id="cancelarEditarBtnA"
-            class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            class="w-full sm:w-auto rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            class="w-full sm:w-auto rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
           >
             Actualizar
           </button>
@@ -174,8 +221,12 @@ const { dni } = Astro.props;
     </div>
   </div>
 
-  <!-- Notificación -->
-  <div id="notification" class="hidden fixed top-4 right-4 p-4 rounded-md shadow-lg"></div>
+  <!-- Notificación responsive -->
+  <div 
+    id="notification" 
+    class="hidden fixed top-4 right-4 left-4 sm:left-auto p-4 rounded-md shadow-lg max-w-sm mx-auto sm:mx-0 z-50"
+    role="alert"
+  ></div>
 </div>
 
 <script define:vars={{ dni }}>
@@ -271,19 +322,23 @@ async function cargarAtenciones(pacienteId) {
       throw new Error('Error en la interfaz de usuario');
     }
 
-    // Ordenar atenciones
     const atencionesOrdenadas = atenciones.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
     tableBody.innerHTML = atencionesOrdenadas.map(atencion => `
-      <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-        <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${formatFecha(atencion.fecha)}</td>
-        <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.profesional}</td>
-        <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${atencion.notaDelDia}</td>
-        <td class="px-4 py-2 text-right">
-          <div class="flex justify-end space-x-2">
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 dark:text-gray-300 sm:pl-6">${formatFecha(atencion.fecha)}</td>
+        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-300">${atencion.profesional}</td>
+        <td class="px-3 py-4 text-sm text-gray-900 dark:text-gray-300">
+          <div class="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg truncate">
+            ${atencion.notaDelDia}
+          </div>
+        </td>
+        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+          <div class="flex justify-end gap-2">
             <button 
               onclick="editarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
-              class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
+              class="text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400"
+              aria-label="Editar"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -293,7 +348,8 @@ async function cargarAtenciones(pacienteId) {
             </button>
             <button 
               onclick="eliminarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
-              class="p-2 text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+              class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+              aria-label="Eliminar"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" 
                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
