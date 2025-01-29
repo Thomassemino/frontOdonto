@@ -1,47 +1,125 @@
 ---
-// Solo necesitamos los props que se pasan al componente
-const { class: clazz } = Astro.props;
+const { 
+  class: clazz,
+  title = "Consultorio Odontológico",
+  description = "Sistema de Gestión Odontológica"
+} = Astro.props;
+
+// Importar componentes necesarios si los hay
 ---
 
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Consultorio Odontológico</title>
-		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content="Sistema de Gestión Odontológica" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<html lang="es" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <!-- SEO básico -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Meta tags para móviles -->
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1F2937" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <!-- Precargar fuentes críticas -->
+    <link 
+      rel="preload" 
+      href="https://fonts.cdnfonts.com/css/inter" 
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/inter">
+    </noscript>
 
-		<script is:inline>
-			if (
-				localStorage.getItem('color-theme') === 'dark' ||
-				(!('color-theme' in localStorage) &&
-					window.matchMedia('(prefers-color-scheme: dark)').matches)
-			) {
-				document.documentElement.classList.add('dark');
-			} else {
-				document.documentElement.classList.remove('dark');
-			}
-		</script>
-	</head>
-	<body
-		class:list={[
-			clazz,
-			'bg-gray-50 dark:bg-gray-800',
-			'scrollbar scrollbar-w-3 scrollbar-thumb-rounded-[0.25rem]',
-			'scrollbar-track-slate-200  scrollbar-thumb-gray-400',
-			'dark:scrollbar-track-gray-900 dark:scrollbar-thumb-gray-700',
-		]}
-	>
-		<slot />
-	</body>
+    <!-- Script para el tema oscuro -->
+    <script is:inline>
+      // Verificar preferencia de tema guardada o del sistema
+      const getThemePreference = () => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('color-theme')) {
+          return localStorage.getItem('color-theme');
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+
+      // Aplicar tema
+      const theme = getThemePreference();
+      document.documentElement.classList[theme === 'dark' ? 'add' : 'remove']('dark');
+    </script>
+  </head>
+  <body
+    class:list={[
+      clazz,
+      // Colores de fondo responsive
+      'bg-gray-50 dark:bg-gray-800',
+      // Sistema de scroll personalizado
+      'scrollbar scrollbar-w-3 scrollbar-thumb-rounded-[0.25rem]',
+      'scrollbar-track-slate-200 scrollbar-thumb-gray-400',
+      'dark:scrollbar-track-gray-900 dark:scrollbar-thumb-gray-700',
+      // Clases base para responsividad
+      'min-h-screen w-full',
+      'font-sans antialiased',
+      // Flex para centrado y organización del contenido
+      'flex flex-col',
+      // Espaciado responsive
+      'px-4 sm:px-6 lg:px-8',
+      // Transiciones suaves
+      'transition-colors duration-200'
+    ]}
+  >
+    <main class="flex-grow">
+      <slot />
+    </main>
+  </body>
 </html>
 
+<!-- Scripts -->
 <script>
-	import 'flowbite';
+  import 'flowbite';
+  
+  // Escuchar cambios en el tema del sistema
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('color-theme')) {
+      document.documentElement.classList[e.matches ? 'add' : 'remove']('dark');
+    }
+  });
 </script>
 
 <style is:global>
-	@import url('https://fonts.cdnfonts.com/css/inter');
+  /* Estilos base */
+  :root {
+    --scroll-behavior: smooth !important;
+    scroll-behavior: smooth;
+  }
+
+  /* Estilos responsive para el contenido */
+  @media (max-width: 640px) {
+    html {
+      font-size: 14px;
+    }
+  }
+
+  /* Mejoras de accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Optimizaciones de rendimiento */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
 </style>
