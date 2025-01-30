@@ -735,32 +735,26 @@ async function renderizarHistorial(historial) {
 }
 
 // Función para obtener el nombre del usuario
-async function obtenerNombreUsuario() {
-  const userId = localStorage.getItem('userId');
-  const userRole = localStorage.getItem('userRole');
-  
-  console.log('Obteniendo nombre para usuario:', { userId, userRole });
-  
+// Función mejorada para obtener el nombre del usuario
+async function obtenerNombreUsuario(userId) {
   if (!userId || userId === 'Sistema') return 'Sistema';
+  
+  const userRole = localStorage.getItem('userRole');
   
   try {
     let response;
-    let rolTexto;
     let userData;
+    let rolTexto = userRole === 'odontologo' ? 'Odontólogo' : 'Secretaria';
 
-    if (userRole === 'odontologo') {
-      response = await fetch(`${BASE_URL}/medico/findById/${userId}`);
-      rolTexto = 'Odontólogo';
-      const data = await response.json();
-      userData = data.medico; // Extraer los datos del objeto medico
-    } else {
-      response = await fetch(`${BASE_URL}/secretaria/buscarId/${userId}`);
-      rolTexto = 'Secretaria';
-      userData = await response.json();
-    }
+    const url = userRole === 'odontologo' 
+      ? `${BASE_URL}/medico/findById/${userId}`
+      : `${BASE_URL}/secretaria/buscarId/${userId}`;
 
-    console.log('Respuesta del servidor:', response.status);
-    console.log('Datos de usuario procesados:', userData);
+    response = await fetch(url);
+    const data = await response.json();
+    
+    // Manejar diferentes estructuras de respuesta
+    userData = userRole === 'odontologo' ? data.medico : data;
 
     if (!response.ok || !userData || !userData.nombre) {
       throw new Error('No se pudo obtener el nombre del usuario');
@@ -774,7 +768,157 @@ async function obtenerNombreUsuario() {
     return `${nombreCapitalizado} (${rolTexto})`;
   } catch (error) {
     console.error('Error al obtener nombre:', error);
-    return `Usuario ${userId}`; // Valor por defecto en caso de error
+    return `Usuario ${userId}`;
+  }
+}
+
+// Función para crear una prestación con información de usuario
+async function crearPrestacion(data) {
+  try {
+    const userId = localStorage.getItem('userId') || 'Sistema';
+    const nombreUsuario = await obtenerNombreUsuario(userId);
+    
+    const prestacionData = {
+      ...data,
+      creadoPor: userId,
+      nombreCreador: nombreUsuario
+    };
+
+    const response = await fetch(`${BASE_URL}/prestaciones`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(prestacionData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al crear la prestación');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al crear prestación:', error);
+    throw error;
+  }
+}
+
+// Función para actualizar una prestación con información de usuario
+async function actualizarPrestacion(id, data) {
+  try {
+    const userId = localStorage.getItem('userId') || 'Sistema';
+    const nombreUsuario = await obtenerNombreUsuario(userId);
+    
+    const prestacionData = {
+      ...data,
+      modificadoPor: userId,
+      nombreModificador: nombreUsuario,
+      fechaModificacion: new Date().toISOString()
+    };
+
+    const response = await fetch(`${BASE_URL}/prestaciones/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(prestacionData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al actualizar la prestación');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al actualizar prestación:', error);
+    throw error;
+  }
+}
+
+// Función para registrar un pago con información de usuario
+async function registrarPago(prestacionId, data) {
+  try {
+    const userId = localStorage.getItem('userId') || 'Sistema';
+    const nombreUsuario = await obtenerNombreUsuario(userId);
+    
+    const pagoData = {
+      ...data,
+      odontologoId: userId,
+      nombreOdontologo: nombreUsuario,
+      fechaCreacion: new Date().toISOString(),
+      estado: 'activo'
+    };
+
+    const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pagoData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al registrar el pago');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al registrar pago:', error);
+    throw error;
+  }
+}
+
+// Función para editar un pago con información de usuario
+async function editarPago(prestacionId, pagoId, data) {
+  try {
+    const userId = localStorage.getItem('userId') || 'Sistema';
+    const nombreUsuario = await obtenerNombreUsuario(userId);
+    
+    const pagoData = {
+      ...data,
+      editadoPor: userId,
+      nombreEditor: nombreUsuario,
+      fechaEdicion: new Date().toISOString()
+    };
+
+    const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos/${pagoId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pagoData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al editar el pago');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al editar pago:', error);
+    throw error;
+  }
+}
+
+// Función para eliminar un pago con información de usuario
+async function eliminarPago(prestacionId, pagoId) {
+  try {
+    const userId = localStorage.getItem('userId') || 'Sistema';
+    const nombreUsuario = await obtenerNombreUsuario(userId);
+    
+    const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos/${pagoId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eliminadoPor: userId,
+        nombreEliminador: nombreUsuario,
+        fechaEliminacion: new Date().toISOString()
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al eliminar el pago');
+    }
+  } catch (error) {
+    console.error('Error al eliminar pago:', error);
+    throw error;
   }
 }
 
@@ -1237,82 +1381,58 @@ pagoForm.addEventListener('submit', async (e) => {
 
   try {
     const formData = new FormData(pagoForm);
-    const prestacionId = formData.get('prestacionSelect');
+    const prestacionId = formData.get('prestacionSelect') || formData.get('prestacionId');
     const pagoId = formData.get('pagoId');
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem('userId') || 'Sistema';
     
-    console.log('Datos del formulario:', {
-      prestacionId,
-      pagoId,
-      userId,
-      monto: formData.get('montoPago'),
-      fecha: formData.get('fechaPago')
-    });
+    // Asegurarse de obtener el nombre del usuario
+    let nombreUsuario;
+    try {
+      nombreUsuario = await obtenerNombreUsuarioActual();
+    } catch (error) {
+      console.error('Error al obtener nombre de usuario:', error);
+      nombreUsuario = 'Sistema';
+    }
 
-    // Obtener nombre del usuario (ahora nunca falla)
-    const nombreUsuario = await obtenerNombreUsuarioActual();
-    console.log('Nombre de usuario obtenido:', nombreUsuario);
-
-    const fechaInput = formData.get('fechaPago');
-    const fecha = new Date(fechaInput);
-    
-    const pagoBase = {
+    // Preparar los datos del pago con todos los campos requeridos
+    const datosPago = {
       monto: parseFloat(formData.get('montoPago')),
-      fecha: fecha.toISOString(),
+      fecha: new Date(formData.get('fechaPago')).toISOString(),
       odontologoId: userId,
-      nombreOdontologo: nombreUsuario
+      nombreOdontologo: nombreUsuario,
+      editadoPor: userId,
+      nombreEditor: nombreUsuario,
+      nombreCreador: nombreUsuario // Agregar el nombreCreador si es necesario
     };
 
-    console.log('Datos base del pago:', pagoBase);
+    console.log('Enviando datos de pago:', datosPago);
 
+    let response;
     if (pagoId) {
       // Edición de pago existente
-      const datosEdicion = {
-        ...pagoBase,
-        editadoPor: userId,
-        nombreEditor: nombreUsuario,
-        fechaEdicion: new Date().toISOString()
-      };
-      
-      console.log('Datos de edición a enviar:', datosEdicion);
-      
-      const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos/${pagoId}`, {
+      response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos/${pagoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosEdicion)
+        body: JSON.stringify(datosPago)
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al editar el pago');
-      }
     } else {
       // Creación de nuevo pago
-      const datosCreacion = {
-        ...pagoBase,
-        fechaCreacion: new Date().toISOString(),
-        creadoPor: userId,
-        nombreCreador: nombreUsuario,
-        estado: 'activo'
-      };
-      
-      console.log('Datos de creación a enviar:', datosCreacion);
-      
-      const response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos`, {
+      response = await fetch(`${BASE_URL}/prestaciones/${prestacionId}/pagos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosCreacion)
+        body: JSON.stringify(datosPago)
       });
+    }
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al registrar el pago');
-      }
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al procesar el pago');
     }
 
     // Actualizar UI
     await cargarPrestaciones();
     
+    // Actualizar historial si está abierto
     if (!document.getElementById('historialModal').classList.contains('hidden')) {
       const paciente = await obtenerPacientePorDni();
       const prestaciones = await obtenerPrestaciones(paciente._id);
