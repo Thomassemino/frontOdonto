@@ -20,28 +20,28 @@ const { dni } = Astro.props;
     </button>
   </div>
 
-  <!-- Vista de tabla para desktop -->
-  <div class="hidden md:block w-full">
-    <div class="inline-block min-w-full py-2 align-middle">
-      <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6">Fecha</th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Profesional</th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Notas</th>
-              <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                <span class="sr-only">Acciones</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody id="atencionesTableBody" class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-            <!-- Las filas se agregarán dinámicamente -->
-          </tbody>
-        </table>
-      </div>
+ <!-- Vista de tabla para desktop -->
+<div class="hidden md:block w-full">
+  <div class="inline-block min-w-full py-2 align-middle">
+    <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-800">
+          <tr>
+            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6">Fecha</th>
+            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Profesional</th>
+            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 w-full">Notas</th>
+            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+              <span class="sr-only">Acciones</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="atencionesTableBody" class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+          <!-- Las filas se agregarán dinámicamente -->
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
 
   <!-- Vista de tarjetas para móvil -->
   <div class="md:hidden space-y-4" id="atencionesCardView">
@@ -333,14 +333,14 @@ async function cargarAtenciones(pacienteId) {
 
     // Actualizar vista de tabla
     tableBody.innerHTML = atencionesOrdenadas.map(atencion => `
-      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 dark:text-gray-300 sm:pl-6">${formatFecha(atencion.fecha)}</td>
-        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-300">${atencion.profesional}</td>
-        <td class="px-3 py-4 text-sm text-gray-900 dark:text-gray-300">
-          <div class="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg truncate">
-            ${atencion.notaDelDia}
-          </div>
-        </td>
+  <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 dark:text-gray-300 sm:pl-6">${formatFecha(atencion.fecha)}</td>
+    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-300">${atencion.profesional}</td>
+    <td class="px-3 py-4 text-sm text-gray-900 dark:text-gray-300">
+      <div class="break-words">
+        ${atencion.notaDelDia}
+      </div>
+    </td>
         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
           <div class="flex justify-end gap-2">
             <button 
@@ -373,16 +373,16 @@ async function cargarAtenciones(pacienteId) {
 
     // Actualizar vista de tarjetas para móvil
     cardView.innerHTML = atencionesOrdenadas.map(atencion => `
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
-        <div class="flex justify-between items-start mb-3">
-          <div class="space-y-1">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              ${formatFecha(atencion.fecha)}
-            </p>
-            <p class="text-base font-semibold text-gray-900 dark:text-gray-100">
-              ${atencion.profesional}
-            </p>
-          </div>
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
+    <div class="flex justify-between items-start mb-3">
+      <div class="space-y-1">
+        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+          ${formatFecha(atencion.fecha)}
+        </p>
+        <p class="text-base font-semibold text-gray-900 dark:text-gray-100">
+          ${atencion.profesional}
+        </p>
+      </div>
           <div class="flex gap-2">
             <button 
               onclick="editarAtencionHandler('${pacienteId}', '${atencion.fecha}')"
@@ -408,11 +408,11 @@ async function cargarAtenciones(pacienteId) {
               </svg>
             </button>
           </div>
-        </div>
-        <div class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-          ${atencion.notaDelDia}
-        </div>
-      </div>
+ </div>
+    <div class="text-sm text-gray-700 dark:text-gray-300 text-left break-words">
+      ${atencion.notaDelDia}
+    </div>
+  </div>
     `).join('');
   } catch (error) {
     console.error('Error en cargarAtenciones:', error);
