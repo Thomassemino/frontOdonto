@@ -43,14 +43,15 @@ const { dni } = Astro.props;
 const BASE_URL = "https://odontoback-production.up.railway.app/api";
 ---
 
-<div class="max-w-full mx-auto bg-gray-800 p-6">
+<div class="w-full max-w-7xl mx-auto bg-gray-800 p-4 md:p-6">
   <!-- Adult Odontogram -->
-  <div class="bg-gray-800 mb-12">
+  <div class="bg-gray-800 mb-8">
     <h2 class="text-xl font-bold text-white mb-6">Odontograma Adulto</h2>
-  </ColapsoButton>
-    <div class="flex flex-wrap gap-4 mb-8 p-4 bg-gray-700 rounded-lg">
+    
+    <!-- Treatment Options -->
+    <div class="flex flex-wrap gap-3 mb-8 p-4 bg-gray-700 rounded-lg">
       {Object.entries(TREATMENTS).map(([name, {icon, color}]) => (
-        <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform" 
+        <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform px-2 py-1 rounded-md hover:bg-gray-600" 
              data-treatment={name}>
           <span class="text-sm font-medium text-white">{name}</span>
           <span style={`color: ${color}`}>{icon}</span>
@@ -59,41 +60,41 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     </div>
 
     <!-- Control Panel -->
-    <div class="mt-8">
-      <div class="grid md:grid-cols-3 gap-4 mb-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Tratamiento</label>
-          <select id="treatment-select" class="w-full rounded-md border-gray-600 bg-gray-700 text-white" required>
+    <div class="mt-8 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="space-y-1.5">
+          <label class="block text-sm font-medium text-gray-300">Tratamiento</label>
+          <select id="treatment-select" class="w-full rounded-md border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
             <option value="">Seleccionar tratamiento</option>
             {Object.entries(TREATMENTS).map(([name]) => (
               <option value={name}>{name}</option>
             ))}
           </select>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Origen</label>
-          <select id="origin-select" class="w-full rounded-md border-gray-600 bg-gray-700 text-white" required>
+        <div class="space-y-1.5">
+          <label class="block text-sm font-medium text-gray-300">Origen</label>
+          <select id="origin-select" class="w-full rounded-md border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
             <option value="">Seleccionar origen</option>
             <option value="propio">Este estudio</option>
             <option value="otro">Otro estudio</option>
           </select>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Observaciones</label>
-          <textarea id="notes" rows="1" class="w-full rounded-md border-gray-600 bg-gray-700 text-white"></textarea>
+        <div class="space-y-1.5">
+          <label class="block text-sm font-medium text-gray-300">Observaciones</label>
+          <textarea id="notes" rows="1" class="w-full rounded-md border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
         </div>
       </div>
 
-      <div class="flex justify-between items-center mb-6">
+      <div class="flex justify-between items-center">
         <div id="notification" class="hidden px-4 py-2 rounded-md"></div>
         <div class="flex space-x-3">
-          <button id="clear-all" class="px-4 py-2 border border-red-600 rounded-md text-red-300 hover:bg-red-700/20">
+          <button id="clear-all" class="px-4 py-2 border border-red-600 rounded-md text-red-300 hover:bg-red-700/20 transition-colors">
             Limpiar Todo
           </button>
-          <button id="reset" class="px-4 py-2 border border-gray-600 rounded-md text-gray-300 hover:bg-gray-700">
+          <button id="reset" class="px-4 py-2 border border-gray-600 rounded-md text-gray-300 hover:bg-gray-700 transition-colors">
             Reiniciar
           </button>
-          <button id="save" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+          <button id="save" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             Guardar
           </button>
         </div>
@@ -101,12 +102,15 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     </div>
 
     <!-- Superior Teeth -->
-    <div class="mb-12">
+    <div class="mb-12 mt-8">
       <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Superior</h3>
-      <div class="grid grid-cols-16 gap-2">
+      <div class="grid grid-cols-16 gap-2 relative">
         {TEETH.superior.map((tooth) => (
-          <div class="tooth-container" data-tooth={tooth}>
-            <span class="tooth-number">{tooth}</span>
+          <div class="tooth-container relative" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-400">{tooth}</span>
+            {['11', '21'].includes(tooth.toString()) && 
+              <div class={`teeth-separator ${tooth === '11' ? 'right' : 'left'}`}></div>
+            }
           </div>
         ))}
       </div>
@@ -115,10 +119,13 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     <!-- Inferior Teeth -->
     <div class="mb-12">
       <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Inferior</h3>
-      <div class="grid grid-cols-16 gap-2">
+      <div class="grid grid-cols-16 gap-2 relative">
         {TEETH.inferior.map((tooth) => (
-          <div class="tooth-container" data-tooth={tooth}>
-            <span class="tooth-number">{tooth}</span>
+          <div class="tooth-container relative" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-400">{tooth}</span>
+            {['41', '31'].includes(tooth.toString()) && 
+              <div class={`teeth-separator ${tooth === '41' ? 'right' : 'left'}`}></div>
+            }
           </div>
         ))}
       </div>
@@ -132,28 +139,30 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     <!-- Superior Primary Teeth -->
     <div class="mb-12">
       <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Superior - Dientes Temporales</h3>
-      <div class="grid grid-cols-16 gap-2">
-        <div class="col-span-3"></div>
+      <div class="grid grid-cols-10 gap-2 max-w-3xl mx-auto relative">
         {PRIMARY_TEETH.superior.map((tooth) => (
-          <div class="tooth-container" data-tooth={tooth}>
-            <span class="tooth-number">{tooth}</span>
+          <div class="tooth-container relative" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-400">{tooth}</span>
+            {['51', '61'].includes(tooth) && 
+              <div class={`teeth-separator ${tooth === '51' ? 'right' : 'left'}`}></div>
+            }
           </div>
         ))}
-        <div class="col-span-3"></div>
       </div>
     </div>
 
     <!-- Inferior Primary Teeth -->
     <div class="mb-12">
       <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Inferior - Dientes Temporales</h3>
-      <div class="grid grid-cols-16 gap-2">
-        <div class="col-span-3"></div>
+      <div class="grid grid-cols-10 gap-2 max-w-3xl mx-auto relative">
         {PRIMARY_TEETH.inferior.map((tooth) => (
-          <div class="tooth-container" data-tooth={tooth}>
-            <span class="tooth-number">{tooth}</span>
+          <div class="tooth-container relative" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-400">{tooth}</span>
+            {['81', '71'].includes(tooth) && 
+              <div class={`teeth-separator ${tooth === '81' ? 'right' : 'left'}`}></div>
+            }
           </div>
         ))}
-        <div class="col-span-3"></div>
       </div>
     </div>
   </div>
@@ -165,7 +174,7 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
       <input type="text" 
         id="search-input" 
         placeholder="Buscar por número de diente o tratamiento..." 
-        class="w-2/4 rounded-md border-gray-600 bg-gray-700 text-white px-4 py-2"
+        class="w-full md:w-2/4 rounded-md border-gray-600 bg-gray-700 text-white px-4 py-2 focus:ring-2 focus:ring-blue-500"
       />
     </div>
     <div id="treatment-history" class="space-y-2">
@@ -175,142 +184,94 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
 </div>
 
 <style>
-.grid-cols-16 {
-  grid-template-columns: repeat(16, minmax(0, 1fr));
-}
-
-.tooth-container {
-  position: relative;
-  width: 50px;
-  height: 50px;
-  margin: auto;
-}
-
-.tooth-canvas {
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.tooth-container:hover .tooth-canvas {
-  transform: scale(1.1);
-}
-
-.tooth-number {
-  position: absolute;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.75rem;
-  color: #9CA3AF;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.tooth-container:hover .tooth-number {
-  opacity: 1;
-}
-
-.protesis-connector {
-  pointer-events: none;
-  z-index: 10;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.notification-animation {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.tooth-container {
-  position: relative;
-  width: 50px;
-  height: 50px;
-  margin: auto;
-  transition: background-color 0.3s ease;
-}
-
-.tooth-container.own-clinic {
-  background-color: rgba(59, 130, 246, 0.1);
-  border-radius: 0.5rem;
-}
-
-.tooth-container.other-clinic {
-  background-color: rgba(239, 68, 68, 0.1);
-  border-radius: 0.5rem;
-}
-
-.teeth-separator {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background-color: rgba(75, 85, 99, 0.5);
-  z-index: 1;
-}
-
-.teeth-separator.right {
-  right: -1px;
-}
-
-.teeth-separator.left {
-  left: -1px;
-}
-
-.tratamiento-item {
-  padding: 0.75rem;
-  background-color: rgba(55, 65, 81, 0.5);
-  backdrop-filter: blur(4px);
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
-  transition: background-color 0.2s;
-}
-
-.tratamiento-item:hover {
-  background-color: rgba(55, 65, 81, 0.7);
-}
-
-.notificacion {
-  position: fixed;
-  right: 1rem;
-  top: 1rem;
-  z-index: 50;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: opacity 0.3s;
-}
-
-select, input, textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  border: 1px solid #4B5563;
-  background-color: #374151;
-  color: white;
-}
-
-select:focus, input:focus, textarea:focus {
-  outline: none;
-  border-color: #3B82F6;
-  ring-color: #3B82F6;
-  ring-width: 2px;
-}
-
-button {
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-</style>
+  .grid-cols-16 {
+    grid-template-columns: repeat(16, minmax(0, 1fr));
+  }
+  
+  .grid-cols-10 {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+  
+  .tooth-container {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    transition: all 0.2s ease;
+  }
+  
+  .tooth-canvas {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .tooth-container:hover .tooth-canvas {
+    transform: scale(1.1);
+  }
+  
+  .tooth-number {
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .tooth-container:hover .tooth-number {
+    opacity: 1;
+  }
+  
+  .tooth-container.own-clinic {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-radius: 0.5rem;
+  }
+  
+  .tooth-container.other-clinic {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-radius: 0.5rem;
+  }
+  
+  .protesis-connector {
+    pointer-events: none;
+    z-index: 10;
+    position: absolute;
+  }
+  
+  /* Animation classes */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .notification-animation {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  /* Focus states */
+  select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: rgb(59, 130, 246);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .tooth-container {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .tooth-number {
+      font-size: 0.65rem;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .tooth-container {
+      width: 35px;
+      height: 35px;
+    }
+  }
+  </style>
 
 <script define:vars={{ dni, TREATMENTS, BASE_URL, COLORS }}>
   class ToothCanvas {
@@ -861,7 +822,7 @@ function seleccionarParteDiente(diente, superficie, elemento) {
       return;
     }
     
-    if (Math.abs(secondNum - firstNum) > 4) {
+    if (Math.abs(secondNum - firstNum) > 7) {
       mostrarNotificacion('Los dientes están demasiado separados', 'error');
       return;
     }
