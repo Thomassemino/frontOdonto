@@ -25,10 +25,10 @@ const TREATMENTS = {
   "Extracción": { icon: "X", fullTooth: true, color: COLORS.primary },
   "P.D": { icon: "X", fullTooth: true, color: COLORS.secondary },
   "Arreglo filtrado": { icon: "◎", fullTooth: false, color: COLORS.secondary, multiSurface: true },
-  "T.C": { icon: "●", fullTooth: false, color: COLORS.primary, multiSurface: true },
+  "T.C": { text: "T.C", fullTooth: false, color: COLORS.primary, multiSurface: true },
   "Corona": { icon: "⭕", fullTooth: true, color: COLORS.primary },
   "Corona filtrada": { icon: "⭕", fullTooth: true, color: COLORS.secondary },
-  "Impl": { icon: "○", fullTooth: false, color: COLORS.gray },
+  "Impl": { text: "Impl", fullTooth: false, color: COLORS.primary },
   "A.M": { icon: "●", fullTooth: false, color: COLORS.secondary, multiSurface: true },
   "Ortodoncia": { icon: "●", fullTooth: false, color: COLORS.green, multiSurface: true },
   "Protesis": { icon: "[]", requiresTwoTeeth: true, fullTooth: true, color: COLORS.primary }
@@ -88,7 +88,7 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
         <div id="notification" class="hidden px-4 py-2 rounded-md"></div>
         <div class="flex space-x-3">
           <button id="clear-all" class="px-4 py-2 border border-red-600 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-            Limpiar Todo
+            Eliminar Todo
           </button>
           <button id="reset" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             Reiniciar
@@ -106,7 +106,7 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
       <div class="grid grid-cols-8 md:grid-cols-16 gap-x-1 gap-y-6 relative w-full max-w-4xl mx-auto">
         {TEETH.superior.map((tooth) => (
           <div class="tooth-container relative w-full aspect-square mx-auto" data-tooth={tooth}>
-            <span class="tooth-number absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] md:text-xs text-gray-600 dark:text-gray-400">{tooth}</span>
+          <span class="tooth-number absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] md:text-xs text-gray-600 dark:text-gray-400 text-center w-full">{tooth}</span>
             {['11', '21'].includes(tooth.toString()) && 
               <div class={`teeth-separator ${tooth === '11' ? 'right' : 'left'}`}></div>
             }
@@ -183,12 +183,21 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
 </div>
 
 <style>
+  .tooth-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 1.5rem; /* Space for the number */
+  }
+
   .tooth-container {
     position: relative;
     transition: all 0.2s ease;
     margin: auto;
     min-width: 28px;
     max-width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   
   .tooth-canvas {
@@ -205,6 +214,8 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
   .tooth-number {
     opacity: 0;
     transition: opacity 0.2s;
+    width: 100%;
+    text-align: center;
   }
   
   .tooth-container:hover .tooth-number {
@@ -212,16 +223,26 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
   }
   
   .tooth-container.own-clinic {
-    @apply bg-blue-500/5 dark:bg-blue-500/20;
+    @apply bg-blue-500/20 dark:bg-blue-500/30;
     border-radius: 0.5rem;
+    padding: 0.25rem;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.1);
   }
   
   .tooth-container.other-clinic {
-    @apply bg-red-500/5 dark:bg-red-500/20;
+    @apply bg-red-500/20 dark:bg-red-500/30;
     border-radius: 0.5rem;
+    padding: 0.25rem;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.1);
   }
   
-  /* Añadir estilos para el tema oscuro */
+  /* Dark theme adjustments */
   :root[class~="dark"] .tooth-canvas {
     filter: brightness(0.9);
   }
@@ -232,6 +253,7 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     position: absolute;
   }
 
+  /* Responsive styles */
   @media (max-width: 360px) {
     .tooth-container {
       min-width: 16px;
@@ -239,7 +261,6 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     }
   }
   
-  /* Pantallas pequeñas */
   @media (max-width: 480px) {
     .tooth-container {
       min-width: 18px;
@@ -247,15 +268,16 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     }
   }
 
-  /* Tablets pequeñas */
   @media (max-width: 767px) {
     .tooth-container {
       min-width: 20px;
       max-width: 22px;
     }
+    .grid-cols-8, .grid-cols-5 {
+      gap: 0.25rem !important;
+    }
   }
 
-  /* Tablets */
   @media (min-width: 768px) {
     .tooth-container {
       min-width: 26px;
@@ -263,22 +285,10 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     }
   }
   
-  /* Escritorio */
   @media (min-width: 1024px) {
     .tooth-container {
       min-width: 28px;
       max-width: 32px;
-    }
-  }
-
-  /* Ajustes del grid en móvil */
-  @media (max-width: 767px) {
-    .grid-cols-8 {
-      column-gap: 0.5rem !important;
-    }
-    
-    .grid-cols-5 {
-      column-gap: 0.5rem !important;
     }
   }
 </style>
@@ -381,6 +391,12 @@ class ToothCanvas {
 
   drawTreatment(treatment, surface) {
     switch(treatment) {
+      case 'T.C':
+        this.drawTC(surface);
+        break;
+      case 'Impl':
+        this.drawImplante();
+        break;
       case 'Caries':
         this.drawCaries(surface);
         break;
@@ -396,17 +412,11 @@ class ToothCanvas {
       case 'Arreglo filtrado':
         this.drawArregloFiltrado(surface);
         break;
-      case 'T.C':
-        this.drawTC(surface);
-        break;
       case 'Corona':
         this.drawCorona();
         break;
       case 'Corona filtrada':
         this.drawCoronaFiltrada();
-        break;
-      case 'Impl':
-        this.drawImplante();
         break;
       case 'A.M':
         this.drawAM(surface);
@@ -623,26 +633,12 @@ drawProtesisEnd() {
   }
 
   drawImplante() {
-    this.ctx.beginPath();
-    this.ctx.strokeStyle = COLORS.gray;
-    this.ctx.lineWidth = 2;
-    
-    const padding = 3;
-    this.ctx.ellipse(
-      this.size/2, 
-      this.size/2, 
-      this.size/2 - padding, 
-      this.size/2 - padding, 
-      0, 
-      0, 
-      2 * Math.PI
-    );
-    
-    // Add a dot in the center
-    this.ctx.stroke();
-    this.ctx.beginPath();
-    this.ctx.arc(this.size/2, this.size/2, 2, 0, 2 * Math.PI);
-    this.ctx.fill();
+    const margin = this.size * 0.25;
+    this.ctx.fillStyle = '#22c55e'; // Using green color
+    this.ctx.font = `${margin * 0.7}px Arial`;
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText("Impl", this.size/2, this.size/2);
   }
 
   drawOrtodoncia(surface) {
@@ -681,7 +677,38 @@ drawProtesisEnd() {
   }
 
   drawTC(surface) {
-    this.drawCaries(surface); // T.C se dibuja igual que Caries
+    const margin = this.size * 0.25;
+    this.ctx.fillStyle = COLORS.primary;
+    this.ctx.font = `${margin * 0.8}px Arial`;
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    
+    let x, y;
+    
+    switch(surface) {
+      case 'central':
+        x = this.size/2;
+        y = this.size/2;
+        break;
+      case 'superior':
+        x = this.size/2;
+        y = margin/2;
+        break;
+      case 'inferior':
+        x = this.size/2;
+        y = this.size - margin/2;
+        break;
+      case 'izquierda':
+        x = margin/2;
+        y = this.size/2;
+        break;
+      case 'derecha':
+        x = this.size - margin/2;
+        y = this.size/2;
+        break;
+    }
+    
+    this.ctx.fillText("T.C", x, y);
   }
 
   drawAM(surface) {
