@@ -49,11 +49,11 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     <h2 class="text-xl font-bold text-white mb-6">Odontograma Adulto</h2>
     
     <!-- Treatment Options -->
-    <div class="flex flex-wrap gap-3 mb-8 p-4 bg-gray-700 rounded-lg">
+    <div class="flex flex-wrap gap-2 md:gap-3 mb-8 p-3 md:p-4 bg-gray-700 rounded-lg">
       {Object.entries(TREATMENTS).map(([name, {icon, color}]) => (
-        <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform px-2 py-1 rounded-md hover:bg-gray-600" 
+        <div class="flex items-center gap-1 md:gap-2 cursor-pointer hover:scale-105 transition-transform px-2 py-1 rounded-md hover:bg-gray-600" 
              data-treatment={name}>
-          <span class="text-sm font-medium text-white">{name}</span>
+          <span class="text-xs md:text-sm font-medium text-white">{name}</span>
           <span style={`color: ${color}`}>{icon}</span>
         </div>
       ))}
@@ -102,12 +102,12 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     </div>
 
     <!-- Superior Teeth -->
-    <div class="mb-12 mt-8">
+    <div class="mb-8 mt-6">
       <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Superior</h3>
-      <div class="grid grid-cols-16 gap-2 relative">
+      <div class="grid grid-cols-8 md:grid-cols-16 gap-1 md:gap-2 relative max-w-full overflow-x-auto px-2">
         {TEETH.superior.map((tooth) => (
-          <div class="tooth-container relative" data-tooth={tooth}>
-            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-400">{tooth}</span>
+          <div class="tooth-container relative min-w-[30px] w-full max-w-[50px] aspect-square mx-auto" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] md:text-xs text-gray-400">{tooth}</span>
             {['11', '21'].includes(tooth.toString()) && 
               <div class={`teeth-separator ${tooth === '11' ? 'right' : 'left'}`}></div>
             }
@@ -116,13 +116,14 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
       </div>
     </div>
 
+
     <!-- Inferior Teeth -->
-    <div class="mb-12">
+    <div class="mb-8">
       <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Inferior</h3>
-      <div class="grid grid-cols-16 gap-2 relative">
+      <div class="grid grid-cols-8 md:grid-cols-16 gap-1 md:gap-2 relative max-w-full overflow-x-auto px-2">
         {TEETH.inferior.map((tooth) => (
-          <div class="tooth-container relative" data-tooth={tooth}>
-            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-400">{tooth}</span>
+          <div class="tooth-container relative min-w-[30px] w-full max-w-[50px] aspect-square mx-auto" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] md:text-xs text-gray-400">{tooth}</span>
             {['41', '31'].includes(tooth.toString()) && 
               <div class={`teeth-separator ${tooth === '41' ? 'right' : 'left'}`}></div>
             }
@@ -133,16 +134,16 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
   </div>
 
   <!-- Pediatric Odontogram -->
-  <div class="bg-gray-800 mt-12 p-6 rounded-lg border-t-2 border-gray-700">
+  <div class="bg-gray-800 mt-12 p-4 md:p-6 rounded-lg border-t-2 border-gray-700">
     <h2 class="text-xl font-bold text-white mb-6">Odontograma Pediátrico</h2>
 
     <!-- Superior Primary Teeth -->
-    <div class="mb-12">
+    <div class="mb-8">
       <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Superior - Dientes Temporales</h3>
-      <div class="grid grid-cols-10 gap-2 max-w-3xl mx-auto relative">
+      <div class="grid grid-cols-5 md:grid-cols-10 gap-1 md:gap-2 max-w-3xl mx-auto relative px-2">
         {PRIMARY_TEETH.superior.map((tooth) => (
-          <div class="tooth-container relative" data-tooth={tooth}>
-            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-400">{tooth}</span>
+          <div class="tooth-container relative min-w-[30px] w-full max-w-[50px] aspect-square mx-auto" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] md:text-xs text-gray-400">{tooth}</span>
             {['51', '61'].includes(tooth) && 
               <div class={`teeth-separator ${tooth === '51' ? 'right' : 'left'}`}></div>
             }
@@ -152,12 +153,12 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     </div>
 
     <!-- Inferior Primary Teeth -->
-    <div class="mb-12">
+    <div class="mb-8">
       <h3 class="text-center text-sm font-medium text-gray-300 mb-4">Inferior - Dientes Temporales</h3>
-      <div class="grid grid-cols-10 gap-2 max-w-3xl mx-auto relative">
+      <div class="grid grid-cols-5 md:grid-cols-10 gap-1 md:gap-2 max-w-3xl mx-auto relative px-2">
         {PRIMARY_TEETH.inferior.map((tooth) => (
-          <div class="tooth-container relative" data-tooth={tooth}>
-            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-400">{tooth}</span>
+          <div class="tooth-container relative min-w-[30px] w-full max-w-[50px] aspect-square mx-auto" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] md:text-xs text-gray-400">{tooth}</span>
             {['81', '71'].includes(tooth) && 
               <div class={`teeth-separator ${tooth === '81' ? 'right' : 'left'}`}></div>
             }
@@ -184,20 +185,10 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
 </div>
 
 <style>
-  .grid-cols-16 {
-    grid-template-columns: repeat(16, minmax(0, 1fr));
-  }
-  
-  .grid-cols-10 {
-    grid-template-columns: repeat(10, minmax(0, 1fr));
-  }
-  
   .tooth-container {
     position: relative;
-    width: 50px;
-    height: 50px;
-    margin: auto;
     transition: all 0.2s ease;
+    margin: auto;
   }
   
   .tooth-canvas {
@@ -236,42 +227,31 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     position: absolute;
   }
   
-  /* Animation classes */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  .notification-animation {
-    animation: fadeIn 0.3s ease-out;
-  }
-  
-  /* Focus states */
-  select:focus, input:focus, textarea:focus {
-    outline: none;
-    border-color: rgb(59, 130, 246);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
+  /* Breakpoint específico para dispositivos muy pequeños */
+  @media (max-width: 360px) {
     .tooth-container {
-      width: 40px;
-      height: 40px;
+      min-width: 25px;
     }
     
     .tooth-number {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
     }
   }
   
-  @media (max-width: 640px) {
+  /* Ajustes para tablets */
+  @media (min-width: 768px) and (max-width: 1024px) {
     .tooth-container {
-      width: 35px;
-      height: 35px;
+      min-width: 35px;
     }
   }
-  </style>
+  
+  /* Ajustes para pantallas grandes */
+  @media (min-width: 1024px) {
+    .tooth-container {
+      min-width: 40px;
+    }
+  }
+</style>
 
 <script define:vars={{ dni, TREATMENTS, BASE_URL, COLORS }}>
   class ToothCanvas {
