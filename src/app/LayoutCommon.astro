@@ -1,5 +1,4 @@
 ---
-// Solo necesitamos los props que se pasan al componente
 const { class: clazz } = Astro.props;
 ---
 
@@ -8,7 +7,7 @@ const { class: clazz } = Astro.props;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Consultorio Odontológico</title>
+		<title class="text-responsive">Consultorio Odontológico</title>
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content="Sistema de Gestión Odontológica" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -44,4 +43,24 @@ const { class: clazz } = Astro.props;
 
 <style is:global>
 	@import url('https://fonts.cdnfonts.com/css/inter');
+
+	/* Estilos responsivos para el título */
+	.text-responsive {
+		font-size: clamp(1rem, 2.5vw, 2rem);
+		line-height: 1.2;
+		font-weight: bold;
+	}
+
+	/* Media queries adicionales si se necesitan ajustes más específicos */
+	@media screen and (max-width: 640px) {
+		.text-responsive {
+			font-size: 1rem;
+		}
+	}
+
+	@media screen and (min-width: 1024px) {
+		.text-responsive {
+			font-size: 2rem;
+		}
+	}
 </style>
