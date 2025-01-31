@@ -43,7 +43,7 @@ const { dni } = Astro.props;
 const BASE_URL = "https://odontoback-production.up.railway.app/api";
 ---
 
-<div class="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 p-4 md:p-6 rounded-lg">
+<div class="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 p-2 md:p-6 rounded-lg">
   <!-- Adult Odontogram -->
   <div class="mb-8">
     <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Odontograma Adulto</h2>
@@ -104,7 +104,7 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     <!-- Superior Teeth -->
     <div class="mb-12 mt-6">
       <h3 class="text-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Superior</h3>
-      <div class="grid grid-cols-8 md:grid-cols-16 gap-x-1 gap-y-6 relative w-full max-w-4xl mx-auto">
+      <div class="grid grid-cols-16 gap-x-0.5 sm:gap-x-1 gap-y-6 relative w-full max-w-4xl mx-auto">
         {TEETH.superior.map((tooth) => (
           <div class="tooth-container relative w-full aspect-square mx-auto" data-tooth={tooth}>
             <span class="tooth-number absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] md:text-xs text-gray-600 dark:text-gray-400">{tooth}</span>
@@ -119,7 +119,7 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     <!-- Inferior Teeth -->
     <div class="mb-12">
       <h3 class="text-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Inferior</h3>
-      <div class="grid grid-cols-8 md:grid-cols-16 gap-x-1 gap-y-6 relative w-full max-w-4xl mx-auto">
+      <div class="grid grid-cols-16 gap-x-0.5 sm:gap-x-1 gap-y-6 relative w-full max-w-4xl mx-auto">
         {TEETH.inferior.map((tooth) => (
           <div class="tooth-container relative w-full aspect-square mx-auto" data-tooth={tooth}>
             <span class="tooth-number absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] md:text-xs text-gray-600 dark:text-gray-400">{tooth}</span>
@@ -233,21 +233,30 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     position: absolute;
   }
 
-  /* Mantener el resto de los media queries igual */
   @media (max-width: 360px) {
+    .tooth-container {
+      min-width: 16px;
+      max-width: 18px;
+    }
+  }
+  
+  /* Pantallas pequeñas */
+  @media (max-width: 480px) {
+    .tooth-container {
+      min-width: 18px;
+      max-width: 20px;
+    }
+  }
+
+  /* Tablets pequeñas */
+  @media (max-width: 767px) {
     .tooth-container {
       min-width: 20px;
       max-width: 22px;
     }
   }
-  
-  @media (max-width: 767px) {
-    .tooth-container {
-      min-width: 22px;
-      max-width: 24px;
-    }
-  }
 
+  /* Tablets */
   @media (min-width: 768px) {
     .tooth-container {
       min-width: 26px;
@@ -255,13 +264,15 @@ const BASE_URL = "https://odontoback-production.up.railway.app/api";
     }
   }
   
+  /* Escritorio */
   @media (min-width: 1024px) {
     .tooth-container {
       min-width: 28px;
       max-width: 32px;
     }
   }
-  
+
+  /* Ajustes del grid en móvil */
   @media (max-width: 767px) {
     .grid-cols-8 {
       column-gap: 0.5rem !important;
