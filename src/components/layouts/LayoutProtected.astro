@@ -1,0 +1,16 @@
+---
+import { AuthProvider } from '../../auth/AuthContext';
+import ProtectedRoute from '../../auth/ProtectedRoute';
+
+interface Props {
+  allowedRoles?: string[];
+}
+
+const { allowedRoles = [] } = Astro.props;
+---
+
+<AuthProvider client:load>
+  <ProtectedRoute allowedRoles={allowedRoles} client:load>
+    <slot />
+  </ProtectedRoute>
+</AuthProvider>

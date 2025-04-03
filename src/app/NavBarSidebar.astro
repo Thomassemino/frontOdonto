@@ -37,18 +37,17 @@ import ColorModeSwitcher from '../components/ColorModeSwitcher.astro';
 							clip-rule="evenodd"></path></svg
 					>
 				</button>
-				<a href="/" class="flex ml-2 md:mr-24">
-					<img
-						src='/images/logo.png'
-						class="h-8 mr-3"
-						alt="Consultorio Odontológico"
-					/>
-					<span
-						class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white"
-						>Consultorio Odontológico</span
-					>
-				</a>
-			</div>
+        <a href="/" class="flex items-center">
+          <img
+            src="/images/logo.png"
+            class="h-8 mr-3"
+            alt="Consultorio Odontológico"
+          />
+          <span class="hidden md:block self-center text-xl font-semibold whitespace-nowrap dark:text-white">
+            Consultorio Odontológico
+          </span>
+        </a>
+        </div>
 
 			<div class="flex items-center">
 				<ColorModeSwitcher />
@@ -107,7 +106,7 @@ import ColorModeSwitcher from '../components/ColorModeSwitcher.astro';
 </nav>
 
 <script>
-  const BASE_URL = "http://179.43.118.101:3001/api;
+  const BASE_URL = "http://179.43.118.101:3001/api";
   
 	async function cargarDatosUsuario() {
     try {

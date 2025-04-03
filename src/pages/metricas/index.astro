@@ -1,0 +1,43 @@
+---
+import LayoutProtected from '../../components/layouts/LayoutProtected.astro';
+import LayoutSidebar from '../../components/layouts/LayoutSidebar.astro';
+import StatsOverview from '../../components/metricas/StatsOverview.astro';
+import AppointmentsChart from '../../components/metricas/AppointmentsChart.astro';
+import RecentAppointments from '../../components/metricas/RecentAppointments.astro';
+import PatientDistribution from '../../components/metricas/PatientDistribution.astro';
+---
+
+<LayoutProtected>
+  <LayoutSidebar title="Dashboard">
+    <div class="p-6 space-y-6">
+      <!-- Stats Overview Grid -->
+      <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
+        <StatsOverview />
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="grid gap-6 mb-8 md:grid-cols-2">
+        <AppointmentsChart />
+        <PatientDistribution />
+      </div>
+
+      <!-- Recent Appointments -->
+      <div class="w-full">
+        <RecentAppointments />
+      </div>
+    </div>
+  </LayoutSidebar>
+</LayoutProtected>
+
+<script>
+  import { getDashboardData } from '../../services/dashboardService';
+  import { showNotification } from '../../utils/notifications';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      await getDashboardData();
+    } catch (error) {
+      showNotification('Error al cargar los datos del dashboard', 'error');
+    }
+  });
+</script>

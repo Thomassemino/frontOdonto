@@ -1,0 +1,27 @@
+---
+import LayoutCommon from "./LayoutCommon.astro";
+import LayoutProtected from "./LayoutProtected.astro";
+
+const { title, showBackButton = true } = Astro.props;
+---
+
+<LayoutProtected>
+  <LayoutCommon>
+    <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-4 text-slate-800 dark:from-slate-900 dark:to-slate-800 dark:text-slate-100 lg:p-16">
+      <div class="mx-auto max-w-7xl">
+        {showBackButton && (
+          <div class="mb-6 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <div class="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
+              <button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                ← Volver al inicio
+              </button>
+              <h1 class="text-2xl font-bold">{title}</h1>
+            </div>
+            <slot name="header-actions" />
+          </div>
+        )}
+        <slot />
+      </div>
+    </div>
+  </LayoutCommon>
+</LayoutProtected>

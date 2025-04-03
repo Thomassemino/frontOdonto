@@ -1,0 +1,1639 @@
+---
+const TEETH = {
+  superior: [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28],
+  inferior: [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]
+};
+
+const PRIMARY_TEETH = {
+  superior: ['55','54','53','52','51','61','62','63','64','65'],
+  inferior: ['85','84','83','82','81','71','72','73','74','75']
+};
+
+const COLORS = {
+  primary: '#3b82f6',    
+  secondary: '#ef4444',  
+  green: '#22c55e',     
+  gray: '#4B5563',      
+  background: '#374151',
+  ownClinic: 'rgba(59, 130, 246, 0.5)',   
+  otherClinic: 'rgba(239, 68, 68, 0.5)'    
+};
+
+const TREATMENTS = {
+  "Caries": { icon: "●", fullTooth: false, color: COLORS.primary, multiSurface: true },
+  "Arreglo": { icon: "●", fullTooth: false, color: COLORS.secondary, multiSurface: true },
+  "Extracción": { icon: "X", fullTooth: true, color: COLORS.primary },
+  "P.D": { icon: "X", fullTooth: true, color: COLORS.secondary },
+  "Arreglo filtrado": { icon: "◎", fullTooth: false, color: COLORS.secondary, multiSurface: true },
+  "T.C": { text: "T.C", fullTooth: false, color: COLORS.primary, multiSurface: true },
+  "Corona": { icon: "⭕", fullTooth: true, color: COLORS.primary },
+  "Corona filtrada": { icon: "⭕", fullTooth: true, color: COLORS.secondary },
+  "Impl": { text: "Impl", fullTooth: false, color: COLORS.primary },
+  "A.M": { icon: "●", fullTooth: false, color: COLORS.secondary, multiSurface: true },
+  "Ortodoncia": { icon: "●", fullTooth: false, color: COLORS.green, multiSurface: true },
+  "Protesis": { icon: "[]", requiresTwoTeeth: true, fullTooth: true, color: COLORS.primary }
+};
+
+interface Props {
+  dni: string;
+}
+
+const { dni } = Astro.props;
+const BASE_URL = "http://179.43.118.101:3001/api";
+---
+
+<div class="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg">
+  <!-- Adult Odontogram -->
+  <div class="mb-8">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6">Odontograma Adulto</h2>
+    
+    <!-- Treatment Options -->
+    <div class="flex flex-wrap gap-1.5 md:gap-3 mb-6 p-2 md:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg overflow-x-auto">
+      {Object.entries(TREATMENTS).map(([name, {icon, color}]) => (
+        <div class="flex items-center gap-1 md:gap-2 cursor-pointer hover:scale-105 transition-transform px-1.5 md:px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 flex-shrink-0" 
+             data-treatment={name}>
+          <span class="text-xs md:text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">{name}</span>
+          <span class="text-lg md:text-xl" style={`color: ${color}`}>{icon}</span>
+        </div>
+      ))}
+    </div>
+
+    <!-- Control Panel -->
+    <div class="mt-6 space-y-4 md:space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+        <div class="space-y-1.5">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tratamiento</label>
+          <select id="treatment-select" class="w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 text-sm md:text-base" required>
+            <option value="">Seleccionar tratamiento</option>
+            {Object.entries(TREATMENTS).map(([name]) => (
+              <option value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+        <div class="space-y-1.5">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Origen</label>
+          <select id="origin-select" class="w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 text-sm md:text-base" required>
+            <option value="">Seleccionar origen</option>
+            <option value="propio">Este estudio</option>
+            <option value="otro">Otro estudio</option>
+          </select>
+        </div>
+        <div class="space-y-1.5 sm:col-span-2 lg:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Observaciones</label>
+          <textarea id="notes" rows="1" class="w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-none text-sm md:text-base"></textarea>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div id="notification" class="hidden px-4 py-2 rounded-md w-full sm:w-auto"></div>
+        <div class="flex flex-wrap gap-2 sm:space-x-3 w-full sm:w-auto justify-end">
+          <button id="clear-all" class="px-3 py-2 border border-red-600 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm md:text-base flex-grow sm:flex-grow-0">
+            Eliminar Todo
+          </button>
+          <button id="reset" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm md:text-base flex-grow sm:flex-grow-0">
+            Reiniciar
+          </button>
+          <button id="save" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm md:text-base flex-grow sm:flex-grow-0">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Superior Teeth -->
+    <div class="mb-8 mt-6 teeth-container">
+      <h3 class="text-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Superior</h3>
+      <div class="grid grid-cols-8 md:grid-cols-16 gap-x-1 gap-y-4 md:gap-y-6 relative w-full max-w-4xl mx-auto teeth-grid">
+        {TEETH.superior.map((tooth) => (
+          <div class="tooth-container relative w-full aspect-square mx-auto" data-tooth={tooth}>
+          <span class="tooth-number absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] xs:text-[10px] md:text-xs text-gray-600 dark:text-gray-400 text-center w-full">{tooth}</span>
+            {['11', '21'].includes(tooth.toString()) && 
+              <div class={`teeth-separator ${tooth === '11' ? 'right' : 'left'}`}></div>
+            }
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Inferior Teeth -->
+    <div class="mb-8 teeth-container">
+      <h3 class="text-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Inferior</h3>
+      <div class="grid grid-cols-8 md:grid-cols-16 gap-x-1 gap-y-4 md:gap-y-6 relative w-full max-w-4xl mx-auto teeth-grid">
+        {TEETH.inferior.map((tooth) => (
+          <div class="tooth-container relative w-full aspect-square mx-auto" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] xs:text-[10px] md:text-xs text-gray-600 dark:text-gray-400">{tooth}</span>
+            {['41', '31'].includes(tooth.toString()) && 
+              <div class={`teeth-separator ${tooth === '41' ? 'right' : 'left'}`}></div>
+            }
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Pediatric Odontogram -->
+  <div class="mt-8 p-3 md:p-6 rounded-lg border-t-2 border-gray-200 dark:border-gray-700">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6">Odontograma Pediátrico</h2>
+
+    <!-- Superior Primary Teeth -->
+    <div class="mb-8 teeth-container">
+      <h3 class="text-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Superior - Dientes Temporales</h3>
+      <div class="grid grid-cols-5 md:grid-cols-10 gap-x-1 gap-y-4 md:gap-y-6 relative w-full max-w-2xl mx-auto teeth-grid">
+        {PRIMARY_TEETH.superior.map((tooth) => (
+          <div class="tooth-container relative w-full aspect-square mx-auto" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] xs:text-[10px] md:text-xs text-gray-600 dark:text-gray-400">{tooth}</span>
+            {['51', '61'].includes(tooth) && 
+              <div class={`teeth-separator ${tooth === '51' ? 'right' : 'left'}`}></div>
+            }
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Inferior Primary Teeth -->
+    <div class="mb-8 teeth-container">
+      <h3 class="text-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Inferior - Dientes Temporales</h3>
+      <div class="grid grid-cols-5 md:grid-cols-10 gap-x-1 gap-y-4 md:gap-y-6 relative w-full max-w-2xl mx-auto teeth-grid">
+        {PRIMARY_TEETH.inferior.map((tooth) => (
+          <div class="tooth-container relative w-full aspect-square mx-auto" data-tooth={tooth}>
+            <span class="tooth-number absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] xs:text-[10px] md:text-xs text-gray-600 dark:text-gray-400">{tooth}</span>
+            {['81', '71'].includes(tooth) && 
+              <div class={`teeth-separator ${tooth === '81' ? 'right' : 'left'}`}></div>
+            }
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-6 w-full max-w-6xl mx-auto">
+  <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Historial de Tratamientos</h3>
+  <div class="mb-4">
+    <input type="text" 
+      id="search-input" 
+      placeholder="Buscar por número de diente o tratamiento..." 
+      class="w-full md:w-2/4 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-blue-500 placeholder-gray-500 dark:placeholder-gray-400 text-sm md:text-base"
+    />
+  </div>
+  <div id="treatment-history" class="space-y-2 max-h-80 overflow-y-auto p-2">
+    <!-- Treatments will be added here dynamically -->
+  </div>
+</div>
+
+<style>
+  /* Responsive viewport */
+  @viewport {
+    width: device-width;
+    zoom: 1.0;
+  }
+
+  /* Base styles for tooth elements */
+  .tooth-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 1.5rem;
+  }
+
+  .tooth-container {
+    position: relative;
+    transition: all 0.2s ease;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .tooth-canvas {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .tooth-container:hover .tooth-canvas {
+    transform: scale(1.1);
+  }
+  
+  .tooth-number {
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .tooth-container:hover .tooth-number {
+    opacity: 1;
+  }
+  
+  .tooth-container.own-clinic {
+    @apply bg-blue-500/20 dark:bg-blue-500/30;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.1);
+  }
+  
+  .tooth-container.other-clinic {
+    @apply bg-red-500/20 dark:bg-red-500/30;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.1);
+  }
+  
+  /* Dark theme adjustments */
+  :root[class~="dark"] .tooth-canvas {
+    filter: brightness(0.9);
+  }
+  
+  .protesis-connector {
+    pointer-events: none;
+    z-index: 10;
+    position: absolute;
+  }
+
+  /* Notification styles */
+  .notificacion {
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Teeth Separator */
+  .teeth-separator {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(156, 163, 175, 0.5);
+  }
+
+  .teeth-separator.left {
+    left: -2px;
+  }
+
+  .teeth-separator.right {
+    right: -2px;
+  }
+
+  /* Responsive styles for teeth containers */
+  .teeth-container {
+    position: relative;
+  }
+
+  /* Responsive design based on screen width */
+  /* Extra Small devices */
+  @media (max-width: 360px) {
+    .tooth-container {
+      min-width: 16px;
+      max-width: 24px;
+    }
+    .teeth-grid {
+      gap-x: 0.25rem !important;
+    }
+  }
+  
+  /* Small devices */
+  @media (min-width: 361px) and (max-width: 480px) {
+    .tooth-container {
+      min-width: 20px;
+      max-width: 28px;
+    }
+  }
+
+  /* Medium devices */
+  @media (min-width: 481px) and (max-width: 767px) {
+    .tooth-container {
+      min-width: 24px;
+      max-width: 32px;
+    }
+  }
+
+  /* Large devices */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .tooth-container {
+      min-width: 28px;
+      max-width: 36px;
+    }
+  }
+  
+  /* Extra Large devices */
+  @media (min-width: 1024px) {
+    .tooth-container {
+      min-width: 32px;
+      max-width: 40px;
+    }
+  }
+</style>
+
+<script define:vars={{ dni, TREATMENTS, BASE_URL, COLORS }}>
+  
+class ToothCanvas {
+  constructor(container, size = 50) {
+    this.size = size;
+    this.container = container;
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = size;
+    this.canvas.height = size;
+    this.canvas.className = 'tooth-canvas';
+    this.ctx = this.canvas.getContext('2d');
+    this.selectedSurfaces = new Map(); // Almacena las superficies seleccionadas y sus tratamientos
+    
+    container.appendChild(this.canvas);
+    
+    this.ctx.strokeStyle = COLORS.gray;
+    this.ctx.lineWidth = 2;
+
+    this.canvas.addEventListener('click', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      this.handleClick(x, y);
+    });
+  }
+
+  clear() {
+    // Limpiar todo el canvas
+    this.ctx.clearRect(0, 0, this.size, this.size);
+    // Resetear estilos
+    this.ctx.strokeStyle = COLORS.gray;
+    this.ctx.lineWidth = 2;
+    this.ctx.setLineDash([]); // Resetear cualquier patrón de línea
+    // Redibujar el diente base
+    this.drawToothBase();
+    // Limpiar el mapa de superficies seleccionadas
+    this.selectedSurfaces.clear();
+  }
+
+  drawToothBase() {
+    const margin = this.size * 0.25;
+    // Usar blanco para modo claro y el color de fondo original para modo oscuro
+    this.ctx.fillStyle = document.documentElement.classList.contains('dark') ? 
+      COLORS.background : '#FFFFFF';
+    
+    // Central
+    this.ctx.fillRect(margin, margin, this.size - 2*margin, this.size - 2*margin);
+    this.ctx.strokeRect(margin, margin, this.size - 2*margin, this.size - 2*margin);
+    
+    // Superior
+    this.ctx.fillRect(margin, 0, this.size - 2*margin, margin);
+    this.ctx.strokeRect(margin, 0, this.size - 2*margin, margin);
+    
+    // Inferior
+    this.ctx.fillRect(margin, this.size - margin, this.size - 2*margin, margin);
+    this.ctx.strokeRect(margin, this.size - margin, this.size - 2*margin, margin);
+    
+    // Izquierda
+    this.ctx.fillRect(0, margin, margin, this.size - 2*margin);
+    this.ctx.strokeRect(0, margin, margin, this.size - 2*margin);
+    
+    // Derecha
+    this.ctx.fillRect(this.size - margin, margin, margin, this.size - 2*margin);
+    this.ctx.strokeRect(this.size - margin, margin, margin, this.size - 2*margin);
+  }
+
+  handleClick(x, y) {
+    const surface = this.getSurfaceFromCoordinates(x, y);
+    if (surface) {
+      const toothNumber = this.container.dataset.tooth;
+      seleccionarParteDiente(toothNumber, surface, this.container);
+    }
+  }
+
+  getSurfaceFromCoordinates(x, y) {
+    const normalizedX = x / this.size;
+    const normalizedY = y / this.size;
+
+    if (normalizedX > 0.25 && normalizedX < 0.75) {
+      if (normalizedY < 0.25) return 'superior';
+      if (normalizedY > 0.75) return 'inferior';
+    }
+
+    if (normalizedY > 0.25 && normalizedY < 0.75) {
+      if (normalizedX < 0.25) return 'izquierda';
+      if (normalizedX > 0.75) return 'derecha';
+    }
+
+    if (normalizedX > 0.25 && normalizedX < 0.75 && 
+        normalizedY > 0.25 && normalizedY < 0.75) {
+      return 'central';
+    }
+
+    return null;
+  }
+
+  drawTreatment(treatment, surface) {
+    switch(treatment) {
+      case 'T.C':
+        this.drawTC(surface);
+        break;
+      case 'Impl':
+        this.drawImplante();
+        break;
+      case 'Caries':
+        this.drawCaries(surface);
+        break;
+      case 'Arreglo':
+        this.drawArreglo(surface);
+        break;
+      case 'Extracción':
+        this.drawExtraction();
+        break;
+      case 'P.D':
+        this.drawPD();
+        break;
+      case 'Arreglo filtrado':
+        this.drawArregloFiltrado(surface);
+        break;
+      case 'Corona':
+        this.drawCorona();
+        break;
+      case 'Corona filtrada':
+        this.drawCoronaFiltrada();
+        break;
+      case 'A.M':
+        this.drawAM(surface);
+        break;
+      case 'Ortodoncia':
+        this.drawOrtodoncia(surface);
+        break;
+    }
+  }
+
+  drawExtraction() {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = COLORS.primary;
+    this.ctx.lineWidth = 3;
+    
+    // First diagonal line
+    this.ctx.moveTo(5, 5);
+    this.ctx.lineTo(this.size - 5, this.size - 5);
+    
+    // Second diagonal line
+    this.ctx.moveTo(this.size - 5, 5);
+    this.ctx.lineTo(5, this.size - 5);
+    
+    this.ctx.stroke();
+  }
+
+  drawPD() {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = COLORS.secondary;
+    this.ctx.lineWidth = 3;
+    
+    this.ctx.moveTo(5, 5);
+    this.ctx.lineTo(this.size - 5, this.size - 5);
+    this.ctx.moveTo(this.size - 5, 5);
+    this.ctx.lineTo(5, this.size - 5);
+    
+    this.ctx.stroke();
+  }
+
+  drawCoronaFiltrada() {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = COLORS.secondary;
+    this.ctx.lineWidth = 2;
+    
+    const padding = 3;
+    this.ctx.ellipse(
+      this.size/2, 
+      this.size/2, 
+      this.size/2 - padding, 
+      this.size/2 - padding, 
+      0, 
+      0, 
+      2 * Math.PI
+    );
+    
+    this.ctx.stroke();
+  }
+
+  drawArregloFiltrado(surface) {
+    const margin = this.size * 0.25;
+    this.ctx.strokeStyle = COLORS.secondary;
+    this.ctx.fillStyle = 'transparent';
+    this.ctx.lineWidth = 2;
+    
+    let x, y;
+    const radius = margin * 0.6;
+    
+    switch(surface) {
+      case 'central':
+        x = this.size/2;
+        y = this.size/2;
+        break;
+      case 'superior':
+        x = this.size/2;
+        y = margin/2;
+        break;
+      case 'inferior':
+        x = this.size/2;
+        y = this.size - margin/2;
+        break;
+      case 'izquierda':
+        x = margin/2;
+        y = this.size/2;
+        break;
+      case 'derecha':
+        x = this.size - margin/2;
+        y = this.size/2;
+        break;
+    }
+    
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    this.ctx.stroke();
+  }
+
+  drawCorona() {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = COLORS.primary;
+    this.ctx.lineWidth = 2;
+    this.ctx.setLineDash([2, 2]); // Make it dashed
+    
+    const padding = 3;
+    this.ctx.ellipse(
+      this.size/2, 
+      this.size/2, 
+      this.size/2 - padding, 
+      this.size/2 - padding, 
+      0, 
+      0, 
+      2 * Math.PI
+    );
+    
+    this.ctx.stroke();
+    this.ctx.setLineDash([]); // Reset dash
+  }
+  
+  drawProtesisStart() {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = COLORS.primary;
+    this.ctx.lineWidth = 3; // Incrementar el ancho para mayor visibilidad
+    
+    // Usar dimensiones relativas al tamaño del canvas para mejor visibilidad
+    const margin = this.size * 0.1;
+    const width = this.size * 0.3;
+    
+    // Draw bracket [ con dimensiones más visibles
+    this.ctx.moveTo(this.size - margin, margin);
+    this.ctx.lineTo(this.size - width, margin);
+    this.ctx.lineTo(this.size - width, this.size - margin);
+    this.ctx.lineTo(this.size - margin, this.size - margin);
+    
+    this.ctx.stroke();
+  }
+
+  drawProtesisEnd() {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = COLORS.primary;
+    this.ctx.lineWidth = 3; // Incrementar el ancho para mayor visibilidad
+    
+    // Usar dimensiones relativas al tamaño del canvas para mejor visibilidad
+    const margin = this.size * 0.1;
+    const width = this.size * 0.3;
+    
+    // Draw bracket ] con dimensiones más visibles
+    this.ctx.moveTo(margin, margin);
+    this.ctx.lineTo(width, margin);
+    this.ctx.lineTo(width, this.size - margin);
+    this.ctx.lineTo(margin, this.size - margin);
+    
+    this.ctx.stroke();
+  }
+  
+  drawCaries(surface) {
+    const margin = this.size * 0.25;
+    this.ctx.fillStyle = COLORS.primary;
+    
+    let x, y;
+    const radius = margin * 0.4;
+    
+    switch(surface) {
+      case 'central':
+        x = this.size/2;
+        y = this.size/2;
+        break;
+      case 'superior':
+        x = this.size/2;
+        y = margin/2;
+        break;
+      case 'inferior':
+        x = this.size/2;
+        y = this.size - margin/2;
+        break;
+      case 'izquierda':
+        x = margin/2;
+        y = this.size/2;
+        break;
+      case 'derecha':
+        x = this.size - margin/2;
+        y = this.size/2;
+        break;
+    }
+    
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    this.ctx.fill();
+  }
+
+  drawArreglo(surface) {
+    const margin = this.size * 0.25;
+    this.ctx.fillStyle = COLORS.secondary;
+    
+    let x, y;
+    const radius = margin * 0.4;
+    
+    switch(surface) {
+      case 'central':
+        x = this.size/2;
+        y = this.size/2;
+        break;
+      case 'superior':
+        x = this.size/2;
+        y = margin/2;
+        break;
+      case 'inferior':
+        x = this.size/2;
+        y = this.size - margin/2;
+        break;
+      case 'izquierda':
+        x = margin/2;
+        y = this.size/2;
+        break;
+      case 'derecha':
+        x = this.size - margin/2;
+        y = this.size/2;
+        break;
+    }
+    
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    this.ctx.fill();
+  }
+
+  drawImplante() {
+    const margin = this.size * 0.25;
+    this.ctx.fillStyle = '#22c55e'; // Using green color
+    this.ctx.font = `${margin * 0.7}px Arial`;
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText("Impl", this.size/2, this.size/2);
+  }
+
+  drawOrtodoncia(surface) {
+    const margin = this.size * 0.25;
+    this.ctx.fillStyle = COLORS.green;
+    
+    let x, y;
+    const radius = margin * 0.4;
+    
+    switch(surface) {
+      case 'central':
+        x = this.size/2;
+        y = this.size/2;
+        break;
+      case 'superior':
+        x = this.size/2;
+        y = margin/2;
+        break;
+      case 'inferior':
+        x = this.size/2;
+        y = this.size - margin/2;
+        break;
+      case 'izquierda':
+        x = margin/2;
+        y = this.size/2;
+        break;
+      case 'derecha':
+        x = this.size - margin/2;
+        y = this.size/2;
+        break;
+    }
+    
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    this.ctx.fill();
+  }
+
+  drawTC(surface) {
+    const margin = this.size * 0.25;
+    this.ctx.fillStyle = COLORS.primary;
+    this.ctx.font = `${margin * 0.8}px Arial`;
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    
+    let x, y;
+    
+    switch(surface) {
+      case 'central':
+        x = this.size/2;
+        y = this.size/2;
+        break;
+      case 'superior':
+        x = this.size/2;
+        y = margin/2;
+        break;
+      case 'inferior':
+        x = this.size/2;
+        y = this.size - margin/2;
+        break;
+      case 'izquierda':
+        x = margin/2;
+        y = this.size/2;
+        break;
+      case 'derecha':
+        x = this.size - margin/2;
+        y = this.size/2;
+        break;
+    }
+    
+    this.ctx.fillText("T.C", x, y);
+  }
+
+  drawAM(surface) {
+    this.drawArreglo(surface); // A.M se dibuja igual que Arreglo
+  }
+}
+
+let idPacienteDeApi = null;
+let protesisFirstTooth = null;
+let protesisFirstElement = null;
+
+// Función para debounce (evitar múltiples llamadas)
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+function cargarTratamientosPendientes() {
+  try {
+    return JSON.parse(localStorage.getItem('tratamientosPendientes') || '[]');
+  } catch (error) {
+    console.error('Error al cargar tratamientos pendientes:', error);
+    return [];
+  }
+}
+
+function guardarTratamientosPendientes(tratamientos) {
+  try {
+    localStorage.setItem('tratamientosPendientes', JSON.stringify(tratamientos));
+  } catch (error) {
+    console.error('Error al guardar tratamientos pendientes:', error);
+    mostrarNotificacion('Error al guardar tratamientos pendientes', 'error');
+  }
+}
+
+function initializeToothCanvases() {
+  document.querySelectorAll('.tooth-container').forEach(container => {
+    const toothCanvas = new ToothCanvas(container);
+    container.toothCanvas = toothCanvas;
+    toothCanvas.drawToothBase();
+  });
+}
+
+function reiniciarCanvas() {
+  // Limpiar todos los canvas y sus contenedores
+  document.querySelectorAll('.tooth-container').forEach(container => {
+    // 1. Limpiar clases CSS
+    container.className = 'tooth-container relative w-full aspect-square mx-auto';
+    
+    // 2. Limpiar canvas
+    if (container.toothCanvas) {
+      // Limpiar el canvas existente
+      container.toothCanvas.clear();
+      // Resetear el mapa de superficies seleccionadas
+      container.toothCanvas.selectedSurfaces = new Map();
+      // Redibujar el diente base
+      container.toothCanvas.drawToothBase();
+    }
+
+    // 3. Asegurarse de que el número del diente permanezca visible
+    const toothNumber = container.dataset.tooth;
+    const numberSpan = container.querySelector('.tooth-number');
+    if (numberSpan) {
+      numberSpan.className = 'tooth-number absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] xs:text-[10px] md:text-xs text-gray-600 dark:text-gray-400';
+    }
+  });
+  
+  // 5. Remover conectores de prótesis
+  document.querySelectorAll('.protesis-connector').forEach(el => el.remove());
+
+  // 6. Resetear variables globales
+  protesisFirstTooth = null;
+  protesisFirstElement = null;
+
+  // 7. Limpiar tratamientos pendientes
+  localStorage.removeItem('tratamientosPendientes');
+}
+
+// Función para crear conectores de prótesis
+function createProtesisConnector(startContainer, endContainer) {
+  // Eliminar conectores existentes para evitar duplicados
+  document.querySelectorAll(`.protesis-connector[data-start="${startContainer.dataset.tooth}"][data-end="${endContainer.dataset.tooth}"]`).forEach(el => el.remove());
+  document.querySelectorAll(`.protesis-connector[data-start="${endContainer.dataset.tooth}"][data-end="${startContainer.dataset.tooth}"]`).forEach(el => el.remove());
+
+  // Crear nuevo conector
+  const connector = document.createElement('canvas');
+  connector.className = 'protesis-connector';
+  connector.dataset.start = startContainer.dataset.tooth;
+  connector.dataset.end = endContainer.dataset.tooth;
+
+  // Determinar qué contenedor está a la izquierda y cuál a la derecha
+  const startRect = startContainer.getBoundingClientRect();
+  const endRect = endContainer.getBoundingClientRect();
+  
+  // Asegurar que startContainer siempre es el que está a la izquierda
+  let leftContainer, rightContainer, leftRect, rightRect;
+  if (startRect.left < endRect.left) {
+    leftContainer = startContainer;
+    rightContainer = endContainer;
+    leftRect = startRect;
+    rightRect = endRect;
+  } else {
+    leftContainer = endContainer;
+    rightContainer = startContainer;
+    leftRect = endRect;
+    rightRect = startRect;
+  }
+
+  const parentRect = leftContainer.parentElement.getBoundingClientRect();
+  
+  // Calcular dimensiones y posición
+  const width = Math.abs(rightRect.left - leftRect.right);
+  connector.style.position = 'absolute';
+  connector.style.top = `${(leftRect.top + leftRect.height/2) - parentRect.top}px`;
+  connector.style.left = `${leftRect.right - parentRect.left}px`;
+  connector.width = width;
+  connector.height = 4; // Incrementar la altura para mayor visibilidad
+
+  // Dibujar la línea conectora
+  const ctx = connector.getContext('2d');
+  ctx.strokeStyle = COLORS.primary;
+  ctx.lineWidth = 3; // Línea más gruesa para mejor visibilidad
+  ctx.beginPath();
+  ctx.moveTo(0, 2);
+  ctx.lineTo(width, 2);
+  ctx.stroke();
+
+  // Agregar el conector al DOM
+  leftContainer.parentElement.appendChild(connector);
+  
+  // Devolver el conector creado para usos futuros
+  return connector;
+}
+
+// Función para reposicionar conectores
+function repositionProtesisConnectors() {
+  document.querySelectorAll('.protesis-connector').forEach(connector => {
+    const startContainer = document.querySelector(`[data-tooth="${connector.dataset.start}"]`);
+    const endContainer = document.querySelector(`[data-tooth="${connector.dataset.end}"]`);
+    
+    if (!startContainer || !endContainer) {
+      connector.remove();
+      return;
+    }
+    
+    // Determinar qué contenedor está a la izquierda y cuál a la derecha
+    const startRect = startContainer.getBoundingClientRect();
+    const endRect = endContainer.getBoundingClientRect();
+    
+    // Asegurar que usamos el contenedor izquierdo para posicionar
+    let leftContainer, rightContainer, leftRect, rightRect;
+    if (startRect.left < endRect.left) {
+      leftContainer = startContainer;
+      rightContainer = endContainer;
+      leftRect = startRect;
+      rightRect = endRect;
+    } else {
+      leftContainer = endContainer;
+      rightContainer = startContainer;
+      leftRect = endRect;
+      rightRect = startRect;
+    }
+    
+    const parentRect = leftContainer.parentElement.getBoundingClientRect();
+    
+    // Actualizar dimensiones y posición
+    const width = Math.abs(rightRect.left - leftRect.right);
+    connector.style.top = `${(leftRect.top + leftRect.height/2) - parentRect.top}px`;
+    connector.style.left = `${leftRect.right - parentRect.left}px`;
+    connector.width = width;
+    
+    // Redibujar la línea
+    const ctx = connector.getContext('2d');
+    ctx.clearRect(0, 0, connector.width, connector.height);
+    ctx.strokeStyle = COLORS.primary;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, 2);
+    ctx.lineTo(width, 2);
+    ctx.stroke();
+  });
+}
+
+function handleProtesis(startContainer, endContainer) {
+  console.log('Aplicando prótesis entre dientes:', {
+    start: startContainer?.dataset?.tooth,
+    end: endContainer?.dataset?.tooth
+  });
+
+  if (!startContainer || !endContainer) {
+    console.error('Contenedores de dientes inválidos:', { startContainer, endContainer });
+    return;
+  }
+
+  // Limpiar y preparar los dientes
+  [startContainer, endContainer].forEach(container => {
+    if (container.toothCanvas) {
+      container.toothCanvas.clear();
+      container.toothCanvas.drawToothBase();
+    }
+  });
+
+  // Dibujar los corchetes
+  startContainer.toothCanvas.drawProtesisStart();
+  endContainer.toothCanvas.drawProtesisEnd();
+
+  // Crear conector
+  createProtesisConnector(startContainer, endContainer);
+  
+  console.log('Prótesis aplicada exitosamente');
+}
+
+function handleProtesisSave(diente, superficie, elemento, origen, tratamientosPendientes) {
+  if (!protesisFirstTooth) {
+    protesisFirstTooth = elemento;
+    protesisFirstElement = elemento;
+    mostrarNotificacion('Seleccione el segundo diente para la prótesis', 'success');
+    return;
+  }
+  
+  const firstNum = parseInt(protesisFirstTooth.dataset.tooth);
+  const secondNum = parseInt(diente);
+  
+  if (Math.floor(firstNum/10) !== Math.floor(secondNum/10)) {
+    mostrarNotificacion('Los dientes deben estar en la misma fila', 'error');
+    return;
+  }
+  
+  if (Math.abs(secondNum - firstNum) > 7) {
+    mostrarNotificacion('Los dientes están demasiado separados', 'error');
+    return;
+  }
+  
+  handleProtesis(protesisFirstTooth, elemento);
+  
+  tratamientosPendientes.push(
+    {
+      numeroDiente: protesisFirstTooth.dataset.tooth,
+      superficie: 'completo',
+      tratamiento: 'Protesis',
+      origen,
+      protesisPartner: diente
+    },
+    {
+      numeroDiente: diente,
+      superficie: 'completo',
+      tratamiento: 'Protesis',
+      origen,
+      protesisPartner: protesisFirstTooth.dataset.tooth
+    }
+  );
+  
+  guardarTratamientosPendientes(tratamientosPendientes);
+  document.getElementById('save').disabled = false;
+  
+  protesisFirstTooth = null;
+  protesisFirstElement = null;
+}
+
+function seleccionarParteDiente(diente, superficie, elemento) {
+  const tratamiento = document.getElementById('treatment-select')?.value;
+  const origen = document.getElementById('origin-select')?.value;
+  
+  if (!tratamiento || !origen) {
+    mostrarNotificacion('Seleccione tratamiento y origen', 'error');
+    return;
+  }
+
+  // Aplicar clase de background según origen
+  elemento.classList.remove('own-clinic', 'other-clinic');
+  elemento.classList.add(origen === 'propio' ? 'own-clinic' : 'other-clinic');
+
+  const tratamientosPendientes = cargarTratamientosPendientes();
+  const tratamientoInfo = TREATMENTS[tratamiento];
+
+  if (!tratamientoInfo) {
+    console.error('Tratamiento no encontrado:', tratamiento);
+    return;
+  }
+
+  // Manejar prótesis
+  if (tratamiento === 'Protesis') {
+    handleProtesisSave(diente, superficie, elemento, origen, tratamientosPendientes);
+    return;
+  }
+
+  // Limpiar tratamientos existentes para este diente
+  const otrosTratamientos = tratamientosPendientes.filter(t => t.numeroDiente !== diente);
+
+  // Para tratamientos que afectan el diente completo
+  if (tratamientoInfo.fullTooth) {
+    elemento.toothCanvas.clear();
+    elemento.toothCanvas.drawToothBase();
+    elemento.toothCanvas.drawTreatment(tratamiento, 'completo');
+    
+    otrosTratamientos.push({
+      numeroDiente: diente,
+      superficie: 'completo',
+      tratamiento,
+      origen
+    });
+  } 
+  // Para tratamientos multi-superficie
+  else if (tratamientoInfo.multiSurface) {
+    elemento.toothCanvas.selectedSurfaces.set(superficie, { tratamiento, origen });
+    elemento.toothCanvas.drawTreatment(tratamiento, superficie);
+    
+    elemento.toothCanvas.selectedSurfaces.forEach((info, surf) => {
+      otrosTratamientos.push({
+        numeroDiente: diente,
+        superficie: surf,
+        tratamiento: info.tratamiento,
+        origen: info.origen
+      });
+    });
+  } 
+  // Para tratamientos normales
+  else {
+    elemento.toothCanvas.clear();
+    elemento.toothCanvas.drawToothBase();
+    elemento.toothCanvas.drawTreatment(tratamiento, superficie);
+    
+    otrosTratamientos.push({
+      numeroDiente: diente,
+      superficie,
+      tratamiento,
+      origen
+    });
+  }
+
+  guardarTratamientosPendientes(otrosTratamientos);
+  document.getElementById('save').disabled = false;
+}
+
+function applyTreatment(container, treatment, surface) {
+  const canvas = container.toothCanvas;
+  if (!canvas) return;
+  
+  if (!TREATMENTS[treatment]) {
+    console.error(`Tratamiento desconocido: ${treatment}`);
+    return;
+  }
+
+  canvas.drawTreatment(treatment, surface);
+}
+
+function dibujarProtesis(diente1, diente2, origen) {
+  const container1 = document.querySelector(`[data-tooth="${diente1}"]`);
+  const container2 = document.querySelector(`[data-tooth="${diente2}"]`);
+  
+  if (!container1 || !container2) return;
+  
+  // Ordenar los dientes (menor a mayor) para consistencia
+  let startContainer, endContainer;
+  if (parseInt(diente1) < parseInt(diente2)) {
+    startContainer = container1;
+    endContainer = container2;
+  } else {
+    startContainer = container2;
+    endContainer = container1;
+  }
+  
+  // Aplicar clases de origen a ambos contenedores
+  [startContainer, endContainer].forEach(container => {
+    container.classList.remove('own-clinic', 'other-clinic');
+    container.classList.add(origen === 'propio' ? 'own-clinic' : 'other-clinic');
+    
+    if (container.toothCanvas) {
+      container.toothCanvas.clear();
+      container.toothCanvas.drawToothBase();
+    }
+  });
+
+  // Dibujar corchetes
+  startContainer.toothCanvas.drawProtesisStart();
+  endContainer.toothCanvas.drawProtesisEnd();
+
+  // Crear y configurar el conector
+  createProtesisConnector(startContainer, endContainer);
+  
+  return {start: startContainer.dataset.tooth, end: endContainer.dataset.tooth};
+}
+
+async function cargarTratamientosExistentes(mantenerProtesis = false) {
+  try {
+    if (!idPacienteDeApi) throw new Error('ID de paciente no disponible');
+    
+    const respuesta = await fetch(`${BASE_URL}/odontograma/patient/${idPacienteDeApi}`);
+    if (!respuesta.ok) throw new Error('Error al cargar tratamientos');
+    
+    const tratamientos = JSON.parse(await respuesta.text());
+    console.log('Tratamientos cargados:', tratamientos);
+
+    // Guarda info de prótesis actuales antes de limpiar
+    let protesisActuales = [];
+    if (mantenerProtesis) {
+      document.querySelectorAll('.protesis-connector').forEach(connector => {
+        protesisActuales.push({
+          start: connector.dataset.start,
+          end: connector.dataset.end,
+          origen: document.querySelector(`[data-tooth="${connector.dataset.start}"]`)?.classList.contains('own-clinic') ? 'propio' : 'otro'
+        });
+      });
+    }
+    
+    // Limpiar todo
+    reiniciarCanvas();
+    
+    if (!Array.isArray(tratamientos) || tratamientos.length === 0) {
+      document.getElementById('treatment-history').innerHTML = 
+          '<div class="text-gray-400 text-center py-4">No hay tratamientos registrados</div>';
+      
+      // Si estábamos manteniendo prótesis, las restauramos
+      if (mantenerProtesis && protesisActuales.length > 0) {
+        protesisActuales.forEach(protesis => {
+          dibujarProtesis(protesis.start, protesis.end, protesis.origen);
+        });
+      }
+      return;
+    }
+
+    // Recolectar prótesis de los datos cargados
+    const protesisPorPar = new Map();
+    const tratamientosOrdenados = tratamientos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    // Primero procesamos las prótesis para identificar los pares
+    tratamientosOrdenados.forEach(odontograma => {
+      const protesisDientes = odontograma.dientes.filter(
+        diente => diente.tratamiento === 'Protesis' && diente.protesisPartner
+      );
+      
+      for (let i = 0; i < protesisDientes.length; i++) {
+        const diente = protesisDientes[i];
+        if (!diente) continue;
+        
+        // Ordenar para crear un ID consistente
+        const [menor, mayor] = [diente.numeroDiente, diente.protesisPartner]
+          .sort((a, b) => parseInt(a) - parseInt(b));
+        const parId = `${menor}-${mayor}`;
+        
+        // Solo guardar el par si no existe uno más reciente
+        if (!protesisPorPar.has(parId)) {
+          protesisPorPar.set(parId, {
+            diente1: menor,
+            diente2: mayor,
+            origen: diente.origen,
+            fecha: odontograma.fecha
+          });
+        }
+      }
+    });
+
+    // Procesar tratamientos no-prótesis
+    // Usamos un Set para rastrear dientes que ya procesamos (prioridad a los más recientes)
+    const procesados = new Set();
+    
+    tratamientosOrdenados.forEach(odontograma => {
+      odontograma.dientes
+        .filter(diente => diente.tratamiento !== 'Protesis')
+        .forEach(diente => {
+          // Si ya procesamos este diente, omitirlo
+          if (procesados.has(diente.numeroDiente)) return;
+          
+          // Si es parte de una prótesis reciente, omitirlo
+          const esDienteProtesis = Array.from(protesisPorPar.values()).some(
+            p => p.diente1 === diente.numeroDiente || p.diente2 === diente.numeroDiente
+          );
+          
+          if (!esDienteProtesis) {
+            const container = document.querySelector(`[data-tooth="${diente.numeroDiente}"]`);
+            if (container && container.toothCanvas) {
+              container.classList.remove('own-clinic', 'other-clinic');
+              container.classList.add(diente.origen === 'propio' ? 'own-clinic' : 'other-clinic');
+              
+              container.toothCanvas.clear();
+              container.toothCanvas.drawToothBase();
+              applyTreatment(container, diente.tratamiento, diente.superficie);
+              
+              // Marcar como procesado
+              procesados.add(diente.numeroDiente);
+            }
+          }
+        });
+    });
+
+    // Dibujar todas las prótesis
+    protesisPorPar.forEach((datos) => {
+      dibujarProtesis(datos.diente1, datos.diente2, datos.origen);
+    });
+
+    // Restaurar las prótesis que mantuvimos (si corresponde)
+    if (mantenerProtesis && protesisActuales.length > 0) {
+      protesisActuales.forEach(protesis => {
+        // Verificar si ya existe en las prótesis dibujadas
+        const existeYa = Array.from(document.querySelectorAll('.protesis-connector')).some(
+          connector => (connector.dataset.start === protesis.start && connector.dataset.end === protesis.end) ||
+                       (connector.dataset.start === protesis.end && connector.dataset.end === protesis.start)
+        );
+        
+        if (!existeYa) {
+          dibujarProtesis(protesis.start, protesis.end, protesis.origen);
+        }
+      });
+    }
+
+    // Actualizar historial
+    actualizarHistorialTratamientos(tratamientosOrdenados);
+    
+    // Reposicionar conectores después de que todo esté renderizado
+    setTimeout(repositionProtesisConnectors, 100);
+
+  } catch (error) {
+    console.error('Error al cargar tratamientos:', error);
+    mostrarNotificacion('Error al cargar tratamientos', 'error');
+  }
+}
+
+// Función para actualizar el historial de tratamientos
+function actualizarHistorialTratamientos(tratamientosOrdenados) {
+  const contenedorHistorial = document.getElementById('treatment-history');
+  if (!contenedorHistorial) return;
+  
+  contenedorHistorial.innerHTML = '';
+  
+  if (tratamientosOrdenados.length === 0) {
+    contenedorHistorial.innerHTML = '<div class="text-gray-400 text-center py-4">No hay tratamientos registrados</div>';
+    return;
+  }
+  
+  tratamientosOrdenados.forEach(odontograma => {
+    odontograma.dientes.forEach(diente => {
+      agregarTratamientoAlHistorial(diente, odontograma.fecha, odontograma._id);
+    });
+  });
+}
+
+function agregarTratamientoAlHistorial(diente, fecha, id) {
+  const contenedorHistorial = document.getElementById('treatment-history');
+  if (!contenedorHistorial) return;
+
+  const tratamiento = TREATMENTS[diente.tratamiento];
+  if (!tratamiento) return;
+  
+  const registroTratamiento = document.createElement('div');
+  registroTratamiento.className = 'mb-2 px-3 py-2.5 bg-gray-700/50 backdrop-blur rounded-lg';
+  registroTratamiento.dataset.id = id;
+  registroTratamiento.dataset.fecha = new Date(fecha).getTime();
+  registroTratamiento.dataset.searchContent = `${diente.numeroDiente} ${diente.tratamiento}`.toLowerCase();
+  
+  const isPrimary = ['5','6','7','8'].includes(diente.numeroDiente.toString().charAt(0));
+  const dentitionType = isPrimary ? '(Temporal)' : '(Permanente)';
+  
+  registroTratamiento.innerHTML = `
+    <div class="flex items-center justify-between flex-wrap gap-1">
+      <div class="flex items-center gap-1 md:gap-2">
+        <span class="font-medium text-white text-xs md:text-sm">Diente ${diente.numeroDiente} ${dentitionType}</span>
+        <span class="text-base md:text-lg" style="color: ${tratamiento.color}">${tratamiento.icon}</span>
+        <span class="${diente.origen === 'propio' ? 'text-blue-400' : 'text-red-400'} text-xs md:text-sm">
+          ${diente.origen === 'propio' ? 'Este estudio' : 'Otro estudio'}
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs md:text-sm text-gray-400">${new Date(fecha).toLocaleDateString()}</span>
+        <button onclick="eliminarTratamiento('${id}')" class="text-gray-400 hover:text-red-400 transition-colors text-base md:text-lg">
+          <span>🗑️</span>
+        </button>
+      </div>
+    </div>
+    <div class="mt-1.5 text-xs md:text-sm text-gray-300 flex flex-wrap gap-1 items-center">
+      <span>${diente.tratamiento}</span>
+      <span class="text-gray-500">-</span>
+      <span>${diente.superficie}</span>
+      ${diente.protesisPartner ? `<span class="text-gray-500">- Conectado con ${diente.protesisPartner}</span>` : ''}
+    </div>
+    ${diente.notas ? `
+      <div class="mt-1.5 text-xs md:text-sm text-gray-400 flex items-center gap-1">
+        <span>📝</span>
+        <span>${diente.notas}</span>
+      </div>
+    ` : ''}
+  `;
+
+  const registros = Array.from(contenedorHistorial.children);
+  const index = registros.findIndex(r => parseInt(r.dataset.fecha || '0') < new Date(fecha).getTime());
+
+  if (index === -1) {
+    contenedorHistorial.appendChild(registroTratamiento);
+  } else {
+    contenedorHistorial.insertBefore(registroTratamiento, registros[index]);
+  }
+}
+
+async function guardarTratamiento() {
+  const tratamientosPendientes = cargarTratamientosPendientes();
+  if (tratamientosPendientes.length === 0) {
+    mostrarNotificacion('No hay tratamientos pendientes', 'error');
+    return;
+  }
+
+  const botonGuardar = document.getElementById('save');
+  if (!botonGuardar) return;
+  
+  botonGuardar.disabled = true;
+  botonGuardar.innerHTML = '<span class="animate-pulse">Guardando...</span>';
+
+  try {
+    if (!idPacienteDeApi) {
+      throw new Error('ID de paciente no disponible');
+    }
+
+    // Guardar protesis actuales antes de enviar
+    const protesisActuales = [];
+    document.querySelectorAll('.protesis-connector').forEach(connector => {
+      protesisActuales.push({
+        start: connector.dataset.start,
+        end: connector.dataset.end,
+        origen: document.querySelector(`[data-tooth="${connector.dataset.start}"]`)?.classList.contains('own-clinic') ? 'propio' : 'otro'
+      });
+    });
+
+    const notas = document.getElementById('notes')?.value || '';
+    const datosDientes = tratamientosPendientes.map(t => ({
+      numeroDiente: t.numeroDiente.toString(),
+      superficie: t.superficie,
+      tratamiento: t.tratamiento,
+      origen: t.origen,
+      notas,
+      protesisPartner: t.protesisPartner
+    }));
+
+    const respuesta = await fetch(`${BASE_URL}/odontograma`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        idPaciente: idPacienteDeApi,
+        dientes: datosDientes
+      })
+    });
+
+    if (!respuesta.ok) {
+      throw new Error(await respuesta.text());
+    }
+    
+    // Limpiamos localStorage para nuevos tratamientos
+    localStorage.removeItem('tratamientosPendientes');
+    
+    // Resetear formulario
+    const tratamientSelect = document.getElementById('treatment-select');
+    const originSelect = document.getElementById('origin-select');
+    const notesTextarea = document.getElementById('notes');
+    
+    if (tratamientSelect) tratamientSelect.value = '';
+    if (originSelect) originSelect.value = '';
+    if (notesTextarea) notesTextarea.value = '';
+    if (botonGuardar) botonGuardar.disabled = true;
+
+    // Recargamos todo manteniendo las prótesis
+    await cargarTratamientosExistentes(true);
+    
+    // Reposicionar conectores después de que todo esté renderizado
+    setTimeout(repositionProtesisConnectors, 100);
+    
+    mostrarNotificacion('Tratamientos guardados exitosamente', 'success');
+  } catch (error) {
+    console.error('Error detallado:', error);
+    mostrarNotificacion(
+      `Error al guardar los tratamientos: ${error.message || 'Error desconocido'}`, 
+      'error'
+    );
+  } finally {
+    if (botonGuardar) {
+      botonGuardar.disabled = false;
+      botonGuardar.innerHTML = 'Guardar';
+    }
+  }
+}
+
+function buscarTratamientos(query) {
+  const contenedorHistorial = document.getElementById('treatment-history');
+  const queryLower = query.toLowerCase();
+  
+  Array.from(contenedorHistorial.children).forEach(registro => {
+    if (!registro.dataset.searchContent) return;
+    const visible = registro.dataset.searchContent.includes(queryLower);
+    registro.style.display = visible ? 'block' : 'none';
+  });
+}
+
+async function limpiarTodo() {
+  if (!confirm('¿Está seguro de que desea eliminar todos los tratamientos?')) return;
+
+  try {
+    if (!idPacienteDeApi) throw new Error('ID de paciente no disponible');
+    
+    const response = await fetch(`${BASE_URL}/odontograma/patient/${idPacienteDeApi}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Error al eliminar tratamientos');
+    
+    // Limpiar localStorage
+    localStorage.removeItem('tratamientosPendientes');
+    
+    // Limpiar UI elements
+    const elements = {
+      treatmentSelect: document.getElementById('treatment-select'),
+      originSelect: document.getElementById('origin-select'),
+      notes: document.getElementById('notes'),
+      save: document.getElementById('save'),
+      treatmentHistory: document.getElementById('treatment-history')
+    };
+    
+    // Reset form elements
+    if (elements.treatmentSelect) elements.treatmentSelect.value = '';
+    if (elements.originSelect) elements.originSelect.value = '';
+    if (elements.notes) elements.notes.value = '';
+    if (elements.save) elements.save.disabled = true;
+    
+    // Limpiar completamente cada contenedor de diente
+    document.querySelectorAll('.tooth-container').forEach(container => {
+      // Remover clases de estilo
+      container.classList.remove('own-clinic', 'other-clinic');
+      
+      // Limpiar y redibujar el canvas
+      if (container.toothCanvas) {
+        container.toothCanvas.clear();
+        container.toothCanvas.drawToothBase();
+        container.toothCanvas.selectedSurfaces = new Map(); // Resetear superficies seleccionadas
+      }
+    });
+
+    // Remover conectores de prótesis
+    document.querySelectorAll('.protesis-connector').forEach(el => el.remove());
+    
+    // Resetear variables globales de prótesis
+    protesisFirstTooth = null;
+    protesisFirstElement = null;
+    
+    // Limpiar historial
+    if (elements.treatmentHistory) {
+      elements.treatmentHistory.innerHTML = 
+        '<div class="text-gray-400 text-center py-4">No hay tratamientos registrados</div>';
+    }
+    
+    mostrarNotificacion('Todos los tratamientos eliminados', 'success');
+  } catch (error) {
+    console.error('Error:', error);
+    mostrarNotificacion('Error al eliminar los tratamientos', 'error');
+  }
+}
+
+function reiniciarSeleccion() {
+  localStorage.removeItem('tratamientosPendientes');
+  
+  reiniciarCanvas();
+  
+  // Resetear variables
+  protesisFirstTooth = null;
+  protesisFirstElement = null;
+  
+  // Limpiar controles
+  document.getElementById('treatment-select').value = '';
+  document.getElementById('origin-select').value = '';
+  document.getElementById('notes').value = '';
+  document.getElementById('save').disabled = true;
+}
+
+function mostrarNotificacion(mensaje, tipo = 'success') {
+  const notificacionExistente = document.querySelector('.notificacion');
+  if (notificacionExistente) {
+    notificacionExistente.remove();
+  }
+
+  const notificacion = document.createElement('div');
+  notificacion.className = `notificacion fixed top-4 right-4 z-50 rounded-lg p-3 md:p-4 shadow-lg transition-opacity duration-300 ${
+    tipo === 'success' 
+      ? 'bg-green-500' 
+      : 'bg-red-500'
+  } text-white text-sm md:text-base max-w-xs md:max-w-md`;
+  notificacion.textContent = mensaje;
+
+  document.body.appendChild(notificacion);
+
+  setTimeout(() => {
+    notificacion.style.opacity = '0';
+    setTimeout(() => notificacion.remove(), 300);
+  }, 3000);
+}
+
+// Inicialización y Event Listeners
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const respuesta = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
+    if (!respuesta.ok) throw new Error('Paciente no encontrado');
+    
+    const datos = JSON.parse(await respuesta.text());
+    idPacienteDeApi = datos.paciente?.id;
+    
+    if (!idPacienteDeApi) {
+      mostrarNotificacion('Error: ID de paciente no encontrado', 'error');
+      return;
+    }
+
+    // Inicializar canvas
+    initializeToothCanvases();
+
+    // Cargar tratamientos existentes
+    await cargarTratamientosExistentes();
+    
+    // Asegurarse de que los conectores estén correctamente posicionados
+    setTimeout(repositionProtesisConnectors, 300);
+
+    // Cargar tratamientos pendientes después de inicializar todo lo demás
+    const tratamientosPendientes = cargarTratamientosPendientes();
+    
+    // Inicializar estado del botón guardar basado en los tratamientos pendientes
+    const saveButton = document.getElementById("save");
+    if (saveButton) {
+      saveButton.disabled = tratamientosPendientes.length === 0;
+    }
+
+    // Agregar listeners para los controles (optimizado)
+    document.querySelectorAll('[data-treatment]').forEach(elem => {
+      elem.addEventListener('click', () => {
+        const treatmentSelect = document.getElementById('treatment-select');
+        if (treatmentSelect) {
+          treatmentSelect.value = elem.dataset.treatment;
+        }
+      });
+    });
+
+    // Configurar evento de búsqueda con debounce
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', debounce((e) => {
+        buscarTratamientos(e.target.value);
+      }, 250));
+    }
+
+    // Configurar botones de acción
+    const resetButton = document.getElementById('reset');
+    const clearAllButton = document.getElementById('clear-all');
+
+    if (saveButton) {
+      saveButton.addEventListener('click', guardarTratamiento);
+    }
+    if (resetButton) {
+      resetButton.addEventListener('click', reiniciarSeleccion);
+    }
+    if (clearAllButton) {
+      clearAllButton.addEventListener('click', limpiarTodo);
+    }
+
+    // Observar cambios en el modo oscuro/claro para actualizar conectores
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        setTimeout(repositionProtesisConnectors, 100);
+      });
+    }
+
+    // Manejar eventos de redimensionamiento para reposicionar conectores
+    window.addEventListener('resize', debounce(repositionProtesisConnectors, 250));
+
+  } catch (error) {
+    console.error('Error al cargar paciente:', error);
+    mostrarNotificacion('Error al cargar paciente', 'error');
+  }
+});
+
+// Exponer función necesaria para el onclick del historial
+window.eliminarTratamiento = eliminarTratamiento;
+</script>

@@ -1,0 +1,11 @@
+---
+import Atencion from './perfil/atenciones/AtencionesR.jsx';
+
+interface Props {
+  dni: string;
+}
+
+const { dni } = Astro.props;
+---
+
+<Atencion client:load dni={dni} />

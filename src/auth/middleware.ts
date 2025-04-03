@@ -3,8 +3,6 @@
 export function isAuthenticated(): boolean {
     const userId = localStorage.getItem('userId');
     const userRole = localStorage.getItem('userRole');
-    console.log('Current user ID:', userId); // Debug
-    console.log('Current user role:', userRole); // Debug
     return userId !== null && userId !== undefined && userId !== '' &&
            userRole !== null && userRole !== undefined && userRole !== '';
   }
@@ -12,14 +10,14 @@ export function isAuthenticated(): boolean {
   // Proteger rutas
   export function requireAuth() {
     const currentPath = window.location.pathname;
-    const publicPaths = ['/login', '/logup'];
+    const publicPaths = ['/auth/login', '/auth/logup'];
     
     if (publicPaths.includes(currentPath)) {
       return true;
     }
   
     if (!isAuthenticated()) {
-      window.location.href = '/login';
+      window.location.href = '/auth/login';
       return false;
     }
     return true;

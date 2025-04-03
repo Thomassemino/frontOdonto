@@ -1,0 +1,11 @@
+---
+import PrestacionesR from './perfil/prestaciones/PrestacionesR.jsx';
+
+interface Props {
+  dni: string;
+}
+
+const { dni } = Astro.props;
+---
+
+<PrestacionesR client:load dni={dni} />

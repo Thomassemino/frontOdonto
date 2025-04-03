@@ -1,0 +1,44 @@
+---
+interface Props {
+  title: string;
+  value: string | number;
+  icon: any;
+  trend: 'up' | 'down';
+  trendValue: string;
+  loading?: boolean;
+  id?: string;
+}
+
+const { title, value, icon: Icon, trend, trendValue, loading = false, id } = Astro.props;
+---
+
+<div id={id} class:list={[
+  'bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6',
+  { 'animate-pulse': loading }
+]}>
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+        {title}
+      </p>
+      <p class="text-2xl font-semibold text-gray-700 dark:text-gray-200">
+        {value}
+      </p>
+    </div>
+    <div class="p-3 bg-blue-100 rounded-full dark:bg-blue-900">
+      <Icon class="w-6 h-6 text-blue-600 dark:text-blue-300" />
+    </div>
+  </div>
+  
+  <div class="mt-4">
+    <span class:list={[
+      'text-sm font-medium',
+      trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+    ]}>
+      {trend === 'up' ? '↑' : '↓'} {trendValue}
+    </span>
+    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+      vs mes anterior
+    </span>
+  </div>
+</div>

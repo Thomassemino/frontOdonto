@@ -1,0 +1,717 @@
+---
+---
+
+<div class="px-4 pt-6">
+	<div class="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+		<div class="flex flex-col md:flex-row justify-between items-center px-6 py-4">
+			<div class="w-full md:w-auto md:pr-8 pb-4 md:pb-0">
+				<img
+          id="profileImage"
+					class="w-48 h-48 rounded-full shadow-lg mx-auto"
+					src="/images/perfil-logo.png"
+					alt="Profile image"
+				/>
+			</div>
+
+			<div class="w-full md:flex-1 md:ml-6">
+				<h5 id="userName" class="mb-2 text-xl font-medium text-gray-900 dark:text-white text-center md:text-left">
+					Cargando...
+				</h5>
+				<div class="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 p-4 md:p-6">
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+						<div>
+							<h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+								Email
+							</h5>
+							<p id="userEmail" class="text-lg font-medium text-gray-900 dark:text-white">
+								Cargando...
+							</p>
+						</div>
+						<div>
+							<h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+								Teléfono
+							</h5>
+							<p id="userPhone" class="text-lg font-medium text-gray-900 dark:text-white">
+								Cargando...
+							</p>
+						</div>
+						<div id="especialidadContainer" class="hidden">
+							<h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+								Especialidad
+							</h5>
+							<p id="userEspecialidad" class="text-lg font-medium text-gray-900 dark:text-white">
+								Cargando...
+							</p>
+						</div>
+						<div id="matriculaContainer" class="hidden">
+							<h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+								Nº Matrícula
+							</h5>
+							<p id="userMatricula" class="text-lg font-medium text-gray-900 dark:text-white">
+								Cargando...
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="tableContainer" class="mt-8">
+			<div class="flex justify-center mb-4 space-x-4">
+				<button
+					id="citasButton"
+					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+				>
+					Ver Citas
+				</button>
+				<button
+					id="pacientesButton"
+					class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+				>
+					Ver Pacientes
+				</button>
+			</div>
+	
+			<!-- Tabla de Citas -->
+			<div id="citasTable" class="hidden w-full">
+        <!-- Vista Desktop -->
+        <div class="hidden md:block">
+          <div class="overflow-x-auto shadow-md sm:rounded-lg">
+            <div class="min-w-full align-middle">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Hora</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Atender</th>
+                  </tr>
+                </thead>
+                <tbody id="citasTableBodyDesktop" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                  <!-- Las filas se llenarán dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vista Mobile -->
+        <div class="md:hidden">
+          <div class="grid grid-cols-1 gap-4 px-4" id="citasTableBodyMobile">
+            <!-- Las tarjetas se llenarán dinámicamente -->
+          </div>
+        </div>
+      </div>
+	
+			<!-- Tabla de Pacientes -->
+			<div id="pacientesTable" class="hidden w-full">
+        <!-- Vista Desktop -->
+        <div class="hidden md:block">
+          <div class="overflow-x-auto shadow-md sm:rounded-lg">
+            <div class="min-w-full align-middle">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">DNI</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  </tr>
+                </thead>
+                <tbody id="pacientesTableBodyDesktop" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                  <!-- Las filas se llenarán dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vista Mobile -->
+        <div class="md:hidden">
+          <div class="grid grid-cols-1 gap-4 px-4" id="pacientesTableBodyMobile">
+            <!-- Las tarjetas se llenarán dinámicamente -->
+          </div>
+        </div>
+      </div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Constantes globales
+	const BASE_URL = "http://179.43.118.101:3001/api";
+	
+	// Cargar datos del perfil
+// Cargar datos del perfil
+window.addEventListener('load', async () => {
+		try {
+			const userId = localStorage.getItem('userId');
+			const userRole = localStorage.getItem('userRole');
+	
+			if (!userId || !userRole) {
+				window.location.href = '/login';
+				return;
+			}
+
+			// Actualizar imagen según el rol
+			const profileImage = document.getElementById('profileImage');
+			if (profileImage) {
+				profileImage.src = userRole === 'secretaria' ? '/images/perfil-logo-secretaria.png' : '/images/perfil-logo.png';
+			}
+
+			// Mostrar/ocultar botones según el rol
+			const tableContainer = document.getElementById('tableContainer');
+			if (tableContainer) {
+				tableContainer.style.display = userRole === 'secretaria' ? 'none' : 'block';
+			}
+	
+			let endpoint = '';
+			if (userRole === 'secretaria') {
+				endpoint = `${BASE_URL}/secretaria/buscarId/${userId}`;
+			} else if (userRole === 'odontologo') {
+				endpoint = `${BASE_URL}/medico/findById/${userId}`;
+				
+				const especialidadContainer = document.getElementById('especialidadContainer');
+				const matriculaContainer = document.getElementById('matriculaContainer');
+				
+				if (especialidadContainer) especialidadContainer.classList.remove('hidden');
+				if (matriculaContainer) matriculaContainer.classList.remove('hidden');
+			}
+	
+			const response = await fetch(endpoint);
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			
+			const data = await response.json();
+			const userData = userRole === 'secretaria' ? data.secretaria : (data.medico || data);
+	
+			const updateElement = (id, value) => {
+				const element = document.getElementById(id);
+				if (element) {
+					element.textContent = value || 'No disponible';
+				}
+			};
+	
+			updateElement('userName', userData.nombre);
+			updateElement('userEmail', userData.email);
+			updateElement('userPhone', userData.celular || userData.telefono);
+	
+			if (userRole === 'odontologo') {
+				updateElement('userEspecialidad', userData.especialidad);
+				updateElement('userMatricula', userData.nMatricula);
+				setupTables();
+			}
+	
+		} catch (error) {
+			console.error('Error loading user data:', error);
+			
+			const userRole = localStorage.getItem('userRole');
+			const errorElements = ['userName', 'userEmail', 'userPhone'];
+			if (userRole === 'odontologo') {
+				errorElements.push('userEspecialidad', 'userMatricula');
+			}
+			errorElements.forEach(id => {
+				const element = document.getElementById(id);
+				if (element) {
+					element.textContent = 'Error al cargar datos';
+				}
+			});
+		}
+	});
+	
+	function setupTables() {
+		const citasButton = document.getElementById('citasButton');
+		const pacientesButton = document.getElementById('pacientesButton');
+		const citasTable = document.getElementById('citasTable');
+		const pacientesTable = document.getElementById('pacientesTable');
+	
+		citasButton.addEventListener('click', () => {
+			pacientesTable.classList.add('hidden');
+			citasTable.classList.remove('hidden');
+			cargarCitas();
+		});
+	
+		pacientesButton.addEventListener('click', () => {
+			citasTable.classList.add('hidden');
+			pacientesTable.classList.remove('hidden');
+			cargarPacientes();
+		});
+	
+		// Cargar citas por defecto
+		citasButton.click();
+	}
+	
+	async function cargarCitas() {
+    const citasTableBodyDesktop = document.getElementById('citasTableBodyDesktop');
+    const citasTableBodyMobile = document.getElementById('citasTableBodyMobile');
+    
+    function mostrarCarga() {
+      citasTableBodyDesktop.innerHTML = `
+        <tr>
+          <td colspan="6" class="px-6 py-8 text-center">
+            <div class="flex flex-col items-center justify-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+              <p class="text-gray-500 dark:text-gray-400">Cargando citas...</p>
+            </div>
+          </td>
+        </tr>
+      `;
+      
+      citasTableBodyMobile.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+          <div class="flex flex-col items-center justify-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">Cargando citas...</p>
+          </div>
+        </div>
+      `;
+    }
+
+    mostrarCarga();
+
+    try {
+      const userId = localStorage.getItem('userId');
+      const response = await fetch(`${BASE_URL}/citas/todas`);
+      if (!response.ok) throw new Error('Error al cargar citas');
+      
+      const data = await response.json();
+      const citasFiltradas = data
+        .filter(cita => cita.medicoId?._id === userId || cita.medicoId === userId)
+        .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+      if (citasFiltradas.length === 0) {
+        const estadoVacio = `
+          <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+            <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p class="text-lg font-medium mb-1">No hay citas programadas</p>
+            <p class="text-sm">Las citas aparecerán aquí cuando se agenden</p>
+          </div>
+        `;
+        
+        citasTableBodyDesktop.innerHTML = `
+          <tr><td colspan="6" class="px-6 py-8 text-center">${estadoVacio}</td></tr>
+        `;
+        citasTableBodyMobile.innerHTML = `
+          <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">${estadoVacio}</div>
+        `;
+        return;
+      }
+
+      citasTableBodyDesktop.innerHTML = '';
+      citasTableBodyMobile.innerHTML = '';
+
+      citasFiltradas.forEach(cita => {
+        const hora = new Date(cita.fecha).toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        const consultaUrl = `/consulta?id=${cita._id}`;
+        const estadoClasses = {
+          'en_proceso': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+          'completada': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+          'pendiente': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+          'cancelada': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+        };
+
+        const estadoTextos = {
+          'en_proceso': 'En proceso',
+          'completada': 'Completada',
+          'pendiente': 'Pendiente',
+          'cancelada': 'Cancelada'
+        };
+
+        // Vista Desktop
+        const rowDesktop = document.createElement('tr');
+        rowDesktop.className = 'bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-150';
+        rowDesktop.innerHTML = `
+          <td class="px-6 py-4 text-sm whitespace-nowrap">
+            <span class="font-medium">${hora}</span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex flex-col">
+              <span class="font-medium text-gray-900 dark:text-white">
+                ${cita.pacienteId?.nombre || 'No disponible'}
+              </span>
+              ${cita.pacienteId?.dni ? 
+                `<span class="text-xs text-gray-500 dark:text-gray-400">
+                  DNI: ${cita.pacienteId.dni}
+                </span>` : 
+                ''}
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <p class="line-clamp-2">${cita.motivo}</p>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${estadoClasses[cita.estado] || ''}">
+              ${estadoTextos[cita.estado] || cita.estado}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="font-medium">$${cita.monto || 0}</span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            ${cita.estado === 'pendiente' ? `
+              <a href="${consultaUrl}"
+                 class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 dark:focus:ring-green-800 transition-colors">
+                  Atender
+                  <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+              </a>
+            ` : '-'}
+          </td>
+        `;
+        citasTableBodyDesktop.appendChild(rowDesktop);
+
+        // Vista Mobile (Tarjeta)
+        const cardMobile = document.createElement('div');
+        cardMobile.className = 'bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-3';
+        cardMobile.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div class="flex flex-col">
+              <span class="text-lg font-medium text-gray-900 dark:text-white">
+                ${cita.pacienteId?.nombre || 'No disponible'}
+              </span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">
+                ${hora}
+              </span>
+              ${cita.pacienteId?.dni ? 
+                `<span class="text-xs text-gray-500 dark:text-gray-400">
+                  DNI: ${cita.pacienteId.dni}
+                </span>` : 
+                ''}
+            </div>
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${estadoClasses[cita.estado] || ''}">
+              ${estadoTextos[cita.estado] || cita.estado}
+            </span>
+          </div>
+          
+          <div class="space-y-2">
+            <div>
+              <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Motivo:</span>
+              <p class="text-sm text-gray-900 dark:text-white">${cita.motivo}</p>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Monto:</span>
+                <span class="text-sm text-gray-900 dark:text-white">$${cita.monto || 0}</span>
+              </div>
+              ${cita.estado === 'pendiente' ? `
+                <a href="${consultaUrl}"
+                   class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 dark:focus:ring-green-800 transition-colors">
+                    Atender
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </a>
+              ` : ''}
+            </div>
+          </div>
+        `;
+        citasTableBodyMobile.appendChild(cardMobile);
+      });
+
+    } catch (error) {
+      console.error('Error al cargar citas:', error);
+      const mensajeError = `
+        <div class="flex flex-col items-center justify-center text-red-500">
+          <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-lg font-medium mb-1">Error al cargar las citas</p>
+          <p class="text-sm">${error.message}</p>
+        </div>
+      `;
+      
+      citasTableBodyDesktop.innerHTML = `
+        <tr><td colspan="6" class="px-6 py-8 text-center">${mensajeError}</td></tr>
+      `;
+      citasTableBodyMobile.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">${mensajeError}</div>
+      `;
+    }
+  }
+
+	async function cargarPacientes() {
+    const pacientesTableBodyDesktop = document.getElementById('pacientesTableBodyDesktop');
+    const pacientesTableBodyMobile = document.getElementById('pacientesTableBodyMobile');
+    
+    function mostrarCarga() {
+      const loadingContent = `
+        <div class="flex flex-col items-center justify-center">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+          <p class="text-gray-500 dark:text-gray-400 mt-2">Cargando pacientes...</p>
+        </div>
+      `;
+
+      pacientesTableBodyDesktop.innerHTML = `
+        <tr>
+          <td colspan="4" class="px-6 py-8 text-center">
+            ${loadingContent}
+          </td>
+        </tr>
+      `;
+      
+      pacientesTableBodyMobile.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+          ${loadingContent}
+        </div>
+      `;
+    }
+
+    mostrarCarga();
+
+    try {
+      const userId = localStorage.getItem('userId');
+      const citasResponse = await fetch(`${BASE_URL}/citas/todas`);
+      if (!citasResponse.ok) throw new Error('Error al obtener las citas');
+      const citasData = await citasResponse.json();
+      
+      const citasDelMedico = citasData.filter(cita => 
+        cita.medicoId?._id === userId || cita.medicoId === userId
+      );
+
+      const pacientesIds = [...new Set(citasDelMedico.map(cita => {
+        if (typeof cita.pacienteId === 'object' && cita.pacienteId !== null) {
+          return cita.pacienteId.id || cita.pacienteId._id;
+        }
+        return cita.pacienteId;
+      }))].filter(Boolean);
+
+      if (pacientesIds.length === 0) {
+        const emptyState = `
+          <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+            <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <p class="text-lg font-medium mb-1">No hay pacientes registrados</p>
+            <p class="text-sm">Los pacientes aparecerán aquí cuando tengan citas</p>
+          </div>
+        `;
+        
+        pacientesTableBodyDesktop.innerHTML = `
+          <tr><td colspan="4" class="px-6 py-8 text-center">${emptyState}</td></tr>
+        `;
+        pacientesTableBodyMobile.innerHTML = `
+          <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">${emptyState}</div>
+        `;
+        return;
+      }
+
+      pacientesTableBodyDesktop.innerHTML = '';
+      pacientesTableBodyMobile.innerHTML = '';
+
+      const pacientesPromises = pacientesIds.map(id => 
+        fetch(`${BASE_URL}/paciente/findById/${id}`)
+          .then(response => response.ok ? response.json() : null)
+          .then(data => data?.paciente)
+          .catch(error => {
+            console.error(`Error al obtener paciente ${id}:`, error);
+            return null;
+          })
+      );
+
+      const pacientes = (await Promise.all(pacientesPromises))
+        .filter(Boolean)
+        .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+      pacientes.forEach(paciente => {
+        // Vista Desktop
+        const rowDesktop = document.createElement('tr');
+        rowDesktop.className = 'bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-150';
+        rowDesktop.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="font-medium text-gray-900 dark:text-white">
+              ${paciente.nombre || 'No disponible'}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            ${paciente.dni || 'No disponible'}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            ${paciente.telefono ? 
+              `<span>${paciente.areaCode || ''} ${paciente.telefono}</span>` : 
+              'No disponible'
+            }
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            ${paciente.mail ? 
+              `<a href="mailto:${paciente.mail}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                ${paciente.mail}
+              </a>` : 
+              'No disponible'
+            }
+          </td>
+        `;
+        pacientesTableBodyDesktop.appendChild(rowDesktop);
+
+        // Vista Mobile
+        const cardMobile = document.createElement('div');
+        cardMobile.className = 'bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-3';
+        cardMobile.innerHTML = `
+          <div class="flex flex-col space-y-2">
+            <span class="text-lg font-medium text-gray-900 dark:text-white">
+              ${paciente.nombre || 'No disponible'}
+            </span>
+            
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">DNI:</span>
+                <span class="text-gray-900 dark:text-white">
+                  ${paciente.dni || 'No disponible'}
+                </span>
+              </div>
+              
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">Teléfono:</span>
+                <span class="text-gray-900 dark:text-white">
+                  ${paciente.telefono ? 
+                    `${paciente.areaCode || ''} ${paciente.telefono}` : 
+                    'No disponible'
+                  }
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <span class="text-gray-500 dark:text-gray-400">Email:</span>
+              ${paciente.mail ? 
+                `<a href="mailto:${paciente.mail}" class="text-blue-600 dark:text-blue-400 hover:underline ml-1">
+                  ${paciente.mail}
+                </a>` : 
+                '<span class="text-gray-900 dark:text-white ml-1">No disponible</span>'
+              }
+            </div>
+          </div>
+        `;
+        pacientesTableBodyMobile.appendChild(cardMobile);
+      });
+
+    } catch (error) {
+      console.error('Error al cargar pacientes:', error);
+      const mensajeError = `
+        <div class="flex flex-col items-center justify-center text-red-500">
+          <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-lg font-medium mb-1">Error al cargar los pacientes</p>
+          <p class="text-sm">${error.message}</p>
+        </div>
+      `;
+      
+      pacientesTableBodyDesktop.innerHTML = `
+        <tr><td colspan="4" class="px-6 py-8 text-center">${mensajeError}</td></tr>
+      `;
+      pacientesTableBodyMobile.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">${mensajeError}</div>
+      `;
+    }
+  }
+	
+	// Script de diagnóstico
+	setTimeout(() => {
+		console.log('=== Diagnóstico de elementos DOM ===');
+		['userName', 'userEmail', 'userPhone', 'userEspecialidad', 'userMatricula'].forEach(id => {
+			const element = document.getElementById(id);
+			console.log(`${id}:`, element ? 'Existe' : 'No existe');
+			if (element) {
+				console.log(`${id} contenido:`, element.textContent);
+			}
+		});
+	}, 2000);
+</script>
+
+<style is:global>
+  /* Estilos generales */
+  .table-container {
+    @apply overflow-x-auto shadow-md sm:rounded-lg;
+  }
+
+  /* Estilos para las tablas */
+  table {
+    @apply w-full text-sm text-left;
+  }
+
+  /* Estilos para los encabezados de tabla */
+  thead {
+    @apply text-xs uppercase;
+  }
+
+  /* Estilos para las celdas */
+  td, th {
+    @apply px-6 py-4;
+  }
+
+  /* Estilos para las filas al pasar el mouse */
+  tr:hover {
+    @apply transition-colors duration-200;
+  }
+
+  /* Estilos para los botones */
+  button {
+    @apply transition-colors duration-200;
+  }
+
+  /* Estilos para los estados */
+  .estado-badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  /* Estilos para los mensajes de error y estado vacío */
+  .empty-message {
+    @apply text-center py-4 text-gray-500 dark:text-gray-400;
+  }
+
+  .error-message {
+    @apply text-center py-4 text-red-500;
+  }
+
+  /* Estilos para el modo oscuro */
+  .dark .table-container {
+    @apply bg-gray-800 border-gray-700;
+  }
+
+  .dark td {
+    @apply text-gray-400;
+  }
+
+  .dark th {
+    @apply text-gray-400 bg-gray-700;
+  }
+
+  /* Estilos para las notificaciones */
+  .notification {
+    @apply fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white transition-opacity duration-300;
+  }
+
+  .notification.success {
+    @apply bg-green-500;
+  }
+
+  .notification.error {
+    @apply bg-red-500;
+  }
+
+  /* Estilos específicos para móvil */
+  @media (max-width: 768px) {
+    .card-grid {
+      @apply grid grid-cols-1 gap-4;
+    }
+
+    .mobile-card {
+      @apply bg-white dark:bg-gray-800 rounded-lg shadow p-4;
+    }
+  }
+</style>

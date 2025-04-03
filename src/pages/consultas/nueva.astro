@@ -1,0 +1,11 @@
+---
+import LayoutCommon from '../../components/layouts/LayoutCommon.astro';
+import LayoutProtected from '../../components/layouts/LayoutProtected.astro';
+import NuevaConsulta from '../../components/consultas/NuevaConsulta';
+---
+
+<LayoutProtected>
+  <LayoutCommon>
+    <NuevaConsulta client:load />
+  </LayoutCommon>
+</LayoutProtected>

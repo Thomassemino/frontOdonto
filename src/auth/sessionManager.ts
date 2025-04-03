@@ -39,7 +39,7 @@ class SessionManager {
 
   private logout(): void {
     clearUserData();
-    window.location.href = '/login';
+    window.location.href = '/auth/login';
   }
 
   // Método público para destruir la instancia

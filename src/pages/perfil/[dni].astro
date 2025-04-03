@@ -1,0 +1,197 @@
+---
+import LayoutCommon from "../../components/layouts/LayoutCommon.astro";
+import LayoutProtected from "../../components/layouts/LayoutProtected.astro";
+import Atenciones from "../../components/Atenciones.astro";
+import Dental from "../../components/Dental.astro";
+import Prestaciones from "../../components/Prestaciones.astro";
+
+const { dni } = Astro.params;
+---
+
+<LayoutProtected>
+  <LayoutCommon>
+    <div class="min-h-screen bg-gradient-to-r from-slate-100 to-slate-200 p-3 dark:from-slate-900 dark:to-slate-800 sm:p-4 lg:p-8">
+      <div class="mx-auto max-w-7xl">
+        <div class="mb-6 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div class="flex items-center space-x-3">
+            <button id="volverBtn" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+              ← Volver
+            </button>
+            <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100 sm:text-2xl">Perfil del Paciente</h1>
+          </div>
+        </div>
+
+        <div class="grid gap-4 sm:gap-6 lg:grid-cols-2">
+          <div class="rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:p-6">
+            <h2 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">Datos Personales</h2>
+            <div class="space-y-3" id="datosPersonales"></div>
+          </div>
+
+          <div class="rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:p-6">
+            <h2 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">Información de Contacto</h2>
+            <div class="space-y-3" id="infoContacto"></div>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-6 sm:p-6">
+          <h2 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl">Historia Clínica</h2>
+          <div class="space-y-6" id="historiaClinica"></div>
+        </div>
+
+        <div class="mt-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-6 sm:p-6">
+          <Dental dni={dni} />
+        </div>
+
+        <div class="mt-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-6 sm:p-6">
+          <Prestaciones dni={dni} />
+        </div>
+
+        <div class="mt-4 rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 sm:mt-6 sm:p-6">
+          <Atenciones dni={dni} />
+        </div>
+        
+      </div>
+    </div>
+  </LayoutCommon>
+</LayoutProtected>
+
+<script type="module" define:vars={{ dni }}>
+const BASE_URL = "http://179.43.118.101:3001/api";
+
+async function cargarPerfil() {
+  try {
+    const pacienteResponse = await fetch(`${BASE_URL}/paciente/findByDni/${dni}`);
+    if (!pacienteResponse.ok) throw new Error('Paciente no encontrado');
+    
+    const { paciente } = await pacienteResponse.json();
+
+    if (paciente.historiaClinica) {
+      const hcResponse = await fetch(`${BASE_URL}/historiaClinica/getHc/${paciente.historiaClinica}`);
+      if (hcResponse.ok) {
+        const { historiaClinica } = await hcResponse.json();
+        renderizarHistoriaClinica(historiaClinica);
+      }
+    }
+
+    renderizarDatosPersonales(paciente);
+    renderizarInfoContacto(paciente);
+  } catch (error) {
+    mostrarNotificacion(error.message, 'error');
+  }
+}
+
+function renderizarDatosPersonales(paciente) {
+  document.getElementById('datosPersonales').innerHTML = `
+    <div class="grid gap-3">
+      <div>
+        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Nombre Completo</label>
+        <p class="text-gray-900 dark:text-white">${paciente.nombre || 'No especificado'}</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">DNI</label>
+        <p class="text-gray-900 dark:text-white">${paciente.dni || 'No especificado'}</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderizarInfoContacto(paciente) {
+  document.getElementById('infoContacto').innerHTML = `
+    <div class="grid gap-3">
+      <div>
+        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
+        <p class="text-gray-900 dark:text-white">${paciente.mail || 'No especificado'}</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Teléfono</label>
+        <p class="text-gray-900 dark:text-white">${paciente.areaCode || ''} ${paciente.telefono || 'No especificado'}</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderizarHistoriaClinica(hc) {
+  const container = document.getElementById('historiaClinica');
+  if (!hc) {
+    container.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No hay historia clínica disponible</p>';
+    return;
+  }
+  
+  container.innerHTML = `
+    <div class="space-y-6">
+      <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
+        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Historia Clínica</h3>
+        <div class="grid gap-4 sm:grid-cols-2">
+          ${renderizarCampo('Alergias', hc.alergia)}
+          ${renderizarCampo('Padece Enfermedad', hc.padeceEnfermedad)}
+          ${renderizarCampo('Paciente Cardíaco', hc.esPacienteCardiaco ? 'Sí' : 'No')}
+          ${renderizarCampo('Medicación', hc.tomaMedicacion)}
+          ${renderizarCampo('Estado Actual de la Boca', hc.estadoActualBoca)}
+        </div>
+      </section>
+
+      <section class="rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:p-6">
+        <h3 class="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100 sm:text-lg">Anotaciones del Médico</h3>
+        <p class="text-gray-700 dark:text-gray-300">${hc.anotacionesMedico || 'Sin anotaciones'}</p>
+      </section>
+    </div>
+  `;
+}
+
+function renderizarCampo(label, valor) {
+  return `
+    <div class="space-y-1">
+      <label class="text-sm font-medium text-gray-500 dark:text-gray-400">${label}</label>
+      <p class="break-words text-gray-900 dark:text-white">${valor || 'No especificado'}</p>
+    </div>
+  `;
+}
+
+function formatearDolor(dolorStr) {
+  try {
+    if (!dolorStr) return 'No especificado';
+    
+    const dolor = JSON.parse(dolorStr);
+    const parts = [];
+    
+    if (dolor.rango) parts.push(`Intensidad: ${dolor.rango}`);
+    if (dolor.tipo) parts.push(`Tipo: ${dolor.tipo}`);
+    if (dolor.caracteristicas?.length) parts.push(`Características: ${dolor.caracteristicas.join(', ')}`);
+    if (dolor.sensibilidad?.length) parts.push(`Sensibilidad: ${dolor.sensibilidad.join(', ')}`);
+    if (dolor.localizacion) {
+      const localizacion = dolor.localizacion
+        .replace(/([A-Z])/g, ' $1')
+        .toLowerCase()
+        .replace(/^./, str => str.toUpperCase());
+      parts.push(`Localización: ${localizacion}`);
+    }
+    return parts.join('. ') || 'No especificado';
+  } catch {
+    return dolorStr || 'No especificado';
+  }
+}
+
+function mostrarNotificacion(mensaje, tipo = 'success') {
+  const notificacionExistente = document.querySelector('.notification');
+  if (notificacionExistente) notificacionExistente.remove();
+
+  const notificacion = document.createElement('div');
+  notificacion.className = `notification fixed right-4 top-4 z-50 rounded-lg p-4 text-white shadow-lg transition-opacity duration-300 ${
+    tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
+  }`;
+  notificacion.textContent = mensaje;
+  
+  document.body.appendChild(notificacion);
+  setTimeout(() => {
+    notificacion.style.opacity = '0';
+    setTimeout(() => notificacion.remove(), 300);
+  }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  cargarPerfil();
+  document.getElementById('volverBtn')?.addEventListener('click', () => window.history.back());
+});
+
+document.addEventListener('astro:page-load', cargarPerfil);
+</script>

@@ -1,0 +1,19 @@
+---
+import PatientDistributionReact from './PatientDistributionReact';
+
+// Puedes pasar los datos como prop o conseguirlos de donde sea necesario
+const initialData = [
+  { name: 'Grupo A', value: 400 },
+  { name: 'Grupo B', value: 300 },
+  // ... más datos
+];
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+  <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+    Distribución de Pacientes
+  </h3>
+  <div class="w-full h-64">
+    <PatientDistributionReact client:load data={initialData} />
+  </div>
+</div>

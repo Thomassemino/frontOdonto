@@ -1,5 +1,3 @@
-// auth/secureAuth.ts
-import { subtle } from 'crypto';
 import { jwtVerify, SignJWT } from 'jose';
 
 interface UserSession {
@@ -9,9 +7,9 @@ interface UserSession {
 }
 
 export class SecureSessionManager {
-  private readonly SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
+  private readonly SECRET_KEY = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY);
   private readonly SESSION_KEY = 'secure_session';
-  private readonly MAX_SESSION_AGE = 30 * 60 * 1000; // 30 minutos
+  private readonly MAX_SESSION_AGE = 30 * 60 * 1000;
   private inactivityTimer: number | null = null;
   private readonly events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
 
@@ -40,18 +38,18 @@ export class SecureSessionManager {
   }
 
   private async encrypt(data: string): Promise<string> {
-    const key = await subtle.importKey(
+    const key = await window.crypto.subtle.importKey(
       'raw',
-      new TextEncoder().encode(process.env.ENCRYPTION_KEY),
+      new TextEncoder().encode(import.meta.env.ENCRYPTION_KEY),
       { name: 'AES-GCM' },
       false,
       ['encrypt']
     );
 
-    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
     const encoded = new TextEncoder().encode(data);
 
-    const ciphertext = await subtle.encrypt(
+    const ciphertext = await window.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
       key,
       encoded
@@ -65,9 +63,9 @@ export class SecureSessionManager {
   }
 
   private async decrypt(encryptedData: string): Promise<string> {
-    const key = await subtle.importKey(
+    const key = await window.crypto.subtle.importKey(
       'raw',
-      new TextEncoder().encode(process.env.ENCRYPTION_KEY),
+      new TextEncoder().encode(import.meta.env.ENCRYPTION_KEY),
       { name: 'AES-GCM' },
       false,
       ['decrypt']
@@ -80,7 +78,7 @@ export class SecureSessionManager {
     const iv = combined.slice(0, 12);
     const ciphertext = combined.slice(12);
 
-    const decrypted = await subtle.decrypt(
+    const decrypted = await window.crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
       key,
       ciphertext
@@ -171,7 +169,7 @@ export class SecureSessionManager {
   public async logout(): Promise<void> {
     sessionStorage.removeItem(this.SESSION_KEY);
     document.cookie = 'auth_token=; Max-Age=0; Secure; SameSite=Strict; HttpOnly; Path=/';
-    window.location.href = '/login';
+    window.location.href = '/auth/login';
   }
 
   public destroy(): void {

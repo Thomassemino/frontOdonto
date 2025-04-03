@@ -1,0 +1,44 @@
+---
+import StatCard from './StatCard.astro';
+import { Users, Calendar, ClipboardList, TrendingUp } from 'lucide-react';
+---
+
+<StatCard
+  title="Total Pacientes"
+  value="0"
+  icon={Users}
+  trend="up"
+  trendValue="12%"
+  loading={true}
+  id="totalPatientsCard"
+/>
+
+<StatCard
+  title="Citas del Mes"
+  value="0"
+  icon={Calendar}
+  trend="up"
+  trendValue="8%"
+  loading={true}
+  id="monthlyAppointmentsCard"
+/>
+
+<StatCard
+  title="Tratamientos Activos"
+  value="0"
+  icon={ClipboardList}
+  trend="down"
+  trendValue="3%"
+  loading={true}
+  id="activeTreatmentsCard"
+/>
+
+<StatCard
+  title="Ingresos del Mes"
+  value="$0"
+  icon={TrendingUp}
+  trend="up"
+  trendValue="24%"
+  loading={true}
+  id="monthlyIncomeCard"
+/>

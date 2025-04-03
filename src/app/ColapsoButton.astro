@@ -1,0 +1,81 @@
+---
+interface Props {
+  title: string;
+  titleClass?: string;
+  containerClass?: string;
+  defaultExpanded?: boolean;
+}
+
+const {
+  title,
+  titleClass = "text-lg font-semibold text-slate-800 dark:text-slate-100 sm:text-xl",
+  containerClass = "space-y-6",
+  defaultExpanded = false, // Cambiado a false por defecto
+} = Astro.props;
+---
+
+<div class={containerClass}>
+  <div class="flex items-center justify-between">
+    <h2 class={titleClass}>
+      {title}
+    </h2>
+    <div class="flex items-center gap-4">
+      <slot name="actions" />
+      <button
+        id="toggleButton"
+        class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-transform duration-200"
+        aria-label="Toggle content"
+      >
+        <svg 
+          id="toggleIcon"
+          class="w-6 h-6 transform transition-transform duration-200" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+          style={`transform: rotate(${defaultExpanded ? '0' : '180'}deg)`}
+        >
+          <path 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            stroke-width="2" 
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div 
+    id="collapsibleContent" 
+    class:list={[
+      "space-y-6 transition-[max-height,opacity] duration-300 overflow-hidden", 
+      { "max-h-0 opacity-0": !defaultExpanded }
+    ]}
+  >
+    <slot />
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleButton = document.getElementById('toggleButton');
+  const content = document.getElementById('collapsibleContent');
+  const icon = document.getElementById('toggleIcon');
+  
+  if (toggleButton && content && icon) {
+    toggleButton.addEventListener('click', () => {
+      const isExpanded = !content.classList.contains('max-h-0');
+      
+      if (isExpanded) {
+        // Colapsar
+        content.classList.add('max-h-0', 'opacity-0');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        // Expandir
+        content.classList.remove('max-h-0', 'opacity-0');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    });
+  }
+});
+</script>
